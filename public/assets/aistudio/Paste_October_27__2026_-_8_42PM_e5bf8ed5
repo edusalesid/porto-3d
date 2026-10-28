@@ -1,0 +1,1008 @@
+# PRODUCT REQUIREMENTS DOCUMENT (PRD)
+# RIZAL OS — Virtual Office Portfolio
+
+**Versi:** 1.0  
+**Tanggal:** 27 Oktober 2026  
+**Status:** Draft untuk pengembangan MVP  
+**Product Type:** Interactive 3D Personal Portfolio  
+**Platform:** Web Desktop dan Mobile  
+**Target Implementasi:** Next.js, React Three Fiber, Three.js
+
+---
+
+## 1. Executive Summary
+
+Rizal OS adalah website portfolio interaktif yang memperkenalkan pemiliknya sebagai Project Manager yang bekerja di persimpangan project execution, product development, software systems, dan AI-enabled workflows.
+
+Alih-alih menggunakan pola portfolio konvensional berupa halaman About, Projects, Skills, dan Experience, Rizal OS menggunakan metafora **virtual office**. Pengunjung menjelajahi lingkungan kantor 3D untuk menemukan project, sistem kerja, pengalaman profesional, studi kasus, dan informasi kontak.
+
+Virtual office berfungsi sebagai antarmuka navigasi. Setiap ruangan memiliki tujuan yang jelas dan terhubung dengan informasi portfolio yang nyata.
+
+Prinsip utama produk:
+
+> Explore the work. Understand the thinking. See the impact.
+
+Produk harus menggabungkan pengalaman visual yang memorable dengan kejelasan informasi profesional. Interaksi 3D tidak boleh menghalangi recruiter atau calon klien untuk memahami kemampuan pemilik portfolio dengan cepat.
+
+## 2. Product Vision
+
+Membangun portfolio Project Manager yang menunjukkan bukan hanya apa yang pernah dikerjakan, tetapi juga bagaimana pemilik portfolio mengidentifikasi masalah, membuat keputusan, mengatur eksekusi, berkolaborasi, dan mengevaluasi hasil.
+
+### 2.1 Value Proposition
+
+- **Untuk recruiter:** memahami kompetensi dan bukti pengalaman kandidat secara cepat.
+- **Untuk hiring manager:** menilai cara berpikir, proses pengambilan keputusan, dan kemampuan eksekusi project.
+- **Untuk calon klien:** memahami layanan, pendekatan kerja, dan contoh solusi yang relevan.
+- **Untuk sesama profesional teknologi:** menjelajahi portfolio dengan pengalaman visual yang berbeda dari website konvensional.
+
+### 2.2 Positioning
+
+Rizal OS bukan game, bukan dashboard operasional perusahaan, dan bukan simulasi kantor yang membutuhkan eksplorasi panjang.
+
+Rizal OS adalah **professional portfolio with a spatial interface**.
+
+Visual 3D berfungsi sebagai navigasi dan storytelling, sementara substansi produk tetap berasal dari project, bukti kontribusi, dokumentasi, dan hasil kerja yang dapat diverifikasi.
+
+## 3. Problem Statement
+
+Portfolio konvensional sering menyajikan project sebagai daftar thumbnail dan deskripsi singkat. Format ini dapat menyulitkan pemilik portfolio untuk memperlihatkan hubungan antara strategi, perencanaan, eksekusi, sistem kerja, dan hasil.
+
+Di sisi lain, website 3D yang terlalu fokus pada visual berisiko membuat pengunjung kebingungan, lambat dimuat, atau gagal menemukan informasi yang dicari.
+
+Rizal OS harus menyelesaikan dua masalah sekaligus:
+
+1. Membuat pengalaman portfolio yang unik dan mudah diingat.
+2. Menyajikan bukti kompetensi Project Manager dengan cepat, terstruktur, dan kredibel.
+
+## 4. Product Goals dan Non-Goals
+
+### 4.1 Product Goals
+
+1. Membangun pengalaman portfolio 3D yang dapat dijelajahi melalui ruangan virtual.
+2. Menampilkan project pilihan dalam format case study yang terstruktur.
+3. Menunjukkan kemampuan project management, product thinking, systems thinking, dan kolaborasi teknologi.
+4. Menyediakan navigasi alternatif yang tidak bergantung pada scene 3D.
+5. Menjamin website tetap usable pada perangkat mobile dan perangkat dengan performa terbatas.
+6. Memungkinkan penambahan project baru tanpa harus membangun ulang scene dari awal.
+7. Memastikan seluruh klaim pengalaman dan dampak memiliki dasar yang dapat diverifikasi.
+
+### 4.2 Non-Goals untuk MVP
+
+MVP tidak mencakup:
+
+- Game dengan karakter, inventory, quest, atau sistem level.
+- Multiplayer atau ruang virtual bersama.
+- Simulasi kantor dengan NPC yang memiliki perilaku kompleks.
+- Login pengunjung atau sistem akun pengguna.
+- Dashboard operasional yang terhubung ke data perusahaan secara real-time.
+- CMS custom yang kompleks.
+- AI chatbot sebagai fitur wajib.
+- Pengukuran dampak bisnis otomatis.
+- Modeling arsitektur 3D fotorealistis dari nol.
+
+## 5. Target Users
+
+### Persona A — Recruiter
+
+**Tujuan:** menilai kecocokan kandidat untuk posisi Project Manager, Technical Project Manager, atau Product/Project role yang relevan.
+
+**Kebutuhan:**
+- Memahami identitas profesional pemilik portfolio.
+- Menemukan project yang paling relevan dengan posisi.
+- Melihat peran, tanggung jawab, keputusan, dan hasil.
+- Mengakses CV serta informasi kontak.
+
+**Risiko UX:** recruiter meninggalkan website jika perlu menghabiskan terlalu banyak waktu untuk memahami navigasinya.
+
+### Persona B — Hiring Manager atau Head of Product
+
+**Tujuan:** mengevaluasi kualitas pemikiran dan kemampuan eksekusi.
+
+**Kebutuhan:**
+- Memahami problem statement dan constraints.
+- Melihat scope, prioritas, proses kerja, dan trade-off.
+- Mengetahui cara menangani risiko, dependensi, dan perubahan.
+- Menilai kontribusi pemilik portfolio secara individual.
+
+### Persona C — Calon Klien
+
+**Tujuan:** mencari seseorang yang mampu mengoordinasikan pengembangan produk atau project teknologi.
+
+**Kebutuhan:**
+- Melihat contoh project yang relevan.
+- Memahami proses kolaborasi.
+- Mengetahui bentuk layanan atau kontribusi yang ditawarkan.
+- Menemukan cara menghubungi pemilik portfolio.
+
+### Persona D — Pengunjung di Perangkat Mobile
+
+**Tujuan:** melihat portfolio melalui ponsel tanpa harus mengoperasikan kontrol 3D yang rumit.
+
+**Kebutuhan:**
+- Navigasi sederhana.
+- Informasi tetap terbaca.
+- Interaksi yang tidak membutuhkan mouse.
+- Alternatif tampilan ketika performa perangkat terbatas.
+
+## 6. Information Architecture
+
+Struktur utama Rizal OS:
+
+```text
+RIZAL OS
+│
+├── HOME / VIRTUAL LOBBY
+│   ├── Professional introduction
+│   ├── Key strengths
+│   └── Explore office
+│
+├── PROJECT ROOM
+│   ├── Project directory
+│   ├── Project filters
+│   └── Project detail / case study
+│
+├── SYSTEMS LAB
+│   ├── Tools and workflow
+│   ├── Technical collaboration
+│   └── System and process examples
+│
+├── EXPERIENCE GALLERY
+│   ├── Professional timeline
+│   ├── Roles and responsibilities
+│   └── Selected contributions
+│
+├── CASE ARCHIVE
+│   ├── Problem statements
+│   ├── Decisions and trade-offs
+│   ├── Execution approach
+│   └── Results and lessons
+│
+└── CONTACT LOUNGE
+    ├── Contact information
+    ├── LinkedIn
+    ├── Email
+    └── Download CV
+```
+
+Semua bagian penting juga harus tersedia melalui navigasi HTML biasa. Pengunjung tidak boleh diwajibkan menemukan ruangan tertentu untuk mengakses informasi dasar.
+
+## 7. User Experience Concept
+
+### 7.1 Visual Direction
+
+Arah visual adalah **stylized isometric office with a futuristic product-studio atmosphere**.
+
+Karakter visual:
+
+- Geometri ruangan yang bersih dan mudah dikenali.
+- Warna dasar navy, slate, dan charcoal.
+- Aksen cyan atau electric blue untuk objek interaktif.
+- Warm lighting pada area tertentu agar scene tidak terasa steril.
+- Kaca, emissive panels, holographic elements, dan floating labels digunakan secukupnya.
+- UI overlay menggunakan dark glass panels dengan kontras teks tinggi.
+- Tipografi modern dan sederhana.
+
+Visual tidak harus fotorealistis. Konsistensi art direction, keterbacaan, dan performa lebih penting.
+
+### 7.2 Layout Utama
+
+**Header kiri:**
+- Logo teks RIZAL OS.
+- Label profesional.
+- Status atau deskripsi singkat.
+
+**Navigasi kanan:**
+- Home
+- Projects
+- Systems
+- Experience
+- Cases
+- Contact
+
+**Area utama:**
+- Scene 3D virtual office.
+- Ruangan yang bisa dipilih.
+- Label ruangan.
+- Hotspot interaktif.
+
+**Panel informasi:**
+- Nama ruangan.
+- Ringkasan konten.
+- Status atau kategori jika relevan.
+- CTA untuk membuka detail.
+
+**Footer atau petunjuk navigasi:**
+- Instruksi orbit dan zoom untuk desktop.
+- Tombol navigasi eksplisit.
+- Pilihan membuka versi list-based.
+
+### 7.3 Prinsip Pengalaman
+
+1. Informasi profesional utama harus terlihat tanpa eksplorasi.
+2. Satu kali klik sudah cukup untuk membuka bagian penting.
+3. Navigasi tidak boleh bergantung hanya pada hover.
+4. Kamera tidak boleh bergerak terlalu cepat atau membuat pengunjung kehilangan orientasi.
+5. Setiap ruangan harus memiliki tujuan yang jelas.
+6. Animasi harus dapat dilewati atau dikurangi.
+7. Pengunjung harus selalu bisa kembali ke lobby atau navigasi utama.
+
+## 8. Scene dan Room Specification
+
+### 8.1 Virtual Lobby
+
+**Tujuan:** menjadi titik awal dan pusat orientasi pengunjung.
+
+**Objek visual:**
+- Area lobby.
+- Holographic globe atau central installation.
+- Signage RIZAL OS.
+- Pintu atau jalur menuju room lain.
+- Ringkasan identitas profesional.
+
+**Konten:**
+- Nama dan role profesional.
+- Ringkasan positioning.
+- Tautan CV.
+- CTA eksplorasi portfolio.
+
+**Interaksi:**
+- Klik Projects untuk menuju Project Room.
+- Klik Systems untuk menuju Systems Lab.
+- Klik Experience untuk menuju Experience Gallery.
+- Klik Cases untuk menuju Case Archive.
+- Klik Contact untuk membuka Contact Lounge.
+
+**Acceptance criteria:**
+- Lobby bisa diakses dari setiap halaman.
+- Pengunjung baru dapat memahami cara menavigasi scene tanpa tutorial panjang.
+- Informasi identitas profesional dapat dibaca tanpa zoom.
+
+### 8.2 Project Room
+
+**Tujuan:** menampilkan proyek-proyek pilihan sebagai bukti kompetensi.
+
+**Objek visual:**
+- Meja kerja.
+- Monitor.
+- Project wall.
+- Kartu project atau layar display yang dapat dipilih.
+
+**Informasi pada project card:**
+- Nama project.
+- Kategori.
+- Peran pemilik portfolio.
+- Periode pengerjaan jika relevan.
+- Status publikasi yang akurat.
+- Satu kalimat mengenai problem atau tujuan.
+- CTA View Case Study.
+
+**Fitur:**
+- Filter berdasarkan kategori.
+- Sorting berdasarkan relevansi atau urutan manual.
+- Klik kartu untuk membuka detail.
+- Tombol kembali ke direktori project.
+
+Kategori awal dapat mencakup Product/SaaS, AI, Software Systems, Marketing Operations, dan Educational Projects. Kategori harus dapat dikonfigurasi berdasarkan isi portfolio yang telah diverifikasi.
+
+**Acceptance criteria:**
+- Setiap project memiliki halaman detail atau panel detail.
+- Project card tidak menyatakan metrik dampak yang belum diverifikasi.
+- Pengunjung dapat mengakses semua project melalui navigasi biasa.
+
+### 8.3 Systems Lab
+
+**Tujuan:** memperlihatkan pendekatan pemilik portfolio terhadap sistem, tools, workflow, dan kolaborasi teknis.
+
+**Objek visual:**
+- Workstation.
+- Diagram workflow.
+- Monitor berisi system map.
+- Floating cards untuk proses atau tools.
+
+**Konten:**
+- Project planning approach.
+- Workflow dan dokumentasi.
+- Dependency management.
+- Risk tracking.
+- Tools yang benar-benar digunakan.
+- Contoh kolaborasi dengan developer, designer, marketer, atau stakeholder.
+
+**Batasan:** daftar tools bukan pengganti bukti kemampuan. Setiap tool atau proses yang ditampilkan sebaiknya dikaitkan dengan contoh penerapannya.
+
+### 8.4 Experience Gallery
+
+**Tujuan:** menyajikan pengalaman profesional secara kronologis dan mudah dipindai.
+
+**Objek visual:**
+- Timeline wall.
+- Panel periode pengalaman.
+- Kartu role atau engagement.
+
+**Konten:**
+- Organisasi atau project.
+- Posisi dan tanggung jawab.
+- Periode.
+- Scope pekerjaan.
+- Kontribusi yang dapat dibuktikan.
+- Link ke case study terkait bila tersedia.
+
+**Acceptance criteria:**
+- Informasi kronologis mudah dipahami.
+- Periode dan gelar tidak boleh dibuat-buat.
+- Pengalaman yang belum dipublikasikan secara lengkap dapat disajikan dengan deskripsi terbatas.
+
+### 8.5 Case Archive
+
+**Tujuan:** menjadi pusat studi kasus mendalam.
+
+Setiap case study menggunakan struktur berikut:
+
+1. **Overview** — apa project-nya.
+2. **Context** — latar belakang dan kondisi awal.
+3. **Problem** — masalah utama yang harus diselesaikan.
+4. **Objectives** — tujuan project dan definisi keberhasilan.
+5. **Constraints** — keterbatasan waktu, biaya, tim, teknologi, atau data.
+6. **Role** — tanggung jawab individual.
+7. **Team and Stakeholders** — pihak yang terlibat.
+8. **Approach** — metodologi dan proses kerja.
+9. **Key Decisions** — keputusan serta alasan di baliknya.
+10. **Execution** — milestone, prioritas, dan koordinasi.
+11. **Risks and Trade-offs** — risiko, respons, dan kompromi.
+12. **Outcome** — hasil yang telah diverifikasi.
+13. **Lessons Learned** — evaluasi dan perbaikan.
+14. **Evidence** — screenshot, diagram, dokumentasi, atau demo publik.
+
+Jika hasil kuantitatif tidak tersedia, gunakan hasil kualitatif yang dapat dibuktikan. Jangan membuat angka untuk memenuhi struktur studi kasus.
+
+### 8.6 Contact Lounge
+
+**Tujuan:** mengubah ketertarikan menjadi komunikasi.
+
+**Konten:**
+- Email.
+- LinkedIn.
+- CV.
+- Ringkasan area kontribusi profesional.
+
+**Interaksi:**
+- Tombol membuka email.
+- Tombol membuka LinkedIn.
+- Tombol mengunduh CV.
+- Feedback ketika link eksternal dibuka bila relevan.
+
+Semua tautan harus menggunakan alamat aktual yang dikonfirmasi sebelum peluncuran.
+
+## 9. User Flow
+
+### Flow A — Recruiter
+
+```text
+Open website
+    ↓
+Read professional introduction
+    ↓
+Select Projects
+    ↓
+Choose relevant project
+    ↓
+Read case study
+    ↓
+Review role, decisions, and evidence
+    ↓
+Download CV / Contact
+```
+
+### Flow B — Pengunjung yang ingin bereksplorasi
+
+```text
+Open website
+    ↓
+Explore Lobby
+    ↓
+Select room from 3D scene
+    ↓
+Camera transitions to room
+    ↓
+Open room panel
+    ↓
+Explore its content
+    ↓
+Return to Lobby or select another room
+```
+
+### Flow C — Pengguna Mobile
+
+```text
+Open website
+    ↓
+Load mobile-friendly scene or 2.5D mode
+    ↓
+Use visible navigation
+    ↓
+Open room content
+    ↓
+Read project details in responsive layout
+```
+
+### Flow D — WebGL Tidak Tersedia
+
+```text
+Open website
+    ↓
+WebGL unavailable or scene initialization fails
+    ↓
+Show accessible portfolio interface
+    ↓
+Open projects, experience, case studies, and contact normally
+```
+
+## 10. Functional Requirements
+
+Prioritas fitur:
+
+- **P0:** wajib untuk MVP.
+- **P1:** penting untuk pengalaman yang lebih baik.
+- **P2:** enhancement setelah MVP stabil.
+
+| ID | Requirement | Prioritas |
+|---|---|---|
+| FR-01 | Website menampilkan identitas dan positioning profesional. | P0 |
+| FR-02 | Scene 3D virtual office dapat dimuat pada browser yang didukung. | P0 |
+| FR-03 | Navigasi HTML untuk setiap bagian utama tersedia. | P0 |
+| FR-04 | Pengunjung dapat memilih room dari navigasi. | P0 |
+| FR-05 | Kamera berpindah ke room yang dipilih dengan transisi yang halus. | P0 |
+| FR-06 | Setiap room memiliki ringkasan dan konten yang relevan. | P0 |
+| FR-07 | Project directory menampilkan project cards. | P0 |
+| FR-08 | Project card dapat membuka case study. | P0 |
+| FR-09 | Case study memiliki struktur konten yang konsisten. | P0 |
+| FR-10 | Contact dan download CV memiliki tautan yang berfungsi. | P0 |
+| FR-11 | Website memiliki fallback jika WebGL atau Three.js gagal dimuat. | P0 |
+| FR-12 | Loading state memiliki batas waktu dan pesan error yang jelas. | P0 |
+| FR-13 | Scene mendukung orbit dan zoom pada desktop. | P1 |
+| FR-14 | Room memiliki hotspot yang dapat dipilih. | P1 |
+| FR-15 | Project dapat difilter berdasarkan kategori. | P1 |
+| FR-16 | Pengunjung dapat mengurangi gerakan animasi. | P1 |
+| FR-17 | Scene mobile memiliki simplifikasi detail dan efek. | P1 |
+| FR-18 | Sistem mencatat event analytics utama dengan persetujuan dan konfigurasi privasi yang sesuai. | P1 |
+| FR-19 | Pengelolaan konten project menggunakan data terstruktur. | P1 |
+| FR-20 | Room menggunakan asset GLB kustom atau asset library yang sesuai. | P2 |
+| FR-21 | Objek dekoratif memiliki animasi tambahan. | P2 |
+| FR-22 | UI menyediakan fitur pencarian project. | P2 |
+
+## 11. Technical Architecture
+
+### 11.1 Recommended Stack
+
+**Frontend**
+- Next.js dengan App Router.
+- React.
+- TypeScript.
+- Tailwind CSS.
+
+**3D Layer**
+- Three.js.
+- React Three Fiber.
+- Drei.
+- GLTF/GLB untuk asset tambahan bila diperlukan.
+
+**Animation**
+- React Three Fiber untuk transformasi objek dan animasi scene.
+- GSAP atau mekanisme animasi berbasis React untuk camera transition jika dibutuhkan.
+- Framer Motion untuk animasi UI HTML, bukan untuk mengendalikan seluruh scene 3D.
+
+**Content**
+- Data project berbasis TypeScript/JSON untuk MVP.
+- CMS dapat dipertimbangkan setelah frekuensi perubahan konten meningkat.
+
+**Deployment**
+- Build website melalui pipeline frontend standar.
+- Deploy ke platform hosting yang mendukung Next.js.
+- Gunakan HTTPS.
+- Asset dapat disajikan dari public directory atau object storage/CDN sesuai kebutuhan.
+
+### 11.2 Component Architecture
+
+```text
+src/
+├── app/
+│   ├── page.tsx
+│   ├── projects/
+│   │   └── [slug]/
+│   │       └── page.tsx
+│   ├── experience/
+│   │   └── page.tsx
+│   ├── systems/
+│   │   └── page.tsx
+│   └── cases/
+│       └── [slug]/
+│           └── page.tsx
+│
+├── components/
+│   ├── navigation/
+│   ├── overlays/
+│   ├── project-cards/
+│   ├── case-study/
+│   └── ui/
+│
+├── three/
+│   ├── OfficeCanvas.tsx
+│   ├── OfficeScene.tsx
+│   ├── Lobby.tsx
+│   ├── ProjectRoom.tsx
+│   ├── SystemsLab.tsx
+│   ├── ExperienceGallery.tsx
+│   ├── CaseArchive.tsx
+│   ├── ContactLounge.tsx
+│   ├── CameraController.tsx
+│   ├── RoomHotspots.tsx
+│   └── materials/
+│
+├── data/
+│   ├── projects.ts
+│   ├── experience.ts
+│   └── case-studies.ts
+│
+└── lib/
+    ├── analytics.ts
+    └── capabilities.ts
+```
+
+Arsitektur final dapat disederhanakan selama batas antara scene 3D, UI HTML, dan konten tetap jelas.
+
+### 11.3 Render Strategy
+
+- Scene 3D dimuat melalui client component karena bergantung pada WebGL.
+- Konten teks inti dirender sebagai HTML semantik.
+- Navigasi dan case study tidak boleh bergantung pada keberhasilan scene 3D.
+- Scene 3D dapat dimuat secara dinamis untuk mengurangi beban awal.
+- Halaman case study harus tetap bisa diakses melalui URL langsung.
+- Jika scene gagal dimuat, UI harus beralih ke portfolio list-based.
+
+### 11.4 Hindari Single-File Production Architecture
+
+Prototype satu file HTML berguna untuk membuktikan konsep, tetapi bukan struktur ideal untuk produk final.
+
+Pemisahan component, content data, scene, dan UI membantu debugging serta mencegah seluruh website gagal ketika satu modul 3D mengalami error.
+
+Untuk mengurangi risiko pemuatan library:
+- Kunci versi dependency.
+- Gunakan build pipeline standar.
+- Tes production build, bukan hanya dev server.
+- Tambahkan error boundary.
+- Hindari ketergantungan pada runtime import yang tidak tervalidasi.
+- Tampilkan fallback ketika library atau WebGL tidak tersedia.
+
+## 12. Asset Strategy
+
+### 12.1 MVP: Procedural Geometry
+
+Ruangan awal dapat dibuat menggunakan primitive geometry Three.js:
+
+- Plane atau box untuk lantai dan dinding.
+- Box untuk meja, rak, monitor, dan panel.
+- Cylinder dan sphere untuk dekorasi.
+- Light dan emissive materials untuk penekanan visual.
+- Sprite atau HTML overlay untuk label.
+
+Keuntungannya adalah ukuran asset lebih kecil, implementasi cepat, dan seluruh proporsi mudah disesuaikan.
+
+### 12.2 Phase 2: 3D Assets
+
+Asset GLB dapat digunakan untuk mengganti objek yang terlalu sederhana, misalnya:
+- Kursi.
+- Sofa.
+- Tanaman.
+- Lampu.
+- Perabot tertentu.
+- Elemen dekorasi unik.
+
+Setiap asset harus diperiksa dari sisi lisensi, poly count, ukuran file, material, dan performa.
+
+### 12.3 Asset Quality Gate
+
+Sebuah asset baru dapat masuk production bila:
+- Memiliki hak penggunaan yang jelas.
+- Ukurannya sesuai target performa.
+- Tidak memiliki material atau tekstur yang tidak diperlukan.
+- Tetap terlihat baik dengan lighting scene.
+- Memiliki skala dan orientasi yang benar.
+- Tidak merusak frame rate secara signifikan.
+
+### 12.4 Custom Asset Priority
+
+Asset custom paling penting bukan seluruh furnitur, melainkan elemen yang membentuk identitas brand:
+- Logo dan signage RIZAL OS.
+- Project boards.
+- Case-study displays.
+- Diagram visual yang merepresentasikan cara kerja.
+- Thumbnail atau artefak project yang memang boleh dipublikasikan.
+
+## 13. Content Requirements
+
+### 13.1 Data Model Project
+
+Setiap project minimal memiliki:
+
+```ts
+type PortfolioProject = {
+  slug: string;
+  title: string;
+  category: string[];
+  summary: string;
+  role: string;
+  period?: string;
+  projectStatus?: string;
+  problem: string;
+  objectives: string[];
+  responsibilities: string[];
+  approach: string[];
+  keyDecisions: string[];
+  outcomes: string[];
+  lessonsLearned?: string[];
+  evidence?: {
+    type: "image" | "diagram" | "link" | "document";
+    title: string;
+    url: string;
+    alt?: string;
+  }[];
+  technologies?: string[];
+  publicUrl?: string;
+};
+```
+
+Optional fields hanya ditampilkan jika tersedia dan layak dipublikasikan. Jenis projectStatus harus menunjukkan status portfolio atau status project yang sebenarnya, bukan status rekaan.
+
+### 13.2 Bukti Hasil
+
+Gunakan urutan prioritas berikut:
+1. Hasil kuantitatif yang dapat dibuktikan.
+2. Bukti artefak atau dokumentasi.
+3. Hasil kualitatif yang dapat dijelaskan dengan spesifik.
+4. Pembelajaran dan keputusan yang diambil.
+
+Hindari klaim generik seperti “meningkatkan efisiensi secara signifikan” tanpa bukti atau penjelasan.
+
+### 13.3 Candidate Project List
+
+Daftar awal dapat dievaluasi dari project yang relevan dengan product management, software, AI, marketing operations, dan edukasi. Contoh kandidat meliputi mFood POS, Employr, DIAMOND KMS, Triagro, dan Prompt Battle.
+
+Daftar tersebut hanyalah kandidat untuk seleksi editorial, bukan pernyataan bahwa semua project siap dipublikasikan. Pemilik portfolio harus memverifikasi peran, status, kontribusi, bukti hasil, dan batasan kerahasiaan sebelum memasukannya ke production.
+
+## 14. Non-Functional Requirements
+
+### 14.1 Performance
+
+Target awal yang perlu diverifikasi melalui pengujian nyata:
+
+- Konten HTML inti dapat muncul sebelum seluruh scene 3D selesai dimuat.
+- Target interaksi scene pada desktop: sekitar 60 FPS pada perangkat yang memadai.
+- Target minimum mobile: sekitar 30 FPS untuk scene yang telah disederhanakan.
+- Scene menghindari shadow map berlebihan dan material terlalu kompleks.
+- Texture dan asset menggunakan ukuran yang proporsional.
+- Hindari memuat seluruh halaman project ke dalam scene sekaligus.
+- Performa diuji pada perangkat kelas menengah, bukan hanya komputer developer.
+
+### 14.2 Reliability
+
+- Kesalahan pemuatan scene tidak boleh membuat seluruh website tidak dapat digunakan.
+- Loading indicator tidak boleh tampil selamanya.
+- Jika terjadi error, pengunjung menerima pesan yang mudah dipahami dan dapat melanjutkan ke versi non-3D.
+- Setiap tombol harus memiliki hasil yang jelas.
+- URL detail dapat dibuka langsung dan dapat di-refresh.
+
+### 14.3 Accessibility
+
+- Navigasi utama menggunakan elemen HTML yang dapat difokuskan keyboard.
+- Tombol memiliki label yang jelas.
+- Teks memiliki kontras yang memadai.
+- Informasi utama tidak hanya tersedia sebagai tekstur di dalam scene.
+- Gerakan kamera dan animasi diminimalkan jika pengguna meminta reduced motion.
+- Konten memiliki hierarki heading yang benar.
+- Gambar memiliki alternative text sesuai konteks.
+- Interaksi penting memiliki alternatif selain hover atau drag.
+
+### 14.4 Responsive Design
+
+**Desktop**
+- Scene 3D penuh.
+- Orbit dan zoom.
+- Navigasi horizontal.
+- Panel informasi di sisi layar.
+
+**Tablet**
+- Kamera dengan batas orbit yang lebih ketat.
+- Jumlah efek dan objek dekoratif dikurangi.
+- UI tetap dapat digunakan dengan sentuhan.
+
+**Mobile**
+- Navigasi berbasis tombol.
+- Scene 2.5D atau kamera terkunci bila diperlukan.
+- Panel konten mengambil lebar layar yang lebih besar.
+- Tidak mengharuskan pengguna mengorbit scene untuk menemukan informasi.
+- Beralih ke mode list-based jika deteksi kemampuan perangkat menunjukkan scene tidak layak digunakan.
+
+### 14.5 SEO
+
+- Halaman project dan case study menggunakan URL yang stabil.
+- Title dan meta description relevan.
+- Konten utama berupa HTML, bukan hanya teks yang dirender dalam canvas.
+- Gunakan Open Graph metadata.
+- Sitemap dan robots configuration disiapkan ketika website dipublikasikan.
+- Hindari menjadikan nama ruangan 3D sebagai satu-satunya cara mesin pencari menemukan konten.
+
+### 14.6 Security and Privacy
+
+- Jangan menyimpan kredensial atau secret di frontend.
+- Gunakan link eksternal yang telah diverifikasi.
+- Jangan mengekspos data internal perusahaan atau informasi pribadi pihak lain.
+- Gunakan analytics hanya jika dibutuhkan dan konfigurasi privasinya sesuai.
+- Seluruh bukti project harus melalui review publikasi sebelum dipasang.
+
+## 15. Loading, Error Handling, dan Fallback
+
+Bagian ini bersifat prioritas karena prototype awal sempat mengalami masalah pemuatan.
+
+### 15.1 Loading State
+
+Urutan yang diharapkan:
+
+1. HTML dan navigasi dasar tampil.
+2. Intro singkat dapat dibaca.
+3. Scene 3D mulai dimuat.
+4. Loading indicator menunjukkan status yang masuk akal.
+5. Scene siap digunakan.
+6. Loading indicator menghilang.
+
+Jika proses gagal melewati batas waktu yang ditentukan, tampilkan pilihan untuk membuka mode portfolio biasa.
+
+### 15.2 Error States
+
+Kasus yang harus ditangani:
+- WebGL tidak tersedia.
+- Three.js gagal dimuat.
+- Kegagalan jaringan ke CDN.
+- Shader atau texture gagal diproses.
+- Asset GLB gagal dimuat.
+- Browser tidak memiliki kemampuan grafis yang memadai.
+- Unhandled error saat transisi kamera.
+
+### 15.3 Error UI
+
+Pesan harus spesifik dan tidak menyalahkan pengguna.
+
+Contoh:
+
+**“3D workspace could not be loaded.”**
+
+“Portfolio tetap bisa dijelajahi dalam mode sederhana.”
+
+CTA:
+- Open Portfolio
+- Retry 3D
+
+Error harus dicatat pada mekanisme monitoring jika tersedia, tanpa mengirim data pribadi yang tidak diperlukan.
+
+## 16. Analytics and Success Metrics
+
+### 16.1 North Star Metric
+
+**Qualified portfolio engagement:** jumlah sesi pengunjung yang membuka setidaknya satu project detail atau case study.
+
+Metric ini lebih relevan daripada sekadar jumlah klik pada objek 3D.
+
+### 16.2 Key Events
+
+- `portfolio_view`
+- `scene_ready`
+- `fallback_activated`
+- `room_selected`
+- `project_opened`
+- `case_study_viewed`
+- `cv_downloaded`
+- `contact_clicked`
+- `external_link_opened`
+
+Event harus menggunakan parameter yang minimal dan tidak memasukkan data pribadi tanpa kebutuhan.
+
+### 16.3 KPI Evaluasi Awal
+
+Target berikut adalah sasaran awal untuk divalidasi, bukan hasil yang sudah tercapai:
+
+- Mayoritas sesi yang dapat menggunakan WebGL berhasil menampilkan scene.
+- Seluruh informasi inti dapat diakses ketika scene gagal.
+- Pengunjung dapat menemukan project detail dalam beberapa interaksi.
+- Tidak ada tautan utama yang rusak.
+- Tidak ada room yang hanya berupa dekorasi tanpa fungsi.
+- Pengunjung yang relevan dapat menemukan CV atau kontak secara mudah.
+
+Setelah website dipublikasikan, target dapat disesuaikan berdasarkan analytics dan pengujian pengguna.
+
+## 17. MVP Scope
+
+### P0 — Launch Blockers
+
+- Virtual office sederhana dengan lima atau enam area.
+- Navigasi HTML yang berfungsi.
+- Lobby dan identitas profesional.
+- Project directory.
+- Minimal beberapa case study yang sudah terverifikasi.
+- Experience timeline.
+- Systems overview.
+- Contact links.
+- Responsive layout.
+- Loading, error handling, dan fallback.
+- Production build yang berhasil.
+- Pengujian browser dan perangkat.
+
+### P1 — Improvement
+
+- Hotspot lebih halus.
+- Animasi kamera yang lebih sinematik.
+- Filter project.
+- Reduced motion control.
+- Optimasi scene untuk mobile.
+- Analytics.
+- Konten visual atau diagram yang lebih kaya.
+- Asset GLB yang dipilih secara selektif.
+
+### P2 — Future Enhancements
+
+- Pintu yang membuka animasi saat room dipilih.
+- Sistem lighting berdasarkan room aktif.
+- Model 3D custom.
+- Search project.
+- Content management system.
+- Bahasa Indonesia dan Inggris.
+- Eksperimen dengan narasi audio.
+- Personal walkthrough yang dapat dilewati.
+
+## 18. Roadmap Implementasi
+
+### Phase 1 — Content and Structure
+
+- Tentukan positioning profesional.
+- Seleksi project yang layak ditampilkan.
+- Kumpulkan bukti, screenshot, dan artefak.
+- Tulis case study.
+- Tentukan struktur navigasi.
+
+**Exit criteria:** setiap section memiliki fungsi dan konten minimum yang terdefinisi.
+
+### Phase 2 — Reliable 2D Foundation
+
+- Bangun Next.js layout.
+- Buat navigasi HTML.
+- Buat halaman project dan case study.
+- Implementasikan responsive styling.
+- Pastikan website usable tanpa WebGL.
+
+**Exit criteria:** seluruh konten inti berfungsi sebelum penambahan 3D.
+
+### Phase 3 — 3D Vertical Slice
+
+Implementasikan satu jalur pengalaman lengkap:
+
+- Lobby.
+- Satu room.
+- Navigasi ke room tersebut.
+- Camera transition.
+- Panel HTML.
+- Fallback jika scene gagal.
+
+**Exit criteria:** satu room dapat diuji menyeluruh dari loading hingga akses konten.
+
+### Phase 4 — Complete Virtual Office
+
+- Tambahkan room lainnya.
+- Tambahkan hotspot.
+- Tambahkan transisi dan lighting.
+- Tambahkan dekorasi secara selektif.
+- Implementasikan kondisi responsive.
+
+**Exit criteria:** semua room memiliki fungsi nyata dan tidak mengorbankan keterbacaan.
+
+### Phase 5 — Optimization and QA
+
+- Uji production build.
+- Uji browser yang ditargetkan.
+- Uji pada perangkat desktop dan mobile.
+- Uji kondisi jaringan buruk.
+- Uji WebGL fallback.
+- Audit aksesibilitas.
+- Audit seluruh konten dan tautan.
+
+**Exit criteria:** seluruh kriteria P0 terpenuhi.
+
+### Phase 6 — Launch and Iterate
+
+- Deploy.
+- Verifikasi domain dan HTTPS.
+- Uji ulang halaman produksi.
+- Pantau error dan analytics.
+- Kumpulkan umpan balik.
+- Prioritaskan perbaikan setelah launch.
+
+## 19. QA Test Scenarios
+
+| ID | Skenario | Expected Result |
+|---|---|---|
+| QA-01 | Pengunjung membuka halaman utama. | Identitas dan navigasi tampil tanpa menunggu scene selesai. |
+| QA-02 | WebGL berhasil dimuat. | Scene interaktif tampil dan loading hilang. |
+| QA-03 | Three.js gagal dimuat. | Fallback portfolio tetap bisa digunakan. |
+| QA-04 | Pengunjung klik Projects. | Kamera berpindah atau project directory terbuka dengan jelas. |
+| QA-05 | Pengunjung membuka project card. | Detail project yang tepat muncul. |
+| QA-06 | Pengunjung membuka URL case study secara langsung. | Konten termuat tanpa mengharuskan masuk lewat scene. |
+| QA-07 | Pengunjung menggunakan keyboard. | Navigasi dan CTA utama dapat digunakan tanpa mouse. |
+| QA-08 | Pengunjung membuka website di mobile. | Konten terbaca dan navigasi dapat digunakan dengan sentuhan. |
+| QA-09 | Jaringan lambat atau terputus. | Pengguna tidak terjebak di loading tanpa batas. |
+| QA-10 | Pengunjung klik CV. | File atau URL CV yang benar terbuka. |
+| QA-11 | Pengunjung membuka Contact. | Informasi kontak dan tautan bekerja. |
+| QA-12 | Pengunjung mengaktifkan reduced motion. | Gerakan visual dikurangi sesuai preferensi. |
+| QA-13 | Browser menolak sebuah texture atau asset. | Scene menangani error tanpa merusak navigasi inti. |
+| QA-14 | Pengunjung melakukan refresh pada case study. | Halaman tetap berfungsi. |
+
+## 20. Definition of Done
+
+MVP dianggap selesai jika:
+
+1. Website berhasil dibangun dalam production mode.
+2. Virtual office dapat dijelajahi pada browser yang ditargetkan.
+3. Semua menu utama berfungsi.
+4. Setiap room memiliki konten dan tujuan yang jelas.
+5. Project detail dan case study dapat dibuka secara langsung.
+6. Navigasi inti tidak bergantung pada WebGL.
+7. Loading indicator tidak dapat macet tanpa batas.
+8. Error saat memuat scene ditangani dengan fallback.
+9. Layout berfungsi pada desktop dan mobile.
+10. Tidak ada tautan utama yang rusak.
+11. Semua fakta, periode, kontribusi, dan hasil project telah diverifikasi pemilik portfolio.
+12. Tidak ada informasi rahasia yang terpublikasi tanpa izin.
+13. Tidak ada error P0 yang diketahui dan belum diselesaikan.
+14. Pengujian QA inti telah didokumentasikan.
+
+## 21. Risiko dan Mitigasi
+
+| Risiko | Dampak | Mitigasi |
+|---|---|---|
+| Terlalu fokus pada visual 3D | Informasi profesional sulit ditemukan | Utamakan HTML content dan navigasi eksplisit |
+| Scene berat | Pengunjung menunggu lama atau meninggalkan website | Procedural geometry, lazy loading, optimasi asset, mobile mode |
+| Library gagal dimuat | Website tidak berfungsi | Fallback, error boundary, versi dependency yang dikunci |
+| Scene sulit dipelihara | Perubahan kecil merusak banyak bagian | Modularisasi scene dan data terpisah |
+| Project case study tidak memiliki bukti | Portfolio kehilangan kredibilitas | Verifikasi konten dan gunakan klaim yang dapat dibuktikan |
+| Pengunjung tidak memahami kontrol | Interaksi membingungkan | Label, CTA, navigasi HTML, kontrol yang dapat dilewati |
+| Asset memiliki lisensi tidak jelas | Risiko penggunaan materi yang tidak sah | Audit lisensi sebelum publikasi |
+| Mobile tidak nyaman | Pengalaman pengguna buruk | 2.5D mode, navigation-first UI, uji perangkat nyata |
+
+## 22. Keputusan Produk yang Direkomendasikan
+
+1. Bangun website sebagai aplikasi Next.js, bukan mengandalkan satu file HTML untuk production.
+2. Jadikan versi 2D sebagai fondasi dan fallback, lalu tambahkan scene Three.js.
+3. Gunakan primitive geometry untuk MVP; tambahkan asset GLB setelah alur interaksi stabil.
+4. Gunakan room sebagai navigasi kontekstual, bukan sebagai pengganti semua navigasi konvensional.
+5. Pisahkan data project dari implementasi 3D agar portfolio mudah diperbarui.
+6. Prioritaskan kualitas case study daripada jumlah ruangan.
+7. Hindari klaim metrik, status, atau kontribusi yang tidak dapat diverifikasi.
+8. Ukur keberhasilan dari akses ke project, case study, CV, dan kontak—not hanya interaksi dengan scene.
+
+## 23. Open Decisions Sebelum Production
+
+Hal-hal yang perlu diputuskan sebelum implementasi final:
+
+- Bahasa utama website: Inggris, Indonesia, atau bilingual.
+- Empat sampai enam project mana yang akan menjadi highlight.
+- Informasi pengalaman apa yang dapat dipublikasikan.
+- URL CV, LinkedIn, email, dan tautan project.
+- Apakah website menggunakan domain personal atau subdomain.
+- Apakah pemilik portfolio membutuhkan CMS untuk memperbarui konten.
+- Apakah visual 3D tetap stylized, atau beralih ke asset custom yang lebih detail.
+- Apakah aksesibilitas dan performa mobile membutuhkan mode 2D sebagai pilihan permanen.
+
+---
+
+## Ringkasan
+
+Rizal OS harus dibangun sebagai **portfolio profesional yang kebetulan memakai 3D**, bukan sebagai demo 3D yang kemudian diberi konten portfolio.
+
+Prioritas implementasi adalah konten yang kredibel, navigasi yang jelas, scene modular, fallback yang andal, dan performa. Jika fondasi tersebut stabil, elemen seperti pintu animasi, hologram, GLB furniture, dan transisi sinematik bisa ditambahkan tanpa mengorbankan fungsi utamanya.
+
+**Definisi sukses:** pengunjung menikmati pengalaman virtual office, memahami kompetensi Project Manager pemiliknya, menemukan bukti kemampuan lewat case study, dan dapat menghubungi pemilik portfolio tanpa hambatan.

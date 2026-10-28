@@ -1,0 +1,6 @@
+{
+  "name": "Rizal OS — Virtual Office Portfolio",
+  "description": "Interactive 3D Virtual Office Portfolio for Rizal — Technical Project Manager specializing in project execution, product development, software systems, and AI-enabled workflows.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
