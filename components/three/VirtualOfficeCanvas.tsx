@@ -7,6 +7,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { ROOMS, RoomId, getRoomById } from '@/lib/portfolio-data';
 
 export type CameraMode = 'orbit' | 'fps' | 'tps';
+export type VisualStyle3D = 'studio' | 'maquette' | 'cozy';
 
 export interface VirtualOfficeCanvasProps {
   activeRoom: RoomId;
@@ -15,10 +16,13 @@ export interface VirtualOfficeCanvasProps {
   zenMode: boolean;
   showFloorPlan: boolean;
   isDrawerOpen?: boolean;
+  isPlaceSelected?: boolean;
   onChangeCameraMode: (mode: CameraMode) => void;
   onToggleZenMode: () => void;
   onToggleFloorPlan: () => void;
   onSelectRoom: (roomId: RoomId) => void;
+  onClickRoom?: (roomId: RoomId) => void;
+  onDismissPlace?: () => void;
   onOpenRoomDetail: (roomId: RoomId) => void;
   onSceneReady: () => void;
   onSceneError: (reason: string) => void;
@@ -65,35 +69,53 @@ const _targetLook = new THREE.Vector3();
 const _projVec = new THREE.Vector3();
 const _moveVec = new THREE.Vector3();
 const _camOffset = new THREE.Vector3();
+const _forwardDir = new THREE.Vector3();
+const _rightDir = new THREE.Vector3();
+const _orbitOffset = new THREE.Vector3();
+const _spherical = new THREE.Spherical();
+
+// Orbit boundary constraints so camera/target never drift far outside the office building
+const ORBIT_TARGET_MIN_X = -15.5;
+const ORBIT_TARGET_MAX_X = 15.5;
+const ORBIT_TARGET_MIN_Y = 0.4;
+const ORBIT_TARGET_MAX_Y = 2.8;
+const ORBIT_TARGET_MIN_Z = -11.0;
+const ORBIT_TARGET_MAX_Z = 14.2;
+const ORBIT_MIN_DISTANCE = 4.5;
+const ORBIT_MAX_DISTANCE = 28.5;
 
 function createWoodParquetTexture(maxAnisotropy: number): THREE.CanvasTexture {
+  // Smooth anti-aliased 512x512 Scandinavian oak parquet texture (zero pixel shimmer)
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
   if (ctx) {
-    ctx.fillStyle = '#d9b991';
+    ctx.fillStyle = '#d8b78e';
     ctx.fillRect(0, 0, 512, 512);
 
     const plankH = 64;
     const plankW = 256;
-    const tones = ['#d5b48a', '#dec098', '#cfa97e', '#e2c6a0', '#d8b78e'];
+    const tones = ['#dec09a', '#d5b48b', '#e2c6a2', '#d1af84', '#dbb990'];
 
     for (let y = 0; y < 512; y += plankH) {
       const rowIndex = Math.floor(y / plankH);
       const offset = (rowIndex % 2) * (plankW / 2);
       for (let x = -plankW; x < 512; x += plankW) {
+        const px = x + offset;
         const tone = tones[(rowIndex + Math.abs(Math.floor(x / plankW))) % tones.length];
         ctx.fillStyle = tone;
-        ctx.fillRect(x + offset, y, plankW - 2, plankH - 2);
+        ctx.fillRect(px, y, plankW, plankH);
 
-        ctx.fillStyle = 'rgba(120, 78, 38, 0.08)';
-        ctx.fillRect(x + offset + 12, y + plankH * 0.3, plankW - 28, 2);
-        ctx.fillRect(x + offset + 24, y + plankH * 0.68, plankW - 48, 1.5);
+        // Subtle soft wood grain lines
+        ctx.fillStyle = 'rgba(160, 118, 74, 0.14)';
+        ctx.fillRect(px + 18, y + 18, plankW - 36, 3);
+        ctx.fillRect(px + 36, y + 42, plankW - 64, 2);
 
-        ctx.strokeStyle = 'rgba(105, 68, 34, 0.28)';
+        // Soft plank seam
+        ctx.strokeStyle = 'rgba(130, 92, 52, 0.28)';
         ctx.lineWidth = 2;
-        ctx.strokeRect(x + offset, y, plankW, plankH);
+        ctx.strokeRect(px, y, plankW, plankH);
       }
     }
   }
@@ -101,7 +123,10 @@ function createWoodParquetTexture(maxAnisotropy: number): THREE.CanvasTexture {
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(10, 8);
+  tex.repeat.set(9, 7);
+  tex.magFilter = THREE.LinearFilter;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.generateMipmaps = true;
   tex.anisotropy = maxAnisotropy;
   return tex;
 }
@@ -114,58 +139,62 @@ function createWhiteboardTexture(
   maxAnisotropy: number
 ): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
-  canvas.width = 768;
-  canvas.height = 384;
+  canvas.width = 1024;
+  canvas.height = 512;
   const ctx = canvas.getContext('2d');
   if (ctx) {
     ctx.fillStyle = '#f8fafc';
-    ctx.fillRect(0, 0, 768, 384);
+    ctx.fillRect(0, 0, 1024, 512);
 
+    // Clean architectural header bar
     ctx.fillStyle = '#0f172a';
-    ctx.fillRect(20, 20, 728, 52);
+    ctx.fillRect(28, 24, 968, 68);
     ctx.fillStyle = accentHex;
-    ctx.fillRect(20, 68, 728, 5);
+    ctx.fillRect(28, 86, 968, 6);
 
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 21px sans-serif';
-    ctx.fillText(title, 38, 53);
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = '600 26px system-ui, -apple-system, sans-serif';
+    ctx.fillText(title, 48, 66);
 
     ctx.fillStyle = '#94a3b8';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText(subtitle, 560, 52);
+    ctx.font = '500 20px monospace';
+    ctx.fillText(subtitle, 760, 66);
 
     const cols = 3;
     cards.slice(0, 6).forEach((card, idx) => {
       const col = idx % cols;
       const row = Math.floor(idx / cols);
-      const cx = 30 + col * 240;
-      const cy = 94 + row * 134;
+      const cx = 36 + col * 320;
+      const cy = 118 + row * 184;
 
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(cx, cy, 220, 112);
-      ctx.strokeStyle = '#e2e8f0';
+      ctx.fillRect(cx, cy, 296, 156);
+      ctx.strokeStyle = '#cbd5e1';
       ctx.lineWidth = 2;
-      ctx.strokeRect(cx, cy, 220, 112);
+      ctx.strokeRect(cx, cy, 296, 156);
 
       ctx.fillStyle = accentHex;
-      ctx.fillRect(cx, cy, 220, 10);
+      ctx.fillRect(cx, cy, 296, 10);
 
       ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 17px sans-serif';
-      ctx.fillText(card.title, cx + 16, cy + 42);
+      ctx.font = '600 22px system-ui, -apple-system, sans-serif';
+      ctx.fillText(card.title, cx + 20, cy + 52);
 
       ctx.fillStyle = '#e2e8f0';
-      ctx.fillRect(cx + 16, cy + 62, 188, 10);
+      ctx.fillRect(cx + 20, cy + 78, 256, 12);
       ctx.fillStyle = accentHex;
-      ctx.fillRect(cx + 16, cy + 62, 130 + (idx % 3) * 24, 10);
+      ctx.fillRect(cx + 20, cy + 78, 175 + (idx % 3) * 28, 12);
 
-      ctx.fillStyle = '#64748b';
-      ctx.font = 'bold 11px monospace';
-      ctx.fillText(card.status, cx + 16, cy + 94);
+      ctx.fillStyle = '#475569';
+      ctx.font = '500 17px monospace';
+      ctx.fillText(`${card.tag} · ${card.status}`, cx + 20, cy + 128);
     });
   }
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
+  tex.magFilter = THREE.LinearFilter;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.generateMipmaps = true;
   tex.anisotropy = maxAnisotropy;
   return tex;
 }
@@ -592,10 +621,13 @@ export default function VirtualOfficeCanvas({
   zenMode,
   showFloorPlan,
   isDrawerOpen = false,
+  isPlaceSelected = false,
   onChangeCameraMode,
   onToggleZenMode,
   onToggleFloorPlan,
   onSelectRoom,
+  onClickRoom,
+  onDismissPlace,
   onOpenRoomDetail,
   onSceneReady,
   onSceneError,
@@ -607,7 +639,27 @@ export default function VirtualOfficeCanvas({
   const cameraModeRef = useRef<CameraMode>(cameraMode);
   const zenModeRef = useRef<boolean>(zenMode);
   const isDrawerOpenRef = useRef<boolean>(isDrawerOpen);
+  const isPlaceSelectedRef = useRef<boolean>(isPlaceSelected);
   const requestRenderRef = useRef<(() => void) | null>(null);
+  const syncVisualStyleRef = useRef<((style: VisualStyle3D) => void) | null>(null);
+
+  const [visualStyle, setVisualStyle] = useState<VisualStyle3D>('studio');
+  const visualStyleRef = useRef<VisualStyle3D>('studio');
+
+  const handleCycleVisualStyle = () => {
+    setVisualStyle((prev) => {
+      const next: VisualStyle3D =
+        prev === 'studio' ? 'maquette' : prev === 'maquette' ? 'cozy' : 'studio';
+      visualStyleRef.current = next;
+      if (syncVisualStyleRef.current) {
+        syncVisualStyleRef.current(next);
+      }
+      if (requestRenderRef.current) {
+        requestRenderRef.current();
+      }
+      return next;
+    });
+  };
 
   const hoveredRoomIdRef = useRef<RoomId | null>(null);
   const isCameraTransitioningRef = useRef<boolean>(false);
@@ -643,23 +695,13 @@ export default function VirtualOfficeCanvas({
 
   const fpsEdgeTurnRef = useRef<number>(0);
 
-  // Mobile Legends-style 360° Analog Joystick vectors (-1..1)
+  // Mobile Legends-style 360° Movement Analog Joystick vector (-1..1)
+  // Camera on mobile is controlled directly by touching/dragging the screen
   const moveJoystickRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const lookJoystickRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-
   const moveStickCenterRef = useRef<{ x: number; y: number } | null>(null);
   const moveStickTouchIdRef = useRef<number | null>(null);
-  const lookStickCenterRef = useRef<{ x: number; y: number } | null>(null);
-  const lookStickTouchIdRef = useRef<number | null>(null);
 
   const [moveStickUi, setMoveStickUi] = useState<{
-    x: number;
-    y: number;
-    active: boolean;
-    angleDeg: number;
-  }>({ x: 0, y: 0, active: false, angleDeg: 0 });
-
-  const [lookStickUi, setLookStickUi] = useState<{
     x: number;
     y: number;
     active: boolean;
@@ -731,9 +773,7 @@ export default function VirtualOfficeCanvas({
       walkTargetRef.current = null;
       fpsEdgeTurnRef.current = 0;
       moveJoystickRef.current = { x: 0, y: 0 };
-      lookJoystickRef.current = { x: 0, y: 0 };
       setMoveStickUi({ x: 0, y: 0, active: false, angleDeg: 0 });
-      setLookStickUi({ x: 0, y: 0, active: false, angleDeg: 0 });
       isCameraTransitioningRef.current = false;
       if (typeof document !== 'undefined' && document.pointerLockElement) {
         try {
@@ -775,6 +815,10 @@ export default function VirtualOfficeCanvas({
   }, [activeRoom]);
 
   useEffect(() => {
+    isPlaceSelectedRef.current = isPlaceSelected;
+  }, [isPlaceSelected]);
+
+  useEffect(() => {
     reducedMotionRef.current = reducedMotion;
     if (requestRenderRef.current) {
       requestRenderRef.current();
@@ -783,6 +827,7 @@ export default function VirtualOfficeCanvas({
 
   const handleResetView = () => {
     if (isDrawerOpenRef.current) return;
+    onDismissPlace?.();
     if (cameraModeRef.current === 'orbit') {
       isCameraTransitioningRef.current = true;
     } else {
@@ -852,42 +897,6 @@ export default function VirtualOfficeCanvas({
     setMoveStickUi({ x: 0, y: 0, active: false, angleDeg: 0 });
   };
 
-  const updateLookAnalogFromPoint = (
-    clientX: number,
-    clientY: number,
-    maxRadius = 30
-  ) => {
-    if (!lookStickCenterRef.current || isDrawerOpenRef.current) return;
-    const rawDx = clientX - lookStickCenterRef.current.x;
-    const rawDy = clientY - lookStickCenterRef.current.y;
-    const dist = Math.hypot(rawDx, rawDy);
-    const clampedDist = Math.min(dist, maxRadius);
-    const angleRad = Math.atan2(rawDy, rawDx);
-    const visualX = dist > 0 ? Math.cos(angleRad) * clampedDist : 0;
-    const visualY = dist > 0 ? Math.sin(angleRad) * clampedDist : 0;
-
-    const normX = visualX / maxRadius;
-    const normY = -visualY / maxRadius;
-
-    lookJoystickRef.current = { x: normX, y: normY };
-    setLookStickUi({
-      x: visualX,
-      y: visualY,
-      active: true,
-      angleDeg: (angleRad * 180) / Math.PI + 90,
-    });
-    if (requestRenderRef.current) {
-      requestRenderRef.current();
-    }
-  };
-
-  const resetLookAnalog = () => {
-    lookStickCenterRef.current = null;
-    lookStickTouchIdRef.current = null;
-    lookJoystickRef.current = { x: 0, y: 0 };
-    setLookStickUi({ x: 0, y: 0, active: false, angleDeg: 0 });
-  };
-
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
@@ -931,10 +940,10 @@ export default function VirtualOfficeCanvas({
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
     renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(width, height);
+    renderer.setSize(width, height, false);
     renderer.setClearColor(0x1e293b, 1);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.18;
+    renderer.toneMappingExposure = 1.12;
     renderer.shadowMap.enabled = !isSoftwareGl;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -952,7 +961,7 @@ export default function VirtualOfficeCanvas({
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1e293b);
-    scene.fog = new THREE.FogExp2(0x1e293b, 0.0085);
+    scene.fog = new THREE.FogExp2(0x1e293b, 0.0075);
 
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
@@ -974,17 +983,57 @@ export default function VirtualOfficeCanvas({
     const initialRoom = ROOMS.find((r) => r.id === activeRoomRef.current) || ROOMS[0];
     camera.position.set(...initialRoom.cameraPosition);
 
+    const renderSceneFrame = () => {
+      renderer.render(scene, camera);
+    };
+
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(...initialRoom.cameraTarget);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
-    controls.maxPolarAngle = Math.PI / 2 - 0.04;
-    controls.minPolarAngle = 0.15;
-    controls.minDistance = 3.5;
-    controls.maxDistance = 48;
+    controls.maxPolarAngle = Math.PI / 2 - 0.05;
+    controls.minPolarAngle = 0.2;
+    controls.minDistance = ORBIT_MIN_DISTANCE;
+    controls.maxDistance = ORBIT_MAX_DISTANCE;
     controls.enablePan = true;
-    controls.screenSpacePanning = true;
+    controls.screenSpacePanning = false;
+
+    const clampOrbitBounds = () => {
+      if (cameraModeRef.current !== 'orbit') return;
+      const clampedX = THREE.MathUtils.clamp(
+        controls.target.x,
+        ORBIT_TARGET_MIN_X,
+        ORBIT_TARGET_MAX_X
+      );
+      const clampedY = THREE.MathUtils.clamp(
+        controls.target.y,
+        ORBIT_TARGET_MIN_Y,
+        ORBIT_TARGET_MAX_Y
+      );
+      const clampedZ = THREE.MathUtils.clamp(
+        controls.target.z,
+        ORBIT_TARGET_MIN_Z,
+        ORBIT_TARGET_MAX_Z
+      );
+
+      const corrX = clampedX - controls.target.x;
+      const corrY = clampedY - controls.target.y;
+      const corrZ = clampedZ - controls.target.z;
+
+      if (corrX !== 0 || corrY !== 0 || corrZ !== 0) {
+        controls.target.set(clampedX, clampedY, clampedZ);
+        camera.position.x += corrX;
+        camera.position.y += corrY;
+        camera.position.z += corrZ;
+      }
+
+      if (camera.position.y < 1.6) {
+        camera.position.y = 1.6;
+      }
+    };
+
     controls.update();
+    clampOrbitBounds();
 
     controls.addEventListener('start', () => {
       isCameraTransitioningRef.current = false;
@@ -1052,8 +1101,9 @@ export default function VirtualOfficeCanvas({
     mainFloorGeo.rotateX(-Math.PI / 2);
     const mainFloorMat = new THREE.MeshStandardMaterial({
       map: woodFloorTex,
-      roughness: 0.55,
-      metalness: 0.05,
+      color: 0xffffff,
+      roughness: 0.58,
+      metalness: 0.04,
     });
     const mainFloor = new THREE.Mesh(mainFloorGeo, mainFloorMat);
     mainFloor.position.set(0, 0, 1.5);
@@ -1061,6 +1111,62 @@ export default function VirtualOfficeCanvas({
     scene.add(mainFloor);
     floorWalkMeshes.push(mainFloor);
     disposables.push(woodFloorTex, mainFloorGeo, mainFloorMat);
+
+    // Eye-friendly 3D Visual Style Presets (Studio Daylight / Clay Maquette / Warm Loft)
+    const applyVisualStyle = (style: VisualStyle3D) => {
+      if (style === 'maquette') {
+        // Minimalist Architectural Clay Maquette: soft warm ivory/alabaster monochrome model
+        scene.background = new THREE.Color(0x27272a);
+        scene.fog = new THREE.FogExp2(0x27272a, 0.0065);
+        renderer.toneMappingExposure = 1.08;
+        hemiLight.color.setHex(0xfafaf9);
+        hemiLight.groundColor.setHex(0xe7e5e4);
+        hemiLight.intensity = 1.45;
+        sunLight.color.setHex(0xfffbeb);
+        sunLight.intensity = 1.85;
+        fillLight.color.setHex(0xf5f5f4);
+        fillLight.intensity = 0.95;
+        mainFloorMat.map = null;
+        mainFloorMat.color.setHex(0xf5f2eb);
+        mainFloorMat.roughness = 0.82;
+        mainFloorMat.needsUpdate = true;
+      } else if (style === 'cozy') {
+        // Cozy Evening Studio: soothing warm golden-hour lighting with low glare
+        scene.background = new THREE.Color(0x1c1917);
+        scene.fog = new THREE.FogExp2(0x1c1917, 0.0075);
+        renderer.toneMappingExposure = 1.02;
+        hemiLight.color.setHex(0xffedd5);
+        hemiLight.groundColor.setHex(0x9a3412);
+        hemiLight.intensity = 1.15;
+        sunLight.color.setHex(0xfdba74);
+        sunLight.intensity = 2.05;
+        fillLight.color.setHex(0xfed7aa);
+        fillLight.intensity = 0.7;
+        mainFloorMat.map = woodFloorTex;
+        mainFloorMat.color.setHex(0xfde68a);
+        mainFloorMat.roughness = 0.55;
+        mainFloorMat.needsUpdate = true;
+      } else {
+        // Default Studio Daylight Diorama: crisp anti-aliased oak parquet & natural studio light
+        scene.background = new THREE.Color(0x1e293b);
+        scene.fog = new THREE.FogExp2(0x1e293b, 0.0075);
+        renderer.toneMappingExposure = 1.12;
+        hemiLight.color.setHex(0xe0f2fe);
+        hemiLight.groundColor.setHex(0xd6c7b2);
+        hemiLight.intensity = 1.35;
+        sunLight.color.setHex(0xfff7ed);
+        sunLight.intensity = 2.1;
+        fillLight.color.setHex(0xbae6fd);
+        fillLight.intensity = 0.85;
+        mainFloorMat.map = woodFloorTex;
+        mainFloorMat.color.setHex(0xffffff);
+        mainFloorMat.roughness = 0.58;
+        mainFloorMat.needsUpdate = true;
+      }
+    };
+
+    syncVisualStyleRef.current = applyVisualStyle;
+    applyVisualStyle(visualStyleRef.current);
 
     const wallMat = new THREE.MeshStandardMaterial({
       color: 0xf8fafc,
@@ -2089,35 +2195,72 @@ export default function VirtualOfficeCanvas({
         camera
       );
 
+      const hits = raycaster.intersectObjects(interactiveMeshes, true);
+      let hitRoomId: RoomId | undefined;
+      let hitIsFloor = false;
+      let hitPoint: THREE.Vector3 | null = null;
+
+      if (hits.length > 0) {
+        const objectHit = hits.find((h) => !h.object.userData?.isFloor) || hits[0];
+        hitIsFloor = Boolean(objectHit.object.userData?.isFloor);
+        hitPoint = objectHit.point;
+        let obj: THREE.Object3D | null = objectHit.object;
+        while (obj && !obj.userData?.roomId) {
+          obj = obj.parent;
+        }
+        hitRoomId = obj?.userData?.roomId as RoomId | undefined;
+      }
+
       if (cameraModeRef.current !== 'orbit') {
         const floorHits = raycaster.intersectObjects(floorWalkMeshes, true);
+        if (hitRoomId && !hitIsFloor) {
+          if (hitPoint) {
+            const [clampedX, clampedZ] = pushOutFromColliders(
+              hitPoint.x,
+              hitPoint.z,
+              PLAYER_RADIUS + 0.35
+            );
+            walkTargetRef.current = new THREE.Vector3(clampedX, 0, clampedZ);
+          }
+          if (onClickRoom) {
+            onClickRoom(hitRoomId);
+          } else {
+            onSelectRoom(hitRoomId);
+          }
+          if (requestRenderRef.current) requestRenderRef.current();
+          return;
+        }
+
         if (floorHits.length > 0) {
           const pt = floorHits[0].point;
           const [clampedX, clampedZ] = pushOutFromColliders(pt.x, pt.z, PLAYER_RADIUS);
           walkTargetRef.current = new THREE.Vector3(clampedX, 0, clampedZ);
+          if (hitRoomId) {
+            if (onClickRoom) {
+              onClickRoom(hitRoomId);
+            } else {
+              onSelectRoom(hitRoomId);
+            }
+          } else {
+            onDismissPlace?.();
+          }
           if (requestRenderRef.current) requestRenderRef.current();
           return;
         }
       }
 
-      const hits = raycaster.intersectObjects(interactiveMeshes, true);
-      if (hits.length > 0) {
-        let obj: THREE.Object3D | null = hits[0].object;
-        while (obj && !obj.userData?.roomId) {
-          obj = obj.parent;
+      if (hitRoomId) {
+        walkTargetRef.current = null;
+        fpsEdgeTurnRef.current = 0;
+        isCameraTransitioningRef.current = true;
+        if (onClickRoom) {
+          onClickRoom(hitRoomId);
+        } else {
+          onSelectRoom(hitRoomId);
         }
-        const hitRoomId = obj?.userData?.roomId as RoomId | undefined;
-        if (hitRoomId) {
-          isDrawerOpenRef.current = true;
-          walkTargetRef.current = null;
-          fpsEdgeTurnRef.current = 0;
-          if (hitRoomId === activeRoomRef.current) {
-            onOpenRoomDetail(hitRoomId);
-          } else {
-            onSelectRoom(hitRoomId);
-            onOpenRoomDetail(hitRoomId);
-          }
-        }
+        if (requestRenderRef.current) requestRenderRef.current();
+      } else {
+        onDismissPlace?.();
       }
     };
 
@@ -2175,6 +2318,10 @@ export default function VirtualOfficeCanvas({
           break;
         case 'KeyR':
           handleResetView();
+          handled = true;
+          break;
+        case 'KeyG':
+          handleCycleVisualStyle();
           handled = true;
           break;
         case 'Enter':
@@ -2314,6 +2461,7 @@ export default function VirtualOfficeCanvas({
     requestRenderRef.current = requestRender;
 
     controls.addEventListener('change', () => {
+      clampOrbitBounds();
       updateHotspotPositions();
       requestRender();
     });
@@ -2351,35 +2499,43 @@ export default function VirtualOfficeCanvas({
         ) {
           isCameraTransitioningRef.current = false;
           const panSpeed = 9.0 * delta;
-          const forwardDir = new THREE.Vector3();
-          camera.getWorldDirection(forwardDir);
-          forwardDir.y = 0;
-          forwardDir.normalize();
-          const rightDir = new THREE.Vector3(-forwardDir.z, 0, forwardDir.x);
+          camera.getWorldDirection(_forwardDir);
+          _forwardDir.y = 0;
+          if (_forwardDir.lengthSq() > 0.0001) {
+            _forwardDir.normalize();
+          } else {
+            _forwardDir.set(0, 0, -1);
+          }
+          _rightDir.set(-_forwardDir.z, 0, _forwardDir.x);
 
           _moveVec.set(0, 0, 0);
-          if (keys.forward) _moveVec.addScaledVector(forwardDir, panSpeed);
-          if (keys.backward) _moveVec.addScaledVector(forwardDir, -panSpeed);
-          if (keys.right) _moveVec.addScaledVector(rightDir, panSpeed);
-          if (keys.left) _moveVec.addScaledVector(rightDir, -panSpeed);
+          if (keys.forward) _moveVec.addScaledVector(_forwardDir, panSpeed);
+          if (keys.backward) _moveVec.addScaledVector(_forwardDir, -panSpeed);
+          if (keys.right) _moveVec.addScaledVector(_rightDir, panSpeed);
+          if (keys.left) _moveVec.addScaledVector(_rightDir, -panSpeed);
           if (hasMoveJoy) {
-            _moveVec.addScaledVector(forwardDir, mJoy.y * panSpeed);
-            _moveVec.addScaledVector(rightDir, mJoy.x * panSpeed);
+            _moveVec.addScaledVector(_forwardDir, mJoy.y * panSpeed);
+            _moveVec.addScaledVector(_rightDir, mJoy.x * panSpeed);
           }
 
           camera.position.add(_moveVec);
           controls.target.add(_moveVec);
+          clampOrbitBounds();
 
           if (keys.turnLeft || keys.turnRight) {
-            const rotAngle = (keys.turnLeft ? 1 : -1) * 1.6 * delta;
-            const offset = camera.position.clone().sub(controls.target);
-            const cosA = Math.cos(rotAngle);
-            const sinA = Math.sin(rotAngle);
-            const rx = offset.x * cosA - offset.z * sinA;
-            const rz = offset.x * sinA + offset.z * cosA;
-            offset.x = rx;
-            offset.z = rz;
-            camera.position.copy(controls.target).add(offset);
+            const yawDelta =
+              ((keys.turnLeft ? 1 : 0) - (keys.turnRight ? 1 : 0)) * 1.6 * delta;
+
+            _orbitOffset.copy(camera.position).sub(controls.target);
+            _spherical.setFromVector3(_orbitOffset);
+            _spherical.theta += yawDelta;
+            _spherical.radius = THREE.MathUtils.clamp(
+              _spherical.radius,
+              ORBIT_MIN_DISTANCE,
+              ORBIT_MAX_DISTANCE
+            );
+            _orbitOffset.setFromSpherical(_spherical);
+            camera.position.copy(controls.target).add(_orbitOffset);
           }
 
           needsMoreFrames = true;
@@ -2410,6 +2566,7 @@ export default function VirtualOfficeCanvas({
 
         if (!isLockedByDrawer) {
           controls.update();
+          clampOrbitBounds();
         }
       } else {
         // =====================================================================
@@ -2421,7 +2578,6 @@ export default function VirtualOfficeCanvas({
         }
         const keys = keysPressedRef.current;
         const mJoy = moveJoystickRef.current;
-        const lJoy = lookJoystickRef.current;
         const turnSpeed = 2.0 * delta;
         const pitchSpeed = 1.45 * delta;
         if (!isLockedByDrawer && keys.turnLeft) {
@@ -2440,15 +2596,6 @@ export default function VirtualOfficeCanvas({
         }
         if (!isLockedByDrawer && keys.lookDown) {
           playerPitchRef.current = Math.max(-0.65, playerPitchRef.current - pitchSpeed);
-          needsMoreFrames = true;
-        }
-        if (!isLockedByDrawer && Math.hypot(lJoy.x, lJoy.y) > 0.04) {
-          cameraOrbitYawRef.current -= lJoy.x * 2.2 * delta;
-          if (mode === 'fps') avatarFacingYawRef.current = cameraOrbitYawRef.current;
-          playerPitchRef.current = Math.max(
-            -0.65,
-            Math.min(0.45, playerPitchRef.current + lJoy.y * 1.55 * delta)
-          );
           needsMoreFrames = true;
         }
         if (!isLockedByDrawer && mode === 'fps' && Math.abs(fpsEdgeTurnRef.current) > 0.01) {
@@ -2683,7 +2830,7 @@ export default function VirtualOfficeCanvas({
         }
       }
 
-      renderer.render(scene, camera);
+      renderSceneFrame();
       updateHotspotPositions();
 
       if (needsMoreFrames || (!isSoftwareGl && !reducedMotionRef.current)) {
@@ -2701,14 +2848,15 @@ export default function VirtualOfficeCanvas({
       camera.aspect = newAspect;
       camera.fov = getResponsiveFov(newAspect);
       camera.updateProjectionMatrix();
-      renderer.setSize(newW, newH);
-      renderer.render(scene, camera);
+      renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(newW, newH, false);
+      renderSceneFrame();
       updateHotspotPositions();
     };
 
     window.addEventListener('resize', handleResize);
 
-    renderer.render(scene, camera);
+    renderSceneFrame();
     updateHotspotPositions();
     onSceneReady();
     requestRender();
@@ -2716,6 +2864,7 @@ export default function VirtualOfficeCanvas({
     return () => {
       disposed = true;
       requestRenderRef.current = null;
+      syncVisualStyleRef.current = null;
       cancelAnimationFrame(rafId);
       if (timeoutId) clearTimeout(timeoutId);
       window.removeEventListener('resize', handleResize);
@@ -2735,6 +2884,12 @@ export default function VirtualOfficeCanvas({
   }, []);
 
   const currentRoomMeta = getRoomById(activeRoom);
+  const styleLabel =
+    visualStyle === 'studio'
+      ? 'Studio'
+      : visualStyle === 'maquette'
+        ? 'Maquette'
+        : 'Warm';
 
   return (
     <div
@@ -2751,40 +2906,40 @@ export default function VirtualOfficeCanvas({
         aria-label="Interactive 3D Digital Office Viewport"
       />
 
-      {/* ZEN MODE EXIT BUTTON */}
+      {/* ZEN MODE EXIT BUTTON — Linear DESIGN.md surface & border */}
       {zenMode && (
         <button
           type="button"
           onClick={onToggleZenMode}
           aria-label="Exit Zen Mode"
-          className="fixed top-3 right-3 sm:top-4 sm:right-4 z-30 px-3.5 py-1.5 rounded-xl bg-[#0B0F17]/90 hover:bg-[#0B0F17] border border-sky-400/80 text-xs font-mono text-sky-300 shadow-xl cursor-pointer"
+          className="fixed top-3 right-3 sm:top-4 sm:right-4 z-30 px-3 py-1.5 rounded-md bg-[#0f1011] hover:bg-[#18191a] border border-[#23252a] text-xs font-mono text-[#f7f8f8] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
         >
           Keluar Zen Mode (Z)
         </button>
       )}
 
-      {/* TOP-CENTER CAMERA MODE SHORTCUT HUD (Responsive Row 2 on Mobile, Top-Center on Desktop) */}
+      {/* TOP-CENTER CAMERA MODE & 3D STYLE HUD — Linear DESIGN.md surface (#0f1011) & 1px border (#23252a) */}
       {!zenMode && (
         <div
           role="region"
           aria-label="3D Camera Mode Switcher"
-          className="fixed top-14 left-2.5 right-2.5 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 md:top-4 z-20 flex items-center justify-between sm:justify-center gap-1 p-1 rounded-xl bg-[#0B0F17]/95 border border-slate-700/90 shadow-2xl"
+          className="fixed top-13 left-2.5 right-2.5 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 md:top-3.5 z-20 flex items-center justify-between sm:justify-center gap-1 p-1 rounded-lg bg-[#0f1011] border border-[#23252a]"
         >
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <button
               type="button"
               onClick={() => onChangeCameraMode('orbit')}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2] ${
                 cameraMode === 'orbit'
-                  ? 'bg-sky-500 text-slate-950 shadow-sm'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+                  ? 'bg-[#5e6ad2] text-[#f7f8f8]'
+                  : 'text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a]'
               }`}
             >
               <kbd
-                className={`hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                className={`hidden sm:inline-block px-1 py-0.5 rounded-xs text-[10px] font-mono ${
                   cameraMode === 'orbit'
-                    ? 'bg-slate-950/25 text-slate-950 font-bold'
-                    : 'bg-slate-800 text-sky-400 border border-slate-700'
+                    ? 'bg-black/25 text-[#f7f8f8]'
+                    : 'bg-[#141516] text-[#8a8f98] border border-[#23252a]'
                 }`}
               >
                 1
@@ -2794,17 +2949,17 @@ export default function VirtualOfficeCanvas({
             <button
               type="button"
               onClick={() => onChangeCameraMode('fps')}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2] ${
                 cameraMode === 'fps'
-                  ? 'bg-sky-500 text-slate-950 shadow-sm'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+                  ? 'bg-[#5e6ad2] text-[#f7f8f8]'
+                  : 'text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a]'
               }`}
             >
               <kbd
-                className={`hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                className={`hidden sm:inline-block px-1 py-0.5 rounded-xs text-[10px] font-mono ${
                   cameraMode === 'fps'
-                    ? 'bg-slate-950/25 text-slate-950 font-bold'
-                    : 'bg-slate-800 text-sky-400 border border-slate-700'
+                    ? 'bg-black/25 text-[#f7f8f8]'
+                    : 'bg-[#141516] text-[#8a8f98] border border-[#23252a]'
                 }`}
               >
                 2
@@ -2814,17 +2969,17 @@ export default function VirtualOfficeCanvas({
             <button
               type="button"
               onClick={() => onChangeCameraMode('tps')}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2] ${
                 cameraMode === 'tps'
-                  ? 'bg-sky-500 text-slate-950 shadow-sm'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
+                  ? 'bg-[#5e6ad2] text-[#f7f8f8]'
+                  : 'text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a]'
               }`}
             >
               <kbd
-                className={`hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                className={`hidden sm:inline-block px-1 py-0.5 rounded-xs text-[10px] font-mono ${
                   cameraMode === 'tps'
-                    ? 'bg-slate-950/25 text-slate-950 font-bold'
-                    : 'bg-slate-800 text-sky-400 border border-slate-700'
+                    ? 'bg-black/25 text-[#f7f8f8]'
+                    : 'bg-[#141516] text-[#8a8f98] border border-[#23252a]'
                 }`}
               >
                 3
@@ -2833,13 +2988,22 @@ export default function VirtualOfficeCanvas({
             </button>
           </div>
 
-          <div className="flex items-center gap-1">
-            <span className="hidden sm:inline-block h-4 w-px bg-slate-800 mx-0.5" aria-hidden="true" />
+          <div className="flex items-center gap-0.5">
+            <span className="hidden sm:inline-block h-3.5 w-px bg-[#23252a] mx-1" aria-hidden="true" />
+            <button
+              type="button"
+              onClick={handleCycleVisualStyle}
+              title="Ganti gaya visual ruangan 3D: Studio / Clay Maquette / Warm Loft (Shortcut: G)"
+              className="px-2 py-1 rounded-md text-[11px] font-mono text-[#f7f8f8] bg-[#141516] hover:bg-[#18191a] border border-[#23252a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
+            >
+              {styleLabel}
+              <span className="hidden sm:inline text-[#8a8f98]"> (G)</span>
+            </button>
             <button
               type="button"
               onClick={handleResetView}
               title="Reset posisi kamera (Shortcut: R)"
-              className="px-2 sm:px-2.5 py-1.5 rounded-lg text-[11px] font-mono text-slate-300 hover:text-white hover:bg-slate-800/80 transition-colors cursor-pointer"
+              className="px-2 py-1 rounded-md text-[11px] font-mono text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
             >
               Reset<span className="hidden sm:inline"> (R)</span>
             </button>
@@ -2847,7 +3011,7 @@ export default function VirtualOfficeCanvas({
               type="button"
               onClick={onToggleZenMode}
               title="Sembunyikan semua UI (Shortcut: Z)"
-              className="px-2 sm:px-2.5 py-1.5 rounded-lg text-[11px] font-mono text-sky-400 hover:bg-slate-800/80 transition-colors cursor-pointer"
+              className="px-2 py-1 rounded-md text-[11px] font-mono text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
             >
               Zen<span className="hidden sm:inline"> (Z)</span>
             </button>
@@ -2861,26 +3025,26 @@ export default function VirtualOfficeCanvas({
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 flex items-center justify-center z-10"
         >
-          <div className="w-2 h-2 rounded-full bg-sky-400/90 ring-4 ring-sky-400/25" />
+          <div className="w-1.5 h-1.5 rounded-full bg-[#f7f8f8] ring-2 ring-[#0f1011]/80" />
         </div>
       )}
 
-      {/* DESKTOP CONTEXTUAL ROOM PILL (md+ only; mobile uses the live Swipe-Up / Swipe-Down Bottom Sheet) */}
-      {!zenMode && !isDrawerOpen && (
-        <div className="hidden md:flex fixed bottom-4 left-1/2 -translate-x-1/2 z-20 items-center justify-center gap-3 px-4 py-2 rounded-xl bg-[#0B0F17]/95 border border-slate-700/90 shadow-2xl">
+      {/* DESKTOP CONTEXTUAL ROOM BAR (md+ only; only shown when a room/place is clicked) */}
+      {!zenMode && !isDrawerOpen && isPlaceSelected && (
+        <div className="hidden md:flex fixed bottom-4 left-1/2 -translate-x-1/2 z-20 items-center justify-center gap-3 px-3.5 py-2 rounded-lg bg-[#0f1011] border border-[#23252a]">
           <div className="flex items-center gap-2 min-w-0">
             <span
-              className="w-2.5 h-2.5 rounded-sm shrink-0"
+              className="w-2 h-2 rounded-xs shrink-0"
               style={{ backgroundColor: currentRoomMeta.accentHex }}
             />
-            <span className="text-xs font-semibold text-slate-100 truncate">
+            <span className="text-xs font-medium tracking-[-0.01em] text-[#f7f8f8] truncate">
               {currentRoomMeta.name}
             </span>
           </div>
           <button
             type="button"
             onClick={() => onOpenRoomDetail(activeRoom)}
-            className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 active:bg-sky-300 text-slate-950 text-xs font-semibold transition-colors shrink-0 cursor-pointer"
+            className="px-3 py-1.5 rounded-md bg-[#5e6ad2] hover:bg-[#6e7ae2] text-[#f7f8f8] text-xs font-medium transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
           >
             Buka Detail Ruangan
           </button>
@@ -2888,248 +3052,145 @@ export default function VirtualOfficeCanvas({
       )}
 
       {/* =====================================================================
-          1. MOBILE LEGENDS-STYLE 360° ANALOG JOYSTICKS (Mobile < md only, stays visible in Zen Mode)
+          1. MOBILE LEFT-THUMB 360° MOVEMENT ANALOG JOYSTICK (Mobile < md only, stays visible in Zen Mode)
+          Note: The circular right-side Camera Analog Joystick has been removed as requested
+          because mobile users rotate/orbit the camera directly via native touch gestures on the screen.
          ===================================================================== */}
       {!isDrawerOpen && (
-        <>
-          {/* LEFT-THUMB 360° MOVEMENT ANALOG JOYSTICK (Mobile Legends Style) */}
-          <div
-            role="group"
-            aria-label="Analog Joystick Pergerakan 360 Derajat"
-            onTouchStart={(e) => {
-              e.stopPropagation();
-              const touch = e.changedTouches[0];
-              if (!touch) return;
-              const rect = e.currentTarget.getBoundingClientRect();
-              moveStickTouchIdRef.current = touch.identifier;
-              moveStickCenterRef.current = {
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2,
-              };
-              updateMoveAnalogFromPoint(touch.clientX, touch.clientY, 36);
-            }}
-            onTouchMove={(e) => {
-              e.stopPropagation();
-              for (let i = 0; i < e.changedTouches.length; i++) {
-                const t = e.changedTouches[i];
-                if (t.identifier === moveStickTouchIdRef.current) {
-                  updateMoveAnalogFromPoint(t.clientX, t.clientY, 36);
-                  break;
-                }
+        <div
+          role="group"
+          aria-label="Analog Joystick Pergerakan 360 Derajat"
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            const touch = e.changedTouches[0];
+            if (!touch) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            moveStickTouchIdRef.current = touch.identifier;
+            moveStickCenterRef.current = {
+              x: rect.left + rect.width / 2,
+              y: rect.top + rect.height / 2,
+            };
+            updateMoveAnalogFromPoint(touch.clientX, touch.clientY, 36);
+          }}
+          onTouchMove={(e) => {
+            e.stopPropagation();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+              const t = e.changedTouches[i];
+              if (t.identifier === moveStickTouchIdRef.current) {
+                updateMoveAnalogFromPoint(t.clientX, t.clientY, 36);
+                break;
               }
-            }}
-            onTouchEnd={(e) => {
-              e.stopPropagation();
-              for (let i = 0; i < e.changedTouches.length; i++) {
-                if (
-                  e.changedTouches[i].identifier === moveStickTouchIdRef.current
-                ) {
-                  resetMoveAnalog();
-                  break;
-                }
+            }
+          }}
+          onTouchEnd={(e) => {
+            e.stopPropagation();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+              if (
+                e.changedTouches[i].identifier === moveStickTouchIdRef.current
+              ) {
+                resetMoveAnalog();
+                break;
               }
-            }}
-            onTouchCancel={(e) => {
-              e.stopPropagation();
-              resetMoveAnalog();
-            }}
-            onPointerDown={(e) => {
-              if (e.pointerType === 'touch') return;
-              e.stopPropagation();
-              e.currentTarget.setPointerCapture(e.pointerId);
-              const rect = e.currentTarget.getBoundingClientRect();
-              moveStickCenterRef.current = {
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2,
-              };
-              updateMoveAnalogFromPoint(e.clientX, e.clientY, 36);
-            }}
-            onPointerMove={(e) => {
-              if (e.pointerType === 'touch' || !moveStickCenterRef.current)
-                return;
-              e.stopPropagation();
-              updateMoveAnalogFromPoint(e.clientX, e.clientY, 36);
-            }}
-            onPointerUp={(e) => {
-              if (e.pointerType === 'touch') return;
-              e.stopPropagation();
-              resetMoveAnalog();
-            }}
-            onPointerCancel={(e) => {
-              if (e.pointerType === 'touch') return;
-              e.stopPropagation();
-              resetMoveAnalog();
-            }}
-            className={`md:hidden fixed ${
-              zenMode ? 'bottom-5' : 'bottom-[76px]'
-            } left-4 z-20 w-28 h-28 rounded-full bg-[#0B0F17]/70 border-2 border-sky-400/40 shadow-[0_0_28px_rgba(56,189,248,0.22)] flex items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing transition-[bottom] duration-200`}
+            }
+          }}
+          onTouchCancel={(e) => {
+            e.stopPropagation();
+            resetMoveAnalog();
+          }}
+          onPointerDown={(e) => {
+            if (e.pointerType === 'touch') return;
+            e.stopPropagation();
+            e.currentTarget.setPointerCapture(e.pointerId);
+            const rect = e.currentTarget.getBoundingClientRect();
+            moveStickCenterRef.current = {
+              x: rect.left + rect.width / 2,
+              y: rect.top + rect.height / 2,
+            };
+            updateMoveAnalogFromPoint(e.clientX, e.clientY, 36);
+          }}
+          onPointerMove={(e) => {
+            if (e.pointerType === 'touch' || !moveStickCenterRef.current)
+              return;
+            e.stopPropagation();
+            updateMoveAnalogFromPoint(e.clientX, e.clientY, 36);
+          }}
+          onPointerUp={(e) => {
+            if (e.pointerType === 'touch') return;
+            e.stopPropagation();
+            resetMoveAnalog();
+          }}
+          onPointerCancel={(e) => {
+            if (e.pointerType === 'touch') return;
+            e.stopPropagation();
+            resetMoveAnalog();
+          }}
+          className={`md:hidden fixed ${
+            zenMode || !isPlaceSelected ? 'bottom-5' : 'bottom-[74px]'
+          } left-4 z-20 w-26 h-26 rounded-full bg-[#0f1011]/90 border border-[#23252a] flex items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing transition-[bottom] duration-200`}
+        >
+          {/* Inner Arena Ring */}
+          <div className="pointer-events-none absolute inset-3 rounded-full border border-[#23252a] bg-[#141516]/80" />
+
+          {/* Directional Chevrons around Outer Ring */}
+          <span
+            className={`pointer-events-none absolute top-1.5 text-[8px] font-mono transition-colors ${
+              moveStickUi.active && moveStickUi.y < -10
+                ? 'text-[#f7f8f8]'
+                : 'text-[#62666d]'
+            }`}
           >
-            {/* Inner Arena Ring */}
-            <div className="pointer-events-none absolute inset-3 rounded-full border border-sky-400/20 bg-slate-900/40" />
+            ▲
+          </span>
+          <span
+            className={`pointer-events-none absolute bottom-1.5 text-[8px] font-mono transition-colors ${
+              moveStickUi.active && moveStickUi.y > 10
+                ? 'text-[#f7f8f8]'
+                : 'text-[#62666d]'
+            }`}
+          >
+            ▼
+          </span>
+          <span
+            className={`pointer-events-none absolute left-1.5 text-[8px] font-mono transition-colors ${
+              moveStickUi.active && moveStickUi.x < -10
+                ? 'text-[#f7f8f8]'
+                : 'text-[#62666d]'
+            }`}
+          >
+            ◄
+          </span>
+          <span
+            className={`pointer-events-none absolute right-1.5 text-[8px] font-mono transition-colors ${
+              moveStickUi.active && moveStickUi.x > 10
+                ? 'text-[#f7f8f8]'
+                : 'text-[#62666d]'
+            }`}
+          >
+            ►
+          </span>
 
-            {/* Directional Chevrons around Outer Ring */}
-            <span
-              className={`pointer-events-none absolute top-1.5 text-[9px] font-bold transition-colors ${
-                moveStickUi.active && moveStickUi.y < -10
-                  ? 'text-sky-300 scale-125'
-                  : 'text-sky-400/45'
-              }`}
-            >
-              ▲
-            </span>
-            <span
-              className={`pointer-events-none absolute bottom-1.5 text-[9px] font-bold transition-colors ${
-                moveStickUi.active && moveStickUi.y > 10
-                  ? 'text-sky-300 scale-125'
-                  : 'text-sky-400/45'
-              }`}
-            >
-              ▼
-            </span>
-            <span
-              className={`pointer-events-none absolute left-1.5 text-[9px] font-bold transition-colors ${
-                moveStickUi.active && moveStickUi.x < -10
-                  ? 'text-sky-300 scale-125'
-                  : 'text-sky-400/45'
-              }`}
-            >
-              ◄
-            </span>
-            <span
-              className={`pointer-events-none absolute right-1.5 text-[9px] font-bold transition-colors ${
-                moveStickUi.active && moveStickUi.x > 10
-                  ? 'text-sky-300 scale-125'
-                  : 'text-sky-400/45'
-              }`}
-            >
-              ►
-            </span>
-
-            {/* Mobile Legends Directional Rim Glow when Active */}
-            {moveStickUi.active && (
-              <div
-                style={{ transform: `rotate(${moveStickUi.angleDeg}deg)` }}
-                className="pointer-events-none absolute inset-0 rounded-full border-t-2 border-sky-300 shadow-[0_-4px_14px_rgba(56,189,248,0.55)]"
-              />
-            )}
-
-            {/* Draggable Inner Analog Thumb Stick Knob */}
+          {/* Active Directional Rim Highlight */}
+          {moveStickUi.active && (
             <div
-              style={{
-                transform: `translate3d(${moveStickUi.x}px, ${moveStickUi.y}px, 0)`,
-              }}
-              className={`pointer-events-none w-12 h-12 rounded-full bg-gradient-to-b from-sky-300 via-sky-400 to-sky-600 border-2 border-white/90 shadow-[0_0_18px_rgba(56,189,248,0.8)] flex items-center justify-center ${
-                moveStickUi.active
-                  ? 'scale-105'
-                  : 'transition-transform duration-150 ease-out'
-              }`}
-            >
-              <div className="w-6 h-6 rounded-full border border-white/60 bg-sky-200/30" />
-            </div>
-          </div>
-
-          {/* RIGHT-THUMB 360° CAMERA ANALOG JOYSTICK (FPS & TPS Modes on Mobile < md) */}
-          {cameraMode !== 'orbit' && (
-            <div
-              role="group"
-              aria-label="Analog Joystick Kamera 360 Derajat"
-              onTouchStart={(e) => {
-                e.stopPropagation();
-                const touch = e.changedTouches[0];
-                if (!touch) return;
-                const rect = e.currentTarget.getBoundingClientRect();
-                lookStickTouchIdRef.current = touch.identifier;
-                lookStickCenterRef.current = {
-                  x: rect.left + rect.width / 2,
-                  y: rect.top + rect.height / 2,
-                };
-                updateLookAnalogFromPoint(touch.clientX, touch.clientY, 30);
-              }}
-              onTouchMove={(e) => {
-                e.stopPropagation();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                  const t = e.changedTouches[i];
-                  if (t.identifier === lookStickTouchIdRef.current) {
-                    updateLookAnalogFromPoint(t.clientX, t.clientY, 30);
-                    break;
-                  }
-                }
-              }}
-              onTouchEnd={(e) => {
-                e.stopPropagation();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                  if (
-                    e.changedTouches[i].identifier ===
-                    lookStickTouchIdRef.current
-                  ) {
-                    resetLookAnalog();
-                    break;
-                  }
-                }
-              }}
-              onTouchCancel={(e) => {
-                e.stopPropagation();
-                resetLookAnalog();
-              }}
-              onPointerDown={(e) => {
-                if (e.pointerType === 'touch') return;
-                e.stopPropagation();
-                e.currentTarget.setPointerCapture(e.pointerId);
-                const rect = e.currentTarget.getBoundingClientRect();
-                lookStickCenterRef.current = {
-                  x: rect.left + rect.width / 2,
-                  y: rect.top + rect.height / 2,
-                };
-                updateLookAnalogFromPoint(e.clientX, e.clientY, 30);
-              }}
-              onPointerMove={(e) => {
-                if (e.pointerType === 'touch' || !lookStickCenterRef.current)
-                  return;
-                e.stopPropagation();
-                updateLookAnalogFromPoint(e.clientX, e.clientY, 30);
-              }}
-              onPointerUp={(e) => {
-                if (e.pointerType === 'touch') return;
-                e.stopPropagation();
-                resetLookAnalog();
-              }}
-              onPointerCancel={(e) => {
-                if (e.pointerType === 'touch') return;
-                e.stopPropagation();
-                resetLookAnalog();
-              }}
-              className={`md:hidden fixed ${
-                zenMode ? 'bottom-5' : 'bottom-[76px]'
-              } right-4 z-20 w-24 h-24 rounded-full bg-[#0B0F17]/70 border-2 border-indigo-400/40 shadow-[0_0_24px_rgba(129,140,248,0.22)] flex items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing transition-[bottom] duration-200`}
-            >
-              <div className="pointer-events-none absolute inset-2.5 rounded-full border border-indigo-400/20 bg-slate-900/40" />
-
-              <span className="pointer-events-none absolute top-1 text-[8px] font-mono text-indigo-300/60">
-                KAMERA
-              </span>
-
-              {lookStickUi.active && (
-                <div
-                  style={{ transform: `rotate(${lookStickUi.angleDeg}deg)` }}
-                  className="pointer-events-none absolute inset-0 rounded-full border-t-2 border-indigo-300 shadow-[0_-4px_12px_rgba(129,140,248,0.5)]"
-                />
-              )}
-
-              <div
-                style={{
-                  transform: `translate3d(${lookStickUi.x}px, ${lookStickUi.y}px, 0)`,
-                }}
-                className={`pointer-events-none w-10 h-10 rounded-full bg-gradient-to-b from-indigo-300 via-indigo-400 to-indigo-600 border-2 border-white/90 shadow-[0_0_15px_rgba(129,140,248,0.8)] flex items-center justify-center ${
-                  lookStickUi.active
-                    ? 'scale-105'
-                    : 'transition-transform duration-150 ease-out'
-                }`}
-              >
-                <div className="w-5 h-5 rounded-full border border-white/60 bg-indigo-200/30" />
-              </div>
-            </div>
+              style={{ transform: `rotate(${moveStickUi.angleDeg}deg)` }}
+              className="pointer-events-none absolute inset-0 rounded-full border-t-2 border-[#5e6ad2]"
+            />
           )}
-        </>
+
+          {/* Draggable Inner Analog Thumb Stick Knob — Linear DESIGN.md #5e6ad2 */}
+          <div
+            style={{
+              transform: `translate3d(${moveStickUi.x}px, ${moveStickUi.y}px, 0)`,
+            }}
+            className={`pointer-events-none w-11 h-11 rounded-full bg-[#5e6ad2] border border-[#f7f8f8]/40 flex items-center justify-center ${
+              moveStickUi.active
+                ? 'scale-105'
+                : 'transition-transform duration-150 ease-out'
+            }`}
+          >
+            <div className="w-4 h-4 rounded-full bg-[#f7f8f8]/25" />
+          </div>
+        </div>
       )}
 
       {/* =====================================================================
@@ -3138,9 +3199,9 @@ export default function VirtualOfficeCanvas({
       {!zenMode && !isDrawerOpen && (
         <div
           aria-label="On-Screen 3D Movement Controls"
-          className="hidden md:flex fixed bottom-4 left-4 z-20 flex-col items-center gap-1 p-2 rounded-xl bg-[#0B0F17]/92 border border-slate-700/80 shadow-2xl touch-none select-none"
+          className="hidden md:flex fixed bottom-4 left-4 z-20 flex-col items-center gap-1.5 p-2 rounded-lg bg-[#0f1011] border border-[#23252a] touch-none select-none"
         >
-          <div className="font-mono text-[9px] uppercase tracking-wider text-slate-400">
+          <div className="font-mono text-[9px] uppercase tracking-wider text-[#62666d]">
             {cameraMode === 'orbit' ? 'GESER KAMERA' : 'JALAN (WASD)'}
           </div>
           <div className="grid grid-cols-3 gap-1">
@@ -3153,7 +3214,7 @@ export default function VirtualOfficeCanvas({
               onPointerUp={() => setPadState('turnLeft', false)}
               onPointerCancel={() => setPadState('turnLeft', false)}
               onPointerLeave={() => setPadState('turnLeft', false)}
-              className="w-9 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-sky-500 active:text-slate-950 border border-slate-700 text-[10px] font-mono text-slate-300 flex items-center justify-center cursor-pointer touch-none select-none"
+              className="w-9 h-7 rounded-md bg-[#141516] hover:bg-[#18191a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[10px] font-mono text-[#8a8f98] hover:text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
               title="Putar Kamera Kiri (Q)"
             >
               ↺ Q
@@ -3167,7 +3228,7 @@ export default function VirtualOfficeCanvas({
               onPointerUp={() => setPadState('forward', false)}
               onPointerCancel={() => setPadState('forward', false)}
               onPointerLeave={() => setPadState('forward', false)}
-              className="w-9 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 border border-slate-600 text-[11px] font-bold text-white flex items-center justify-center cursor-pointer touch-none select-none"
+              className="w-9 h-7 rounded-md bg-[#18191a] hover:bg-[#23252a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[11px] font-mono font-medium text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
               title="Maju (W / Arrow Up)"
             >
               ▲ W
@@ -3181,7 +3242,7 @@ export default function VirtualOfficeCanvas({
               onPointerUp={() => setPadState('turnRight', false)}
               onPointerCancel={() => setPadState('turnRight', false)}
               onPointerLeave={() => setPadState('turnRight', false)}
-              className="w-9 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-sky-500 active:text-slate-950 border border-slate-700 text-[10px] font-mono text-slate-300 flex items-center justify-center cursor-pointer touch-none select-none"
+              className="w-9 h-7 rounded-md bg-[#141516] hover:bg-[#18191a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[10px] font-mono text-[#8a8f98] hover:text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
               title="Putar Kamera Kanan (E)"
             >
               E ↻
@@ -3196,7 +3257,7 @@ export default function VirtualOfficeCanvas({
               onPointerUp={() => setPadState('left', false)}
               onPointerCancel={() => setPadState('left', false)}
               onPointerLeave={() => setPadState('left', false)}
-              className="w-9 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 border border-slate-600 text-[11px] font-bold text-white flex items-center justify-center cursor-pointer touch-none select-none"
+              className="w-9 h-7 rounded-md bg-[#18191a] hover:bg-[#23252a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[11px] font-mono font-medium text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
               title="Kiri (A / Arrow Left)"
             >
               ◄ A
@@ -3210,7 +3271,7 @@ export default function VirtualOfficeCanvas({
               onPointerUp={() => setPadState('backward', false)}
               onPointerCancel={() => setPadState('backward', false)}
               onPointerLeave={() => setPadState('backward', false)}
-              className="w-9 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 border border-slate-600 text-[11px] font-bold text-white flex items-center justify-center cursor-pointer touch-none select-none"
+              className="w-9 h-7 rounded-md bg-[#18191a] hover:bg-[#23252a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[11px] font-mono font-medium text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
               title="Putar Balik / Mundur (S / Arrow Down)"
             >
               ▼ S
@@ -3224,7 +3285,7 @@ export default function VirtualOfficeCanvas({
               onPointerUp={() => setPadState('right', false)}
               onPointerCancel={() => setPadState('right', false)}
               onPointerLeave={() => setPadState('right', false)}
-              className="w-9 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 border border-slate-600 text-[11px] font-bold text-white flex items-center justify-center cursor-pointer touch-none select-none"
+              className="w-9 h-7 rounded-md bg-[#18191a] hover:bg-[#23252a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[11px] font-mono font-medium text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
               title="Kanan (D / Arrow Right)"
             >
               D ►
@@ -3250,18 +3311,18 @@ export default function VirtualOfficeCanvas({
                 onOpenRoomDetail(room.id);
               }}
               aria-label={`Enter ${room.name} (${room.shortLabel})`}
-              className={`pointer-events-auto absolute top-0 left-0 flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-opacity duration-150 shadow-lg cursor-pointer opacity-0 ${
+              className={`pointer-events-auto absolute top-0 left-0 flex items-center gap-2 px-2.5 py-1.5 rounded-md border transition-opacity duration-150 cursor-pointer opacity-0 ${
                 isCurrent
-                  ? 'bg-[#0f172a] border-sky-400 text-slate-50 shadow-sky-950/60'
-                  : 'bg-[#0f172a]/95 border-slate-600/80 text-slate-200 hover:border-sky-400/80 hover:text-white'
+                  ? 'bg-[#0f1011] border-[#5e6ad2] text-[#f7f8f8]'
+                  : 'bg-[#0f1011]/95 border-[#23252a] text-[#8a8f98] hover:border-[#34373f] hover:text-[#f7f8f8]'
               }`}
               style={{ willChange: 'transform, opacity' }}
             >
               <span
-                className="w-2.5 h-2.5 rounded-sm shrink-0"
+                className="w-2 h-2 rounded-xs shrink-0"
                 style={{ backgroundColor: room.accentHex }}
               />
-              <span className="text-xs font-semibold tracking-tight whitespace-nowrap">
+              <span className="text-xs font-medium tracking-[-0.01em] whitespace-nowrap">
                 {room.name}
               </span>
             </button>
@@ -3269,25 +3330,25 @@ export default function VirtualOfficeCanvas({
         })}
       </div>
 
-      {/* Collapsible Office Floor Plan Blueprint (Only shown when toggled open) */}
+      {/* Collapsible Office Floor Plan Blueprint — Linear DESIGN.md panel */}
       {!zenMode && showFloorPlan && (
         <aside
           aria-label="Digital Office Floor Plan"
-          className="fixed top-28 left-2.5 right-2.5 sm:left-auto sm:right-4 sm:w-64 md:top-16 z-30 bg-[#0B0F17]/96 border border-slate-700/80 rounded-xl p-3.5 shadow-2xl"
+          className="fixed top-26 left-2.5 right-2.5 sm:left-auto sm:right-4 sm:w-64 md:top-15 z-30 bg-[#0f1011] border border-[#23252a] rounded-lg p-3.5"
         >
-          <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-[#23252a]">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-sky-400">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-[#62666d]">
                 DENAH KANTOR DIGITAL
               </p>
-              <p className="text-xs font-semibold text-slate-200">
-                Klik Ruangan untuk Pindah
+              <p className="text-xs font-medium text-[#f7f8f8]">
+                Pilih Ruangan
               </p>
             </div>
             <button
               type="button"
               onClick={onToggleFloorPlan}
-              className="font-mono text-[10px] uppercase tracking-wider text-slate-400 hover:text-slate-200 px-2 py-0.5 rounded border border-slate-700 cursor-pointer"
+              className="font-mono text-[10px] text-[#8a8f98] hover:text-[#f7f8f8] px-2 py-0.5 rounded-xs bg-[#141516] border border-[#23252a] cursor-pointer"
             >
               Tutup
             </button>
@@ -3303,16 +3364,20 @@ export default function VirtualOfficeCanvas({
                     key={rid}
                     type="button"
                     onClick={() => {
-                      onSelectRoom(rid);
+                      if (onClickRoom) {
+                        onClickRoom(rid);
+                      } else {
+                        onSelectRoom(rid);
+                      }
                     }}
-                    className={`text-left p-2 rounded-lg border transition-colors cursor-pointer ${
+                    className={`text-left p-2 rounded-md border transition-colors cursor-pointer ${
                       active
-                        ? 'bg-sky-500/20 border-sky-400 text-white'
-                        : 'bg-slate-900/90 border-slate-800 text-slate-300 hover:border-slate-600'
+                        ? 'bg-[#5e6ad2]/15 border-[#5e6ad2] text-[#f7f8f8]'
+                        : 'bg-[#141516] border-[#23252a] text-[#8a8f98] hover:text-[#f7f8f8] hover:border-[#34373f]'
                     }`}
                   >
-                    <div className="text-[11px] font-semibold truncate">{r.name}</div>
-                    <div className="text-[10px] text-slate-400 truncate">Sayap Utara</div>
+                    <div className="text-[11px] font-medium text-[#f7f8f8] truncate">{r.name}</div>
+                    <div className="text-[10px] text-[#62666d] truncate">Sayap Utara</div>
                   </button>
                 );
               })}
@@ -3321,16 +3386,20 @@ export default function VirtualOfficeCanvas({
             <button
               type="button"
               onClick={() => {
-                onSelectRoom('lobby');
+                if (onClickRoom) {
+                  onClickRoom('lobby');
+                } else {
+                  onSelectRoom('lobby');
+                }
               }}
-              className={`w-full text-left p-2 rounded-lg border transition-colors cursor-pointer ${
+              className={`w-full text-left p-2 rounded-md border transition-colors cursor-pointer ${
                 activeRoom === 'lobby'
-                  ? 'bg-sky-500/20 border-sky-400 text-white'
-                  : 'bg-slate-900/90 border-slate-800 text-slate-300 hover:border-slate-600'
+                  ? 'bg-[#5e6ad2]/15 border-[#5e6ad2] text-[#f7f8f8]'
+                  : 'bg-[#141516] border-[#23252a] text-[#8a8f98] hover:text-[#f7f8f8] hover:border-[#34373f]'
               }`}
             >
-              <div className="text-xs font-semibold">Virtual Office Lobby</div>
-              <div className="text-[10px] text-slate-400">Area Resepsionis Utama</div>
+              <div className="text-xs font-medium text-[#f7f8f8]">Virtual Office Lobby</div>
+              <div className="text-[10px] text-[#62666d]">Area Resepsionis Utama</div>
             </button>
 
             <div className="grid grid-cols-2 gap-1.5">
@@ -3342,16 +3411,20 @@ export default function VirtualOfficeCanvas({
                     key={rid}
                     type="button"
                     onClick={() => {
-                      onSelectRoom(rid);
+                      if (onClickRoom) {
+                        onClickRoom(rid);
+                      } else {
+                        onSelectRoom(rid);
+                      }
                     }}
-                    className={`text-left p-2 rounded-lg border transition-colors cursor-pointer ${
+                    className={`text-left p-2 rounded-md border transition-colors cursor-pointer ${
                       active
-                        ? 'bg-sky-500/20 border-sky-400 text-white'
-                        : 'bg-slate-900/90 border-slate-800 text-slate-300 hover:border-slate-600'
+                        ? 'bg-[#5e6ad2]/15 border-[#5e6ad2] text-[#f7f8f8]'
+                        : 'bg-[#141516] border-[#23252a] text-[#8a8f98] hover:text-[#f7f8f8] hover:border-[#34373f]'
                     }`}
                   >
-                    <div className="text-[11px] font-semibold truncate">{r.name}</div>
-                    <div className="text-[10px] text-slate-400 truncate">Sayap Tengah</div>
+                    <div className="text-[11px] font-medium text-[#f7f8f8] truncate">{r.name}</div>
+                    <div className="text-[10px] text-[#62666d] truncate">Sayap Tengah</div>
                   </button>
                 );
               })}
@@ -3360,16 +3433,20 @@ export default function VirtualOfficeCanvas({
             <button
               type="button"
               onClick={() => {
-                onSelectRoom('contact');
+                if (onClickRoom) {
+                  onClickRoom('contact');
+                } else {
+                  onSelectRoom('contact');
+                }
               }}
-              className={`w-full text-left p-2 rounded-lg border transition-colors cursor-pointer ${
+              className={`w-full text-left p-2 rounded-md border transition-colors cursor-pointer ${
                 activeRoom === 'contact'
-                  ? 'bg-sky-500/20 border-sky-400 text-white'
-                  : 'bg-slate-900/90 border-slate-800 text-slate-300 hover:border-slate-600'
+                  ? 'bg-[#5e6ad2]/15 border-[#5e6ad2] text-[#f7f8f8]'
+                  : 'bg-[#141516] border-[#23252a] text-[#8a8f98] hover:text-[#f7f8f8] hover:border-[#34373f]'
               }`}
             >
-              <div className="text-xs font-semibold">Coffee Bar & Contact Lounge</div>
-              <div className="text-[10px] text-slate-400">Area Tamu Selatan</div>
+              <div className="text-xs font-medium text-[#f7f8f8]">Coffee Bar & Contact Lounge</div>
+              <div className="text-[10px] text-[#62666d]">Area Tamu Selatan</div>
             </button>
           </div>
         </aside>

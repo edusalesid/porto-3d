@@ -1,7 +1,10 @@
 node_modules/
 .next/
+.vercel/
+.playwright-cli/
 coverage/
 .DS_Store
 *.log
+*.tsbuildinfo
 .env*
 !.env.example

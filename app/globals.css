@@ -6,22 +6,23 @@
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Custom scrollbar for room panels and drawers */
+/* Custom scrollbar for room panels and drawers — Linear DESIGN.md surface tokens */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0b0f17;
+  background: #08090a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #23252a;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #34373f;
 }
+
 

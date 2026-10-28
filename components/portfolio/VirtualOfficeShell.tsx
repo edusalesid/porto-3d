@@ -50,6 +50,7 @@ export default function VirtualOfficeShell({
   const [showFloorPlan, setShowFloorPlan] = useState<boolean>(false);
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [isPlaceSelected, setIsPlaceSelected] = useState<boolean>(false);
   const [sheetDragY, setSheetDragY] = useState<number>(0);
   const [isSheetDragging, setIsSheetDragging] = useState<boolean>(false);
   const sheetTouchStartYRef = useRef<number | null>(null);
@@ -86,6 +87,7 @@ export default function VirtualOfficeShell({
       if (roomParam && ROOMS.some((r) => r.id === roomParam)) {
         setActiveRoom(roomParam);
         if (roomParam !== 'lobby') {
+          setIsPlaceSelected(true);
           setDrawerOpen(true);
         }
       }
@@ -94,6 +96,7 @@ export default function VirtualOfficeShell({
         if (found) {
           setActiveRoom('cases');
           setActiveCaseProject(found);
+          setIsPlaceSelected(true);
           setDrawerOpen(true);
         }
       }
@@ -130,7 +133,10 @@ export default function VirtualOfficeShell({
       if (e.key === 'Escape') {
         if (drawerOpen) {
           setDrawerOpen(false);
+          setIsPlaceSelected(false);
           setActiveCaseProject(null);
+        } else if (isPlaceSelected) {
+          setIsPlaceSelected(false);
         } else if (zenMode) {
           setZenMode(false);
         } else if (showInfoCard) {
@@ -156,7 +162,7 @@ export default function VirtualOfficeShell({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [drawerOpen, zenMode, showInfoCard, showFloorPlan, viewMode]);
+  }, [drawerOpen, isPlaceSelected, zenMode, showInfoCard, showFloorPlan, viewMode]);
 
   const handleChangeCameraMode = (newMode: CameraMode) => {
     setCameraMode(newMode);
@@ -172,8 +178,16 @@ export default function VirtualOfficeShell({
     trackPortfolioEvent('room_selected', { room: roomId });
   };
 
+  const handleClickRoom = (roomId: RoomId) => {
+    setActiveRoom(roomId);
+    setActiveCaseProject(null);
+    setIsPlaceSelected(true);
+    trackPortfolioEvent('room_selected', { room: roomId, action: 'click_place' });
+  };
+
   const handleOpenRoomDetail = (roomId: RoomId) => {
     setActiveRoom(roomId);
+    setIsPlaceSelected(true);
     setDrawerOpen(true);
     trackPortfolioEvent('room_selected', { room: roomId, action: 'open_panel' });
   };
@@ -181,6 +195,7 @@ export default function VirtualOfficeShell({
   const handleOpenProjectCase = (project: PortfolioProject) => {
     setActiveCaseProject(project);
     setActiveRoom('cases');
+    setIsPlaceSelected(true);
     setDrawerOpen(true);
     trackPortfolioEvent('case_study_viewed', { slug: project.slug });
   };
@@ -199,10 +214,10 @@ export default function VirtualOfficeShell({
       data-state={viewMode === '3d' ? `room-${activeRoom}` : 'list-mode'}
       className={
         viewMode === '3d'
-          ? `fixed inset-0 w-screen h-dvh overflow-hidden touch-none bg-[#0B0F17] text-slate-100 ${
+          ? `fixed inset-0 w-screen h-dvh overflow-hidden touch-none bg-[#08090a] text-[#f7f8f8] ${
               cameraMode === 'fps' && !drawerOpen ? 'md:!cursor-none md:[&_*]:!cursor-none' : ''
             }`
-          : 'min-h-screen flex flex-col bg-[#0B0F17] text-slate-100'
+          : 'min-h-screen flex flex-col bg-[#08090a] text-[#f7f8f8]'
       }
     >
       {/* Top Bar is ONLY shown in 2D List Mode so 3D mode is 100% Full 1-Page without 01-06 navbar */}
@@ -231,6 +246,7 @@ export default function VirtualOfficeShell({
               zenMode={zenMode}
               showFloorPlan={showFloorPlan}
               isDrawerOpen={drawerOpen}
+              isPlaceSelected={isPlaceSelected}
               onChangeCameraMode={handleChangeCameraMode}
               onToggleZenMode={() => setZenMode((z) => !z)}
               onToggleFloorPlan={() => {
@@ -241,6 +257,8 @@ export default function VirtualOfficeShell({
                 });
               }}
               onSelectRoom={handleSelectRoom}
+              onClickRoom={handleClickRoom}
+              onDismissPlace={() => setIsPlaceSelected(false)}
               onOpenRoomDetail={handleOpenRoomDetail}
               onSceneReady={() => {
                 setSceneStatus('ready');
@@ -259,17 +277,17 @@ export default function VirtualOfficeShell({
             <div
               role="status"
               aria-live="polite"
-              className="absolute inset-0 z-20 flex items-center justify-center bg-[#0B0F17]/90 p-6"
+              className="absolute inset-0 z-20 flex items-center justify-center bg-[#08090a]/92 p-6"
             >
-              <div className="max-w-md w-full p-6 rounded-2xl bg-[#0F172A] border border-slate-800 space-y-4 text-center shadow-2xl">
-                <div className="text-xs font-mono text-sky-400">
-                  INITIALIZING RIZAL OS SPATIAL WORKSPACE
+              <div className="max-w-md w-full p-6 rounded-lg bg-[#0f1011] border border-[#23252a] space-y-3.5 text-center">
+                <div className="text-[11px] font-mono text-[#62666d] uppercase tracking-wider">
+                  RIZAL OS · SPATIAL WORKSPACE
                 </div>
-                <h2 className="font-display text-xl font-bold text-slate-100">
+                <h2 className="font-display text-lg font-semibold tracking-[-0.02em] text-[#f7f8f8]">
                   Loading 3D Virtual Office...
                 </h2>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Preparing stylized rooms, project boards, and case archives. You can wait a moment or switch immediately to the standard portfolio view.
+                <p className="text-xs text-[#8a8f98] leading-relaxed">
+                  Preparing studio rooms, project boards, and case archives. You can wait a moment or switch immediately to the standard portfolio view.
                 </p>
                 <div className="pt-2 flex items-center justify-center gap-3">
                   <button
@@ -280,7 +298,7 @@ export default function VirtualOfficeShell({
                         reason: 'user_skipped_loading',
                       });
                     }}
-                    className="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-lg transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 text-xs font-medium bg-[#18191a] hover:bg-[#23252a] text-[#f7f8f8] border border-[#23252a] rounded-md transition-colors cursor-pointer"
                   >
                     Open Standard Portfolio
                   </button>
@@ -293,31 +311,31 @@ export default function VirtualOfficeShell({
           {sceneStatus === 'error' && (
             <div
               role="alert"
-              className="absolute inset-0 z-20 flex items-center justify-center bg-[#0B0F17] p-6"
+              className="absolute inset-0 z-20 flex items-center justify-center bg-[#08090a] p-6"
             >
-              <div className="max-w-md w-full p-6 rounded-2xl bg-[#0F172A] border border-slate-800 space-y-4 shadow-2xl">
-                <div className="flex items-center gap-2.5 text-amber-400">
-                  <AlertTriangle className="w-5 h-5 shrink-0" />
-                  <span className="text-xs font-mono uppercase">
+              <div className="max-w-md w-full p-6 rounded-lg bg-[#0f1011] border border-[#23252a] space-y-4">
+                <div className="flex items-center gap-2 text-[#8a8f98]">
+                  <AlertTriangle className="w-4 h-4 text-[#5e6ad2] shrink-0" />
+                  <span className="text-[11px] font-mono uppercase tracking-wider">
                     WebGL / 3D Workspace Notice
                   </span>
                 </div>
-                <h2 className="font-display text-xl font-bold text-slate-100">
+                <h2 className="font-display text-lg font-semibold tracking-[-0.02em] text-[#f7f8f8]">
                   3D workspace could not be loaded.
                 </h2>
-                <p className="text-sm text-slate-300 leading-relaxed">
+                <p className="text-xs text-[#8a8f98] leading-relaxed">
                   Portfolio tetap bisa dijelajahi dalam mode sederhana. All projects, 14-point case studies, systems documentation, and CV downloads remain 100% accessible.
                 </p>
                 {sceneErrorReason && (
-                  <p className="text-xs font-mono text-slate-400 bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <p className="text-xs font-mono text-[#8a8f98] bg-[#141516] p-2.5 rounded-md border border-[#23252a]">
                     Reason: {sceneErrorReason}
                   </p>
                 )}
-                <div className="pt-2 flex flex-wrap items-center gap-3">
+                <div className="pt-1 flex flex-wrap items-center gap-2.5">
                   <button
                     type="button"
                     onClick={() => setViewMode('2d')}
-                    className="px-4 py-2 text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-lg transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 text-xs font-medium bg-[#5e6ad2] hover:bg-[#6e7ae2] text-[#f7f8f8] rounded-md transition-colors cursor-pointer"
                   >
                     Open Portfolio
                   </button>
@@ -328,7 +346,7 @@ export default function VirtualOfficeShell({
                       setSceneErrorReason('');
                       setSceneMountKey((k) => k + 1);
                     }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium bg-[#141516] hover:bg-[#18191a] text-[#8a8f98] hover:text-[#f7f8f8] border border-[#23252a] rounded-md transition-colors cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Retry 3D</span>
@@ -338,18 +356,18 @@ export default function VirtualOfficeShell({
             </div>
           )}
 
-          {/* COMPACT FLOATING TOP-LEFT PILL (Responsive on Mobile & Desktop, zero room-list bar!) */}
+          {/* COMPACT FLOATING TOP-LEFT BAR — Linear DESIGN.md (#0f1011 surface, #23252a 1px border, #5e6ad2 accent) */}
           {!zenMode && (
-            <div className="fixed top-2.5 left-2.5 right-2.5 md:top-4 md:left-4 md:right-auto z-20 flex flex-col items-stretch md:items-start gap-2 pointer-events-none">
-              <div className="pointer-events-auto flex items-center justify-between md:justify-start gap-1 p-1 rounded-xl bg-[#0B0F17]/95 border border-slate-700/90 shadow-2xl">
-                <div className="flex items-center gap-1.5 px-2 py-1 border-r border-slate-800 shrink-0">
-                  <span className="w-2 h-2 rounded-full bg-sky-400" />
-                  <span className="font-display text-[11px] sm:text-xs font-bold tracking-tight text-slate-100 whitespace-nowrap">
+            <div className="fixed top-2.5 left-2.5 right-2.5 md:top-3.5 md:left-3.5 md:right-auto z-20 flex flex-col items-stretch md:items-start gap-2 pointer-events-none">
+              <div className="pointer-events-auto flex items-center justify-between md:justify-start gap-1 p-1 rounded-lg bg-[#0f1011] border border-[#23252a]">
+                <div className="flex items-center gap-2 px-2 py-1 border-r border-[#23252a] shrink-0">
+                  <span className="w-2 h-2 rounded-xs bg-[#5e6ad2]" />
+                  <span className="font-display text-xs font-semibold tracking-[-0.02em] text-[#f7f8f8] whitespace-nowrap">
                     RIZAL OS
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-0.5 overflow-x-auto no-scrollbar">
                   <button
                     type="button"
                     onClick={() => {
@@ -360,10 +378,10 @@ export default function VirtualOfficeShell({
                       });
                     }}
                     aria-expanded={showInfoCard}
-                    className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                    className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2] ${
                       showInfoCard
-                        ? 'bg-sky-500 text-slate-950 font-semibold'
-                        : 'text-slate-200 hover:bg-slate-800/80'
+                        ? 'bg-[#5e6ad2] text-[#f7f8f8]'
+                        : 'text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a]'
                     }`}
                   >
                     <Info className="w-3.5 h-3.5 shrink-0" />
@@ -380,10 +398,10 @@ export default function VirtualOfficeShell({
                       });
                     }}
                     aria-expanded={showFloorPlan}
-                    className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                    className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2] ${
                       showFloorPlan
-                        ? 'bg-sky-500 text-slate-950 font-semibold'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                        ? 'bg-[#5e6ad2] text-[#f7f8f8]'
+                        : 'text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a]'
                     }`}
                   >
                     <MapIcon className="w-3.5 h-3.5 shrink-0" />
@@ -393,9 +411,9 @@ export default function VirtualOfficeShell({
                   <button
                     type="button"
                     onClick={() => setViewMode('2d')}
-                    className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-colors cursor-pointer shrink-0"
+                    className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-xs font-medium text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a] transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
                   >
-                    <ListFilter className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <ListFilter className="w-3.5 h-3.5 shrink-0" />
                     <span>2D</span>
                   </button>
 
@@ -407,7 +425,7 @@ export default function VirtualOfficeShell({
                         source: 'floating_pill',
                       })
                     }
-                    className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-sky-300 transition-colors shrink-0"
+                    className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-xs font-medium bg-[#141516] hover:bg-[#18191a] text-[#f7f8f8] border border-[#23252a] transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
                   >
                     <FileDown className="w-3.5 h-3.5 shrink-0" />
                     <span>CV</span>
@@ -415,32 +433,32 @@ export default function VirtualOfficeShell({
                 </div>
               </div>
 
-              {/* Expandable Room Info Card (Hidden by default so 3D view is clean) */}
+              {/* Expandable Room Info Card — Linear DESIGN.md card */}
               {showInfoCard && (
                 <section
                   aria-label="Active Room Summary"
-                  className="pointer-events-auto w-full max-w-sm p-3.5 sm:p-4 rounded-xl bg-[#0F172A]/96 border border-slate-700/90 shadow-2xl space-y-2.5"
+                  className="pointer-events-auto w-full max-w-sm p-3.5 sm:p-4 rounded-lg bg-[#0f1011] border border-[#23252a] space-y-2.5"
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-xs font-mono text-sky-400">
-                      {currentRoomMeta.name.toUpperCase()}
+                  <div className="flex items-center justify-between gap-3 pb-2 border-b border-[#23252a]">
+                    <div className="text-[11px] font-mono text-[#62666d] uppercase tracking-wider">
+                      {currentRoomMeta.name}
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowInfoCard(false)}
-                      className="text-xs font-mono text-slate-400 hover:text-white cursor-pointer"
+                      className="text-[11px] font-mono text-[#8a8f98] hover:text-[#f7f8f8] cursor-pointer"
                     >
                       Tutup
                     </button>
                   </div>
 
-                  <h1 className="font-display text-sm sm:text-base font-bold text-slate-100 leading-snug">
+                  <h1 className="font-display text-sm font-semibold tracking-[-0.015em] text-[#f7f8f8] leading-snug">
                     {activeRoom === 'lobby'
                       ? 'Project Execution, Product Systems & AI Workflows'
                       : currentRoomMeta.purpose}
                   </h1>
 
-                  <p className="text-xs text-slate-300 leading-relaxed">
+                  <p className="text-xs text-[#8a8f98] leading-relaxed">
                     {currentRoomMeta.summary}
                   </p>
 
@@ -449,16 +467,17 @@ export default function VirtualOfficeShell({
                       type="button"
                       onClick={() => {
                         setShowInfoCard(false);
+                        setIsPlaceSelected(true);
                         setDrawerOpen(true);
                       }}
-                      className="px-3.5 py-1.5 text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-lg transition-colors cursor-pointer"
+                      className="px-3 py-1.5 text-xs font-medium bg-[#5e6ad2] hover:bg-[#6e7ae2] text-[#f7f8f8] rounded-md transition-colors cursor-pointer"
                     >
                       {currentRoomMeta.ctaLabel}
                     </button>
                     <button
                       type="button"
                       onClick={() => setViewMode('2d')}
-                      className="px-2.5 py-1.5 text-xs text-slate-300 hover:text-white underline underline-offset-4 cursor-pointer"
+                      className="px-2.5 py-1.5 text-xs text-[#8a8f98] hover:text-[#f7f8f8] underline underline-offset-4 cursor-pointer"
                     >
                       2D List Mode
                     </button>
@@ -469,7 +488,8 @@ export default function VirtualOfficeShell({
           )}
 
           {/* =================================================================
-              1. MOBILE PERSISTENT SWIPE-UP / SWIPE-DOWN BOTTOM SHEET (< md)
+              1. MOBILE SWIPE-UP / SWIPE-DOWN BOTTOM SHEET (< md)
+              Hidden by default; only appears when a room/place is clicked!
              ================================================================= */}
           {!zenMode && (
             <>
@@ -480,29 +500,37 @@ export default function VirtualOfficeShell({
                   setSheetDragY(0);
                   setIsSheetDragging(false);
                   setDrawerOpen(false);
+                  setIsPlaceSelected(false);
                   setActiveCaseProject(null);
                 }}
-                className={`md:hidden fixed inset-0 z-30 bg-black/65 transition-opacity duration-300 ${
+                className={`md:hidden fixed inset-0 z-30 bg-black/70 transition-opacity duration-300 ${
                   drawerOpen
                     ? 'opacity-100 pointer-events-auto'
                     : 'opacity-0 pointer-events-none'
                 }`}
               />
 
-              {/* Mobile Swipe-Up / Swipe-Down Sheet Container */}
+              {/* Mobile Swipe-Up / Swipe-Down Sheet Container — Linear DESIGN.md */}
               <div
                 role="dialog"
                 aria-modal={drawerOpen}
+                aria-hidden={!isPlaceSelected && !drawerOpen}
                 aria-label={`${currentRoomMeta.name} Mobile Bottom Sheet`}
                 style={{
                   transform: drawerOpen
                     ? `translateY(${Math.max(0, sheetDragY)}px)`
-                    : `translateY(calc(100% - 62px + ${Math.min(0, sheetDragY)}px))`,
+                    : isPlaceSelected
+                      ? `translateY(calc(100% - 60px + ${Math.max(-620, Math.min(80, sheetDragY))}px))`
+                      : 'translateY(100%)',
                 }}
-                className={`md:hidden fixed inset-x-0 bottom-0 z-40 h-[86dvh] bg-[#0B0F17] rounded-t-3xl border-t border-slate-700/90 flex flex-col shadow-2xl overflow-hidden ${
+                className={`md:hidden fixed inset-x-0 bottom-0 z-40 h-[86dvh] bg-[#08090a] rounded-t-2xl border-t border-[#23252a] flex flex-col overflow-hidden ${
+                  !isPlaceSelected && !drawerOpen
+                    ? 'pointer-events-none opacity-0 invisible'
+                    : 'pointer-events-auto opacity-100 visible'
+                } ${
                   isSheetDragging
                     ? ''
-                    : 'transition-transform duration-300 ease-out'
+                    : 'transition-[transform,opacity,visibility] duration-300 ease-out'
                 }`}
               >
                 {/* Interactive Swipe-Up / Swipe-Down Handle & Header Bar */}
@@ -515,9 +543,9 @@ export default function VirtualOfficeShell({
                     if (sheetTouchStartYRef.current === null) return;
                     const deltaY =
                       e.touches[0].clientY - sheetTouchStartYRef.current;
-                    if (!drawerOpen && deltaY < 0) {
-                      setSheetDragY(Math.max(-620, deltaY));
-                    } else if (drawerOpen && deltaY > 0) {
+                    if (!drawerOpen) {
+                      setSheetDragY(Math.max(-620, Math.min(80, deltaY)));
+                    } else if (deltaY > 0) {
                       setSheetDragY(deltaY);
                     }
                   }}
@@ -532,14 +560,15 @@ export default function VirtualOfficeShell({
                     setSheetDragY(0);
 
                     if (!drawerOpen) {
-                      // Swipe Up (or quick tap on handle bar) opens the sheet
                       if (finalDeltaY < -24 || Math.abs(finalDeltaY) < 6) {
                         setDrawerOpen(true);
+                      } else if (finalDeltaY > 18) {
+                        setIsPlaceSelected(false);
                       }
                     } else {
-                      // Swipe Down (or quick tap on handle bar) closes the sheet
                       if (finalDeltaY > 32 || Math.abs(finalDeltaY) < 6) {
                         setDrawerOpen(false);
+                        setIsPlaceSelected(false);
                         setActiveCaseProject(null);
                       }
                     }
@@ -557,9 +586,9 @@ export default function VirtualOfficeShell({
                     )
                       return;
                     const deltaY = e.clientY - sheetTouchStartYRef.current;
-                    if (!drawerOpen && deltaY < 0) {
-                      setSheetDragY(Math.max(-620, deltaY));
-                    } else if (drawerOpen && deltaY > 0) {
+                    if (!drawerOpen) {
+                      setSheetDragY(Math.max(-620, Math.min(80, deltaY)));
+                    } else if (deltaY > 0) {
                       setSheetDragY(deltaY);
                     }
                   }}
@@ -577,10 +606,13 @@ export default function VirtualOfficeShell({
                     if (!drawerOpen) {
                       if (finalDeltaY < -24 || Math.abs(finalDeltaY) < 6) {
                         setDrawerOpen(true);
+                      } else if (finalDeltaY > 18) {
+                        setIsPlaceSelected(false);
                       }
                     } else {
                       if (finalDeltaY > 32 || Math.abs(finalDeltaY) < 6) {
                         setDrawerOpen(false);
+                        setIsPlaceSelected(false);
                         setActiveCaseProject(null);
                       }
                     }
@@ -590,27 +622,27 @@ export default function VirtualOfficeShell({
                       ? 'Swipe down untuk menutup detail ruangan'
                       : 'Swipe up untuk membuka detail ruangan'
                   }
-                  className="h-[62px] px-4 bg-[#0F172A] border-b border-slate-800 flex flex-col justify-center cursor-grab active:cursor-grabbing touch-none select-none shrink-0"
+                  className="h-[60px] px-4 bg-[#0f1011] border-b border-[#23252a] flex flex-col justify-center cursor-grab active:cursor-grabbing touch-none select-none shrink-0"
                 >
-                  {/* Pill bar + Swipe Gesture Indicator */}
-                  <div className="flex flex-col items-center justify-center mb-1">
-                    <div className="w-11 h-1.5 rounded-full bg-sky-400/80" />
+                  {/* Handle Bar Indicator */}
+                  <div className="flex flex-col items-center justify-center mb-1.5">
+                    <div className="w-9 h-1 rounded-full bg-[#34373f]" />
                   </div>
 
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <span
-                        className="w-2.5 h-2.5 rounded-sm shrink-0"
+                        className="w-2 h-2 rounded-xs shrink-0"
                         style={{ backgroundColor: currentRoomMeta.accentHex }}
                       />
-                      <span className="font-display text-xs font-bold text-slate-100 truncate">
+                      <span className="font-display text-xs font-medium tracking-[-0.01em] text-[#f7f8f8] truncate">
                         {activeCaseProject
                           ? activeCaseProject.title
                           : currentRoomMeta.name}
                       </span>
                     </div>
 
-                    <span className="font-mono text-[10px] font-semibold tracking-wider text-sky-400 shrink-0">
+                    <span className="font-mono text-[10px] font-medium tracking-wider text-[#8a8f98] shrink-0">
                       {drawerOpen
                         ? '▼ SWIPE DOWN TUTUP'
                         : '▲ SWIPE UP DETAIL'}
@@ -618,7 +650,7 @@ export default function VirtualOfficeShell({
                   </div>
                 </div>
 
-                {/* Mobile Scrollable Content (Also supports Swipe-Down-to-Close when at scrollTop === 0) */}
+                {/* Mobile Scrollable Content */}
                 <div
                   ref={mobileSheetScrollRef}
                   onTouchStart={(e) => {
@@ -653,6 +685,7 @@ export default function VirtualOfficeShell({
                     if (sheetContentTouchStartYRef.current === null) return;
                     if (sheetDragY > 50) {
                       setDrawerOpen(false);
+                      setIsPlaceSelected(false);
                       setActiveCaseProject(null);
                     }
                     sheetContentTouchStartYRef.current = null;
@@ -687,37 +720,37 @@ export default function VirtualOfficeShell({
                       onSelectProjectSlug={handleSelectProjectSlug}
                     />
                   ) : activeRoom === 'cases' ? (
-                    <div className="space-y-8">
-                      <div className="space-y-2">
-                        <p className="text-xs font-mono tracking-wider text-amber-400">
+                    <div className="space-y-6">
+                      <div className="space-y-1.5">
+                        <p className="text-[11px] font-mono tracking-wider text-[#62666d] uppercase">
                           CASE ARCHIVE · 14-POINT DEEP-DIVE STUDIES
                         </p>
-                        <h2 className="font-display text-2xl font-bold text-slate-100">
+                        <h2 className="font-display text-xl font-semibold tracking-[-0.02em] text-[#f7f8f8]">
                           Select a Case Study to Inspect
                         </h2>
-                        <p className="text-sm text-slate-300">
+                        <p className="text-xs text-[#8a8f98] leading-relaxed">
                           Every case study follows a rigorous 14-point structure: Overview, Context, Problem, Objectives, Constraints, Individual Role, Team, Approach, Key Decisions, Execution, Risks, Outcomes, Lessons Learned, and Evidence.
                         </p>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-4">
+                      <div className="grid grid-cols-1 gap-3">
                         {PORTFOLIO_PROJECTS.map((proj) => (
                           <div
                             key={proj.slug}
-                            className="p-5 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between gap-4"
+                            className="p-4 rounded-lg bg-[#141516] border border-[#23252a] flex flex-col justify-between gap-3.5"
                           >
                             <div className="space-y-1.5">
-                              <div className="text-xs text-slate-400">
-                                <span className="text-amber-400 font-medium">
+                              <div className="text-xs text-[#62666d]">
+                                <span className="text-[#8a8f98] font-medium">
                                   {proj.category.join(' / ')}
                                 </span>
                                 <span> · {proj.role} · </span>
-                                <span className="font-mono">{proj.period}</span>
+                                <span className="font-mono tabular-nums">{proj.period}</span>
                               </div>
-                              <h3 className="font-display text-base font-bold text-slate-100">
+                              <h3 className="font-display text-sm font-semibold tracking-[-0.015em] text-[#f7f8f8]">
                                 {proj.title}
                               </h3>
-                              <p className="text-xs text-slate-300">
+                              <p className="text-xs text-[#8a8f98] leading-relaxed">
                                 {proj.summary}
                               </p>
                             </div>
@@ -725,13 +758,13 @@ export default function VirtualOfficeShell({
                               <button
                                 type="button"
                                 onClick={() => handleOpenProjectCase(proj)}
-                                className="px-4 py-2 text-xs font-semibold bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg transition-colors whitespace-nowrap cursor-pointer"
+                                className="px-3.5 py-1.5 text-xs font-medium bg-[#5e6ad2] hover:bg-[#6e7ae2] text-[#f7f8f8] rounded-md transition-colors whitespace-nowrap cursor-pointer"
                               >
                                 Read 14-Point Case
                               </button>
                               <Link
                                 href={`/cases/${proj.slug}`}
-                                className="inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs text-slate-300 hover:text-white border border-slate-800 rounded-lg whitespace-nowrap"
+                                className="inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs text-[#8a8f98] hover:text-[#f7f8f8] bg-[#18191a] border border-[#23252a] rounded-md whitespace-nowrap"
                               >
                                 <span>Direct URL</span>
                                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -750,29 +783,30 @@ export default function VirtualOfficeShell({
           )}
 
           {/* =================================================================
-              2. DESKTOP RIGHT SLIDE-OVER DRAWER (md+ only)
+              2. DESKTOP RIGHT SLIDE-OVER DRAWER (md+ only) — Linear DESIGN.md
              ================================================================= */}
           {drawerOpen && (
             <div
               role="dialog"
               aria-modal="true"
               aria-label={`${currentRoomMeta.name} Content Panel`}
-              className="hidden md:flex fixed inset-0 z-40 justify-end bg-black/65 touch-auto"
+              className="hidden md:flex fixed inset-0 z-40 justify-end bg-black/70 touch-auto"
               onClick={(e) => {
                 if (e.target === e.currentTarget) {
                   setDrawerOpen(false);
+                  setIsPlaceSelected(false);
                   setActiveCaseProject(null);
                 }
               }}
             >
-              <div className="relative w-full max-w-3xl h-full bg-[#0B0F17] border-l border-slate-800 flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-right duration-200">
-                <div className="px-6 py-4 bg-[#0F172A] border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
+              <div className="relative w-full max-w-3xl h-full bg-[#08090a] border-l border-[#23252a] flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
+                <div className="px-6 py-3.5 bg-[#0f1011] border-b border-[#23252a] flex items-center justify-between gap-3 shrink-0">
                   <div className="flex items-center gap-2 min-w-0">
                     <span
-                      className="w-2.5 h-2.5 rounded-sm shrink-0"
+                      className="w-2 h-2 rounded-xs shrink-0"
                       style={{ backgroundColor: currentRoomMeta.accentHex }}
                     />
-                    <span className="font-display text-sm font-bold text-slate-100 truncate">
+                    <span className="font-display text-sm font-medium tracking-[-0.015em] text-[#f7f8f8] truncate">
                       {activeCaseProject
                         ? activeCaseProject.title
                         : currentRoomMeta.name}
@@ -783,12 +817,13 @@ export default function VirtualOfficeShell({
                     type="button"
                     onClick={() => {
                       setDrawerOpen(false);
+                      setIsPlaceSelected(false);
                       setActiveCaseProject(null);
                     }}
                     aria-label="Close Room Panel"
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 shrink-0 cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#141516] hover:bg-[#18191a] border border-[#23252a] text-xs font-medium text-[#8a8f98] hover:text-[#f7f8f8] shrink-0 cursor-pointer"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                     <span>Tutup</span>
                   </button>
                 </div>
@@ -820,37 +855,37 @@ export default function VirtualOfficeShell({
                       onSelectProjectSlug={handleSelectProjectSlug}
                     />
                   ) : activeRoom === 'cases' ? (
-                    <div className="space-y-8">
-                      <div className="space-y-2">
-                        <p className="text-xs font-mono tracking-wider text-amber-400">
+                    <div className="space-y-6">
+                      <div className="space-y-1.5">
+                        <p className="text-[11px] font-mono tracking-wider text-[#62666d] uppercase">
                           CASE ARCHIVE · 14-POINT DEEP-DIVE STUDIES
                         </p>
-                        <h2 className="font-display text-2xl font-bold text-slate-100">
+                        <h2 className="font-display text-2xl font-semibold tracking-[-0.02em] text-[#f7f8f8]">
                           Select a Case Study to Inspect
                         </h2>
-                        <p className="text-sm text-slate-300">
+                        <p className="text-sm text-[#8a8f98] leading-relaxed">
                           Every case study follows a rigorous 14-point structure: Overview, Context, Problem, Objectives, Constraints, Individual Role, Team, Approach, Key Decisions, Execution, Risks, Outcomes, Lessons Learned, and Evidence.
                         </p>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-4">
+                      <div className="grid grid-cols-1 gap-3">
                         {PORTFOLIO_PROJECTS.map((proj) => (
                           <div
                             key={proj.slug}
-                            className="p-5 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                            className="p-5 rounded-lg bg-[#141516] border border-[#23252a] hover:border-[#34373f] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                           >
                             <div className="space-y-1.5">
-                              <div className="text-xs text-slate-400">
-                                <span className="text-amber-400 font-medium">
+                              <div className="text-xs text-[#62666d]">
+                                <span className="text-[#8a8f98] font-medium">
                                   {proj.category.join(' / ')}
                                 </span>
                                 <span> · {proj.role} · </span>
-                                <span className="font-mono">{proj.period}</span>
+                                <span className="font-mono tabular-nums">{proj.period}</span>
                               </div>
-                              <h3 className="font-display text-base font-bold text-slate-100">
+                              <h3 className="font-display text-base font-semibold tracking-[-0.015em] text-[#f7f8f8]">
                                 {proj.title}
                               </h3>
-                              <p className="text-xs text-slate-300">
+                              <p className="text-xs text-[#8a8f98] leading-relaxed">
                                 {proj.summary}
                               </p>
                             </div>
@@ -858,13 +893,13 @@ export default function VirtualOfficeShell({
                               <button
                                 type="button"
                                 onClick={() => handleOpenProjectCase(proj)}
-                                className="px-4 py-2 text-xs font-semibold bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-lg transition-colors whitespace-nowrap cursor-pointer"
+                                className="px-3.5 py-1.5 text-xs font-medium bg-[#5e6ad2] hover:bg-[#6e7ae2] text-[#f7f8f8] rounded-md transition-colors whitespace-nowrap cursor-pointer"
                               >
                                 Read 14-Point Case
                               </button>
                               <Link
                                 href={`/cases/${proj.slug}`}
-                                className="inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs text-slate-300 hover:text-white border border-slate-800 rounded-lg whitespace-nowrap"
+                                className="inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs text-[#8a8f98] hover:text-[#f7f8f8] bg-[#18191a] border border-[#23252a] rounded-md whitespace-nowrap"
                               >
                                 <span>Direct URL</span>
                                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -883,15 +918,15 @@ export default function VirtualOfficeShell({
           )}
         </main>
       ) : (
-        /* ACCESSIBLE 2D LIST-BASED PORTFOLIO MODE */
-        <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10 space-y-16">
-          <div className="p-4 rounded-xl bg-[#0F172A] border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+        /* ACCESSIBLE 2D LIST-BASED PORTFOLIO MODE — Linear DESIGN.md */
+        <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-10 space-y-14">
+          <div className="p-4 rounded-lg bg-[#0f1011] border border-[#23252a] flex flex-wrap items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <div className="text-xs font-mono text-sky-400">
+              <div className="text-[11px] font-mono text-[#62666d] uppercase tracking-wider">
                 STANDARD ACCESSIBLE PORTFOLIO VIEW (2D LIST MODE)
               </div>
-              <p className="text-xs text-slate-300">
-                All rooms, projects, 14-point case studies, systems workflows, and contact links are presented in a clean editorial layout.
+              <p className="text-xs text-[#8a8f98]">
+                All rooms, projects, 14-point case studies, systems workflows, and contact links are presented in a structured Linear editorial layout.
               </p>
             </div>
             <button
@@ -901,9 +936,9 @@ export default function VirtualOfficeShell({
                 setSceneMountKey((k) => k + 1);
                 setViewMode('3d');
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-lg transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium bg-[#5e6ad2] hover:bg-[#6e7ae2] text-[#f7f8f8] rounded-md transition-colors cursor-pointer"
             >
-              <Box className="w-4 h-4" />
+              <Box className="w-3.5 h-3.5" />
               <span>Enter 3D Virtual Office</span>
             </button>
           </div>
@@ -921,7 +956,7 @@ export default function VirtualOfficeShell({
                 />
               </section>
 
-              <hr className="border-slate-800/80" />
+              <hr className="border-[#23252a]" />
 
               <section id="projects">
                 <ProjectDirectorySection
@@ -929,7 +964,7 @@ export default function VirtualOfficeShell({
                 />
               </section>
 
-              <hr className="border-slate-800/80" />
+              <hr className="border-[#23252a]" />
 
               <section id="systems">
                 <SystemsLabSection
@@ -937,7 +972,7 @@ export default function VirtualOfficeShell({
                 />
               </section>
 
-              <hr className="border-slate-800/80" />
+              <hr className="border-[#23252a]" />
 
               <section id="experience">
                 <ExperienceGallerySection
@@ -945,7 +980,7 @@ export default function VirtualOfficeShell({
                 />
               </section>
 
-              <hr className="border-slate-800/80" />
+              <hr className="border-[#23252a]" />
 
               <section id="contact">
                 <ContactLoungeSection />
@@ -957,3 +992,4 @@ export default function VirtualOfficeShell({
     </div>
   );
 }
+

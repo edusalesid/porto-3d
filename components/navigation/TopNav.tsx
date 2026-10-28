@@ -38,7 +38,7 @@ export default function TopNav({
   };
 
   return (
-    <header className="w-full h-16 px-6 bg-[#0B0F17]/95 border-b border-slate-800/80 flex items-center justify-between gap-8 z-30 relative">
+    <header className="w-full h-14 px-6 bg-[#0f1011] border-b border-[#23252a] flex items-center justify-between gap-8 z-30 relative">
       {/* Zone 1: Single text element wordmark */}
       <Link
         href="/"
@@ -48,15 +48,16 @@ export default function TopNav({
             onSelectRoom('lobby');
           }
         }}
-        className="font-display text-lg font-bold tracking-tight text-slate-100 hover:text-sky-400 transition-colors whitespace-nowrap shrink-0"
+        className="font-display text-sm font-semibold tracking-[-0.02em] text-[#f7f8f8] hover:text-white transition-colors whitespace-nowrap shrink-0 flex items-center gap-2"
       >
-        RIZAL OS
+        <span className="w-2 h-2 rounded-xs bg-[#5e6ad2]" />
+        <span>RIZAL OS</span>
       </Link>
 
       {/* Zone 2: 5 concise single-line text navigation links */}
       <nav
         aria-label="Primary Navigation"
-        className="hidden md:flex items-center gap-7 text-sm font-medium text-slate-300"
+        className="hidden md:flex items-center gap-6 text-xs font-medium text-[#8a8f98]"
       >
         {NAV_ITEMS.map((item) => {
           const isActive = activeRoom === item.id;
@@ -65,10 +66,10 @@ export default function TopNav({
               key={item.id}
               href={item.href}
               onClick={(e) => handleNavClick(e, item)}
-              className={`whitespace-nowrap shrink-0 py-1 transition-colors border-b-2 ${
+              className={`whitespace-nowrap shrink-0 py-1 transition-colors border-b ${
                 isActive
-                  ? 'text-sky-400 border-sky-400 font-semibold'
-                  : 'text-slate-300 border-transparent hover:text-white hover:border-slate-600'
+                  ? 'text-[#f7f8f8] border-[#5e6ad2] font-medium'
+                  : 'text-[#8a8f98] border-transparent hover:text-[#f7f8f8]'
               }`}
             >
               {item.label}
@@ -85,7 +86,7 @@ export default function TopNav({
           onClick={() =>
             trackPortfolioEvent('cv_downloaded', { source: 'top_bar' })
           }
-          className="px-4 py-2 text-xs font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 rounded-lg transition-colors whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+          className="px-3 py-1.5 text-xs font-medium text-[#f7f8f8] bg-[#5e6ad2] hover:bg-[#6e7ae2] rounded-md transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
         >
           Download CV
         </a>
@@ -93,3 +94,4 @@ export default function TopNav({
     </header>
   );
 }
+
