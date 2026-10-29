@@ -5,11 +5,13 @@ import {
   PORTFOLIO_PROJECTS,
   EXPERIENCE_TIMELINE,
   SYSTEMS_WORKFLOWS,
+  TECH_STACK_SYSTEMS,
   CONTACT_INFO,
-  ProjectCategory,
-  PortfolioProject,
+  type ProjectCategory,
+  type PortfolioProject,
   filterAndSortProjects,
 } from '@/lib/portfolio-data';
+import { TechLogo } from './TechLogos';
 import { trackPortfolioEvent } from '@/lib/analytics';
 import {
   Search,
@@ -23,6 +25,8 @@ import {
   ArrowRight,
   ExternalLink,
   ChevronRight,
+  Globe,
+  Play,
 } from 'lucide-react';
 
 const CATEGORIES: (ProjectCategory | 'All')[] = [
@@ -30,96 +34,105 @@ const CATEGORIES: (ProjectCategory | 'All')[] = [
   'Product/SaaS',
   'AI',
   'Software Systems',
-  'Marketing Operations',
-  'Educational Projects',
 ];
 
 export function LobbyOverviewSection({
   onNavigateRoom,
   onSelectProject,
+  onCardHover,
 }: {
   onNavigateRoom?: (roomId: 'projects' | 'systems' | 'experience' | 'cases' | 'contact') => void;
   onSelectProject?: (project: PortfolioProject) => void;
+  onCardHover?: (cardId: string | null) => void;
 }) {
   return (
     <div className="space-y-7">
       {/* Rizal Avatar Greeting Hero Card — Linear DESIGN.md */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)]">
-        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full p-1 bg-[#1d1e20] border border-[rgba(255,255,255,0.13)] shrink-0 overflow-hidden flex items-center justify-center">
-          <img
-            src="/avatar/rizal-wave.webp"
-            alt="Rizal — Riizalhp"
-            className="w-full h-full object-contain"
-          />
-        </div>
-        <div className="space-y-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#46c98a] animate-pulse" />
-            <span className="text-xs font-mono text-[#a7a7aa]">Riizalhp · Technical Project Manager</span>
+      {/* Unified Profile Card */}
+      <div
+        id="lobby-hero"
+        data-card-id="lobby-hero"
+        onMouseEnter={() => onCardHover?.('lobby-hero')}
+        onMouseLeave={() => onCardHover?.(null)}
+        className="p-4 sm:p-6 landscape:p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.18)] transition-all space-y-3.5 sm:space-y-4"
+      >
+        <div className="flex flex-row items-center gap-3.5 sm:gap-4">
+          <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full p-1 bg-[#1d1e20] border border-[rgba(255,255,255,0.13)] shrink-0 overflow-hidden flex items-center justify-center">
+            <img
+              src="/avatar/rizal-wave.webp"
+              alt="Rizal Hanifa Pratama"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <h1 className="text-base sm:text-lg font-semibold text-[#e8e8e9]">
-            Hey, I'm Rizal. Welcome to my workspace.
-          </h1>
-          <p className="text-xs sm:text-sm text-[#a7a7aa] leading-relaxed">
-            Menghubungkan eksekusi sprint teknis, arsitektur software, dan integrasi workflow otomasi AI dengan bukti pengiriman nyata.
-          </p>
+          <div className="space-y-0.5 sm:space-y-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#46c98a] animate-pulse" />
+              <span className="text-xs font-mono text-[#a7a7aa]">Guru Koding &amp; IT Project Manager</span>
+            </div>
+            <h1 className="text-lg sm:text-2xl font-display font-semibold text-[#e8e8e9] tracking-[-0.02em]">
+              {CONTACT_INFO.fullName}
+            </h1>
+            <p className="text-xs font-mono text-[#38bdf8] line-clamp-1 sm:line-clamp-none">
+              {CONTACT_INFO.title}
+            </p>
+          </div>
+        </div>
+
+        <p className="text-xs sm:text-sm text-[#a7a7aa] leading-relaxed pt-2.5 sm:pt-3 border-t border-[rgba(255,255,255,0.06)]">
+          {CONTACT_INFO.summary}
+        </p>
+
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-1 text-xs font-mono text-[#77787c]">
+          <span className="px-2.5 py-1 rounded-md bg-[#232426] text-[#e8e8e9]">S1 Informatika UPN Veteran Yogyakarta</span>
+          <span className="px-2.5 py-1 rounded-md bg-[#232426] text-[#e8e8e9]">Bilingual (ICIF)</span>
+          <span className="px-2.5 py-1 rounded-md bg-[#232426] text-[#e8e8e9]">Tim SPMI</span>
+          <span className="px-2.5 py-1 rounded-md bg-[#232426] text-[#e8e8e9]">Lab 50+ Perangkat</span>
+          <span className="px-2.5 py-1 rounded-md bg-[#232426] text-[#f5d400]">Semarang, Indonesia</span>
         </div>
       </div>
 
-      <div className="space-y-2">
-        <p className="text-[11px] font-mono tracking-wider text-[#77787c] uppercase">
-          01. EXECUTIVE SUMMARY · VIRTUAL LOBBY
-        </p>
-        <h2
-          className="font-display text-2xl sm:text-3xl font-semibold text-[#e8e8e9] tracking-[-0.025em]"
-          style={{ textWrap: 'balance' }}
-        >
-          {CONTACT_INFO.name} — {CONTACT_INFO.title}
-        </h2>
-        <p className="text-sm text-[#a7a7aa] leading-relaxed max-w-2xl">
-          {CONTACT_INFO.positioning}
-        </p>
-        <p className="text-xs font-mono text-[#f5d400]">
-          “{CONTACT_INFO.tagline}”
-        </p>
-      </div>
-
-      {/* Key Strengths — Linear DESIGN.md 1px bordered surface grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-[rgba(255,255,255,0.085)]">
-        <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)]">
-          <h3 className="text-sm font-medium tracking-[-0.01em] text-[#e8e8e9] mb-1.5 flex items-center gap-2">
+      {/* Key Competencies - Clean & Direct */}
+      <div
+        id="lobby-strengths"
+        data-card-id="lobby-strengths"
+        onMouseEnter={() => onCardHover?.('lobby-strengths')}
+        onMouseLeave={() => onCardHover?.(null)}
+        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+      >
+        <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] space-y-1">
+          <h3 className="text-sm font-medium tracking-[-0.01em] text-[#e8e8e9] flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#f5d400]" />
-            01. Project Execution & Governance
+            01. Pendidikan Koding &amp; AI
           </h3>
           <p className="text-xs text-[#a7a7aa] leading-relaxed">
-            Translating business objectives into WBS vertical slices, dependency matrices, risk registers, and on-time pilot deployments.
+            Pengajaran logika pemrograman, instruksi kelas bilingual ICIF, dan implementasi program Deep Learning &amp; AI tingkat SMA.
           </p>
         </div>
-        <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)]">
-          <h3 className="text-sm font-medium tracking-[-0.01em] text-[#e8e8e9] mb-1.5 flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] space-y-1">
+          <h3 className="text-sm font-medium tracking-[-0.01em] text-[#e8e8e9] flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
-            02. Product & Systems Thinking
+            02. Manajemen Proyek IT &amp; Agile
           </h3>
           <p className="text-xs text-[#a7a7aa] leading-relaxed">
-            Authoring comprehensive PRDs, offline-resilient state machines, RBAC workflows, and cross-departmental data contracts.
+            Perencanaan sprint Agile Scrum, koordinasi backlog, mitigasi risiko dependensi teknis, dan delivery proyek software tepat waktu.
           </p>
         </div>
-        <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)]">
-          <h3 className="text-sm font-medium tracking-[-0.01em] text-[#e8e8e9] mb-1.5 flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] space-y-1">
+          <h3 className="text-sm font-medium tracking-[-0.01em] text-[#e8e8e9] flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#6e6edb]" />
-            03. AI-Enabled Operational Workflows
+            03. Penjaminan Mutu &amp; Lab Komputer
           </h3>
           <p className="text-xs text-[#a7a7aa] leading-relaxed">
-            Designing citation-grounded RAG knowledge bases, deterministic evaluation rubrics, and human-in-the-loop automation.
+            Kontribusi pada SPMI untuk mutu pembelajaran dan pengelolaan operasional harian 50+ perangkat laboratorium komputer.
           </p>
         </div>
-        <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)]">
-          <h3 className="text-sm font-medium tracking-[-0.01em] text-[#e8e8e9] mb-1.5 flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] space-y-1">
+          <h3 className="text-sm font-medium tracking-[-0.01em] text-[#e8e8e9] flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#46c98a]" />
-            04. Cross-Functional Collaboration
+            04. Digitalisasi &amp; Implementasi Sistem
           </h3>
           <p className="text-xs text-[#a7a7aa] leading-relaxed">
-            Aligning software engineers, product designers, and frontline operators (cashiers, recruiters, field coordinators).
+            Penyelarasan kebutuhan pengguna, perancangan sistem digital, dan kolaborasi teknis lintas divisi engineering dan operasional.
           </p>
         </div>
       </div>
@@ -129,7 +142,13 @@ export function LobbyOverviewSection({
         <h3 className="text-[11px] font-mono text-[#77787c] uppercase tracking-wider">
           JELAJAHI ZONA RUANGAN KERJA
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div
+          id="lobby-navigation"
+          data-card-id="lobby-navigation"
+          onMouseEnter={() => onCardHover?.('lobby-navigation')}
+          onMouseLeave={() => onCardHover?.(null)}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
+        >
           {onNavigateRoom && (
             <>
               <button
@@ -138,8 +157,8 @@ export function LobbyOverviewSection({
                 className="flex items-center justify-between p-3.5 rounded-xl bg-[#18191b] hover:bg-[#202123] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.15)] text-left transition-colors cursor-pointer"
               >
                 <div>
-                  <div className="text-sm font-medium text-[#e8e8e9]">02. Projects Studio</div>
-                  <div className="text-xs text-[#a7a7aa]">Katalog 6 produk unggulan & karya digital</div>
+                  <div className="text-sm font-medium text-[#e8e8e9]">02. Studio Proyek</div>
+                  <div className="text-xs text-[#a7a7aa]">Katalog produk unggulan &amp; karya digital</div>
                 </div>
                 <FolderGit2 className="w-4 h-4 text-[#f5d400] shrink-0" />
               </button>
@@ -149,8 +168,8 @@ export function LobbyOverviewSection({
                 className="flex items-center justify-between p-3.5 rounded-xl bg-[#18191b] hover:bg-[#202123] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.15)] text-left transition-colors cursor-pointer"
               >
                 <div>
-                  <div className="text-sm font-medium text-[#e8e8e9]">03. Systems Lab</div>
-                  <div className="text-xs text-[#a7a7aa]">Blueprint PRD, alur kerja sistem & mitigasi risiko</div>
+                  <div className="text-sm font-medium text-[#e8e8e9]">03. Laboratorium Sistem</div>
+                  <div className="text-xs text-[#a7a7aa]">Blueprint PRD, alur kerja sistem &amp; mitigasi risiko</div>
                 </div>
                 <Layers className="w-4 h-4 text-[#38bdf8] shrink-0" />
               </button>
@@ -160,8 +179,8 @@ export function LobbyOverviewSection({
                 className="flex items-center justify-between p-3.5 rounded-xl bg-[#18191b] hover:bg-[#202123] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.15)] text-left transition-colors cursor-pointer"
               >
                 <div>
-                  <div className="text-sm font-medium text-[#e8e8e9]">04. Experience Gallery</div>
-                  <div className="text-xs text-[#a7a7aa]">Perjalanan karir & peran kepemimpinan tim</div>
+                  <div className="text-sm font-medium text-[#e8e8e9]">04. Galeri Pengalaman</div>
+                  <div className="text-xs text-[#a7a7aa]">Perjalanan karir &amp; peran kepemimpinan tim</div>
                 </div>
                 <Briefcase className="w-4 h-4 text-[#46c98a] shrink-0" />
               </button>
@@ -171,8 +190,8 @@ export function LobbyOverviewSection({
                 className="flex items-center justify-between p-3.5 rounded-xl bg-[#18191b] hover:bg-[#202123] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.15)] text-left transition-colors cursor-pointer"
               >
                 <div>
-                  <div className="text-sm font-medium text-[#e8e8e9]">05. Case Archive</div>
-                  <div className="text-xs text-[#a7a7aa]">Bedah studi kasus lengkap & pertimbangan solusi</div>
+                  <div className="text-sm font-medium text-[#e8e8e9]">05. Arsip Studi Kasus</div>
+                  <div className="text-xs text-[#a7a7aa]">Bedah studi kasus lengkap &amp; pertimbangan solusi</div>
                 </div>
                 <BookOpen className="w-4 h-4 text-[#f5d400] shrink-0" />
               </button>
@@ -186,8 +205,10 @@ export function LobbyOverviewSection({
 
 export function ProjectDirectorySection({
   onSelectProject,
+  onCardHover,
 }: {
   onSelectProject?: (project: PortfolioProject) => void;
+  onCardHover?: (cardId: string | null) => void;
 }) {
   const [selectedCategory, setSelectedCategory] =
     useState<ProjectCategory | 'All'>('All');
@@ -229,7 +250,7 @@ export function ProjectDirectorySection({
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari produk (mFood POS, KMS, Employr, TriAgro, RAG)..."
+              placeholder="Cari produk (Unilever GT2, OEE Monitor, Employr, mFood)..."
               className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#141516] border border-[rgba(255,255,255,0.085)] rounded-lg text-[#e8e8e9] placeholder:text-[#77787c] focus:outline-none focus:border-[rgba(255,255,255,0.22)]"
             />
           </div>
@@ -305,7 +326,11 @@ export function ProjectDirectorySection({
           {filteredProjects.map((project) => (
             <article
               key={project.slug}
-              className="p-4 sm:p-5 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.16)] transition-all space-y-3.5 shadow-sm"
+              id={project.slug}
+              data-card-id={project.slug}
+              onMouseEnter={() => onCardHover?.(project.slug)}
+              onMouseLeave={() => onCardHover?.(null)}
+              className="p-4 sm:p-5 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.18)] transition-all space-y-3.5 shadow-sm"
             >
               {/* Product Showcase Banner Image */}
               {project.bannerImage && (
@@ -317,6 +342,12 @@ export function ProjectDirectorySection({
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
+                    {project.demoVideo && (
+                      <div className="absolute top-2.5 right-2.5 px-2 py-1 rounded-md bg-[#121314]/90 border border-[#38bdf8]/40 text-[11px] font-mono text-[#38bdf8] flex items-center gap-1.5 backdrop-blur-sm pointer-events-none shadow-md">
+                        <Play className="w-3 h-3 text-[#38bdf8] fill-[#38bdf8]" />
+                        <span>Demo Tersedia</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Gallery Sub-Screens if available */}
@@ -400,9 +431,27 @@ export function ProjectDirectorySection({
 
 export function SystemsLabSection({
   onSelectProjectSlug,
+  onCardHover,
 }: {
   onSelectProjectSlug?: (slug: string) => void;
+  onCardHover?: (cardId: string | null) => void;
 }) {
+  const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
+
+  const categories = [
+    'Semua',
+    'Agen AI & Routing',
+    'Frontend & 3D',
+    'Backend & Data',
+    'Manajemen Proyek',
+    'Kreatif & Media',
+  ];
+
+  const filteredTools =
+    selectedCategory === 'Semua'
+      ? TECH_STACK_SYSTEMS
+      : TECH_STACK_SYSTEMS.filter((t) => t.category === selectedCategory);
+
   return (
     <div className="space-y-6">
       {/* Rizal Systems Thinking Avatar Banner */}
@@ -415,28 +464,104 @@ export function SystemsLabSection({
           />
         </div>
         <div className="text-xs text-[#a7a7aa] min-w-0">
-          <span className="text-[#e8e8e9] font-medium">Sistem &amp; Tata Kelola: </span>
-          Memecah kompleksitas proyek menjadi vertical slices WBS, state machine deterministik, dan SOP sitasi RAG tanpa halusinasi.
+          <span className="text-[#e8e8e9] font-medium">Sistem &amp; Alur Kerja Nyata: </span>
+          Memadukan alur kerja agile sprint, agentic AI lokal (9Router/Antigravity), stack fullstack 3D modern, dan operasional lab komputer.
         </div>
       </div>
 
       <div className="space-y-1.5">
         <p className="text-[11px] font-mono tracking-wider text-[#77787c] uppercase">
-          03. SYSTEMS LAB · WORKFLOWS, RISK &amp; TECHNICAL COLLABORATION
+          03. LABORATORIUM SISTEM · TECH STACK &amp; METODOLOGI EKSEKUSI
         </p>
         <h2 className="font-display text-2xl font-semibold text-[#e8e8e9] tracking-[-0.02em]">
-          Operating System &amp; Execution Methodology
+          Alat Kerja &amp; Sistem Operasi Proyek
         </h2>
         <p className="text-sm text-[#a7a7aa] leading-relaxed">
-          Tools are never a substitute for structured thinking. Every methodology and tool listed below is linked directly to how it was applied in a real project.
+          Tools tidak pernah menggantikan pemikiran terstruktur. Di bawah ini adalah kumpulan teknologi harian, alur kerja agentic AI, dan metodologi eksekusi nyata yang saya gunakan dalam mengelola proyek dan membangun sistem.
         </p>
       </div>
 
+      {/* Tech Arsenal Showcase Grid */}
+      <div className="space-y-3 pt-3 border-t border-[rgba(255,255,255,0.085)]">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-mono uppercase tracking-wider text-[#77787c] font-semibold">
+            Daftar Alat Kerja Aktif ({filteredTools.length})
+          </h3>
+          <span className="text-[11px] font-mono text-[#38bdf8]">
+            Stack Interaktif
+          </span>
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-colors whitespace-nowrap cursor-pointer ${
+                selectedCategory === cat
+                  ? 'bg-[#38bdf8] text-[#0f1115] font-semibold'
+                  : 'bg-[#18191b] text-[#a7a7aa] hover:text-[#e8e8e9] border border-[rgba(255,255,255,0.08)]'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Tools Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {filteredTools.map((tool) => (
+            <div
+              key={tool.id}
+              className="p-3.5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.18)] hover:bg-[#1c1d20] transition-all flex flex-col justify-between group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-[#141516] border border-[rgba(255,255,255,0.08)] flex items-center justify-center p-1 group-hover:scale-105 transition-transform">
+                      <TechLogo name={tool.id} className="w-full h-full" />
+                    </div>
+                    <span className="font-display text-xs font-semibold text-[#e8e8e9]">
+                      {tool.name}
+                    </span>
+                  </div>
+                  <span
+                    className="text-[10px] font-mono px-2 py-0.5 rounded-md font-medium"
+                    style={{
+                      color: tool.badgeHex,
+                      backgroundColor: `${tool.badgeHex}15`,
+                      border: `1px solid ${tool.badgeHex}30`,
+                    }}
+                  >
+                    {tool.role.split(' ')[0]}
+                  </span>
+                </div>
+                <p className="text-xs text-[#a7a7aa] leading-relaxed line-clamp-2">
+                  {tool.description}
+                </p>
+              </div>
+              <div className="mt-2.5 pt-2 border-t border-[rgba(255,255,255,0.04)] text-[10px] font-mono text-[#77787c]">
+                {tool.role}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="space-y-4 pt-3 border-t border-[rgba(255,255,255,0.085)]">
+        <h3 className="text-xs font-mono uppercase tracking-wider text-[#77787c] font-semibold">
+          Alur Kerja Eksekusi &amp; SOP
+        </h3>
         {SYSTEMS_WORKFLOWS.map((pillar) => (
           <section
             key={pillar.id}
-            className="p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] space-y-4"
+            id={pillar.id}
+            data-card-id={pillar.id}
+            onMouseEnter={() => onCardHover?.(pillar.id)}
+            onMouseLeave={() => onCardHover?.(null)}
+            className="p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.18)] transition-all space-y-4"
           >
             <div className="space-y-1">
               <div className="text-[11px] font-mono text-[#f5d400] uppercase tracking-wider">
@@ -452,7 +577,7 @@ export function SystemsLabSection({
 
             <div className="space-y-2">
               <h4 className="text-xs font-medium text-[#e8e8e9]">
-                Core Execution Practices
+                Praktik Eksekusi Inti
               </h4>
               <ul className="space-y-1.5 text-xs text-[#a7a7aa]">
                 {pillar.practices.map((prac, i) => (
@@ -466,7 +591,7 @@ export function SystemsLabSection({
 
             <div className="space-y-2 pt-3 border-t border-[rgba(255,255,255,0.085)]">
               <h4 className="text-xs font-medium text-[#e8e8e9]">
-                Applied Tools &amp; Artifacts
+                Alat &amp; Artefak yang Diterapkan
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {pillar.toolsUsed.map((tool, i) => (
@@ -507,36 +632,22 @@ export function SystemsLabSection({
 }
 
 export function ExperienceGallerySection({
-  onSelectProjectSlug,
+  onCardHover,
 }: {
   onSelectProjectSlug?: (slug: string) => void;
+  onCardHover?: (cardId: string | null) => void;
 }) {
   return (
     <div className="space-y-6">
-      {/* Rizal Explaining Avatar Banner */}
-      <div className="flex items-center gap-3.5 p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)]">
-        <div className="w-12 h-12 rounded-full p-1 bg-[#1d1e20] border border-[rgba(255,255,255,0.13)] shrink-0 overflow-hidden flex items-center justify-center">
-          <img
-            src="/avatar/rizal-explaining.webp"
-            alt="Rizal Explaining Leadership"
-            className="w-full h-full object-contain"
-          />
-        </div>
-        <div className="text-xs text-[#a7a7aa] min-w-0">
-          <span className="text-[#e8e8e9] font-medium">Rekam Jejak &amp; Kepemimpinan: </span>
-          Menavigasi tim lintas fungsi dari fase inisiasi PRD, manajemen dependensi sprint, hingga peluncuran live production.
-        </div>
-      </div>
-
       <div className="space-y-1.5">
         <p className="text-[11px] font-mono tracking-wider text-[#77787c] uppercase">
-          04. EXPERIENCE GALLERY · CHRONOLOGICAL TRACK RECORD
+          04. Galeri Pengalaman · Rekam Jejak Kronologis
         </p>
         <h2 className="font-display text-2xl font-semibold text-[#e8e8e9] tracking-[-0.02em]">
-          Professional Roles &amp; Project Engagements
+          Pengalaman Profesional &amp; Rekam Jejak Karir
         </h2>
         <p className="text-sm text-[#a7a7aa] leading-relaxed">
-          Chronological overview of project management roles, operational scope, and verifiable deliverables linked to their respective case studies.
+          Ringkasan kronologis peran profesional, cakupan tanggung jawab, dan hasil kerja nyata yang terverifikasi.
         </p>
       </div>
 
@@ -544,13 +655,20 @@ export function ExperienceGallerySection({
         {EXPERIENCE_TIMELINE.map((item, idx) => (
           <article
             key={item.id}
-            className="p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] space-y-3"
+            id={item.id}
+            data-card-id={item.id}
+            onMouseEnter={() => onCardHover?.(item.id)}
+            onMouseLeave={() => onCardHover?.(null)}
+            className="p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] hover:border-[rgba(255,255,255,0.18)] transition-all space-y-3"
           >
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[#77787c]">
               <span className="font-mono text-[#f5d400] font-medium tabular-nums">
                 0{idx + 1} · {item.period}
               </span>
-              <span className="text-[#a7a7aa]">{item.organization}</span>
+              <span className="text-[#a7a7aa]">
+                {item.organization}
+                {item.location ? ` · ${item.location}` : ''}
+              </span>
             </div>
 
             <h3 className="font-display text-base sm:text-lg font-semibold tracking-[-0.015em] text-[#e8e8e9]">
@@ -558,7 +676,7 @@ export function ExperienceGallerySection({
             </h3>
 
             <p className="text-xs text-[#77787c]">
-              Scope: <span className="text-[#a7a7aa]">{item.scope}</span>
+              Cakupan: <span className="text-[#a7a7aa]">{item.scope}</span>
             </p>
 
             <p className="text-xs sm:text-sm text-[#a7a7aa] leading-relaxed">
@@ -573,24 +691,6 @@ export function ExperienceGallerySection({
                 </li>
               ))}
             </ul>
-
-            <div className="pt-3 border-t border-[rgba(255,255,255,0.085)] flex flex-wrap items-center gap-3">
-              <span className="text-xs text-[#77787c]">Related Case Studies:</span>
-              {item.relatedCaseSlugs.map((slug) => {
-                const proj = PORTFOLIO_PROJECTS.find((p) => p.slug === slug);
-                if (!proj) return null;
-                return onSelectProjectSlug ? (
-                  <button
-                    key={slug}
-                    type="button"
-                    onClick={() => onSelectProjectSlug(slug)}
-                    className="text-xs font-medium text-[#f5d400] hover:text-[#e8e8e9] underline underline-offset-4 cursor-pointer transition-colors"
-                  >
-                    {proj.title.split(' — ')[0]}
-                  </button>
-                ) : null;
-              })}
-            </div>
           </article>
         ))}
       </div>
@@ -601,12 +701,20 @@ export function ExperienceGallerySection({
 export function CaseStudyFullView({
   project,
   onBack,
+  onCardHover,
 }: {
   project: PortfolioProject;
   onBack?: () => void;
+  onCardHover?: (cardId: string | null) => void;
 }) {
   return (
-    <article className="space-y-7">
+    <article
+      id={project.slug}
+      data-card-id={project.slug}
+      onMouseEnter={() => onCardHover?.(project.slug)}
+      onMouseLeave={() => onCardHover?.(null)}
+      className="space-y-7"
+    >
       {onBack && (
         <div>
           <button
@@ -619,8 +727,29 @@ export function CaseStudyFullView({
         </div>
       )}
 
-      {/* Case Study Banner Image */}
-      {project.bannerImage && (
+      {/* Case Study Media Showcase (Demo Video or Banner) */}
+      {project.demoVideo ? (
+        <div className="space-y-2">
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-[#28292c] bg-[#0d0f14] shadow-xl">
+            <video
+              controls
+              playsInline
+              preload="metadata"
+              poster={project.demoVideo.poster || project.bannerImage}
+              className="w-full h-full object-contain bg-black"
+            >
+              <source src={project.demoVideo.url} type={project.demoVideo.type || 'video/mp4'} />
+              Browser Anda tidak mendukung tag video HTML5.
+            </video>
+          </div>
+          {project.demoVideo.caption && (
+            <p className="text-[11px] text-[#77787c] font-mono flex items-center gap-1.5 px-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#f5d400]"></span>
+              <span>{project.demoVideo.caption}</span>
+            </p>
+          )}
+        </div>
+      ) : project.bannerImage ? (
         <div className="relative w-full aspect-[2/1] rounded-xl overflow-hidden border border-[#28292c] bg-[#121314]">
           <img
             src={project.bannerImage}
@@ -628,7 +757,7 @@ export function CaseStudyFullView({
             className="w-full h-full object-cover"
           />
         </div>
-      )}
+      ) : null}
 
       {/* Header */}
       <header className="space-y-3 pb-5 border-b border-[rgba(255,255,255,0.085)]">
@@ -859,11 +988,67 @@ export function CaseStudyFullView({
           ))}
         </ul>
       </section>
+
+      {/* 14. Evidence, Artifacts & Demos */}
+      {project.evidence && project.evidence.length > 0 && (
+        <section className="space-y-3 pt-2">
+          <h2 className="text-[11px] font-mono text-[#77787c]">
+            14. VERIFIED EVIDENCE, ARTIFACTS &amp; DEMOS
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {project.evidence.map((ev, i) => (
+              <div
+                key={i}
+                className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] flex flex-col justify-between space-y-2.5"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-[#202123] border border-[rgba(255,255,255,0.085)] text-[#f5d400]">
+                      {ev.type}
+                    </span>
+                    <span className="text-xs font-semibold text-[#e8e8e9] truncate">
+                      {ev.title}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#a7a7aa]">{ev.caption}</p>
+                </div>
+
+                {ev.metricsOrSpec && ev.metricsOrSpec.length > 0 && (
+                  <ul className="text-[11px] font-mono text-[#77787c] space-y-0.5 pt-1 border-t border-[rgba(255,255,255,0.06)]">
+                    {ev.metricsOrSpec.map((spec, sIdx) => (
+                      <li key={sIdx} className="flex items-center gap-1">
+                        <span className="text-[#46c98a]">✓</span>
+                        <span>{spec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <div className="pt-1">
+                  <a
+                    href={ev.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-[#38bdf8] hover:underline font-mono"
+                  >
+                    <span>{ev.type === 'video' ? 'Putar Video Demo' : 'Buka Bukti'}</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </article>
   );
 }
 
-export function ContactLoungeSection() {
+export function ContactLoungeSection({
+  onCardHover,
+}: {
+  onCardHover?: (cardId: string | null) => void;
+} = {}) {
   const [copied, setCopied] = useState<boolean>(false);
   const [senderName, setSenderName] = useState<string>('');
   const [senderEmail, setSenderEmail] = useState<string>('');
@@ -907,34 +1092,34 @@ export function ContactLoungeSection() {
         </div>
         <div className="text-xs text-[#a7a7aa] min-w-0">
           <span className="text-[#e8e8e9] font-medium">Siap Berkolaborasi: </span>
-          Terbuka untuk diskusi proyek delivery, technical PM roles, atau konsultasi arsitektur sistem produk.
+          Terbuka untuk diskusi program pembelajaran coding/AI, penjaminan mutu SPMI, IT Project Management, atau delivery sistem perangkat lunak.
         </div>
       </div>
 
       <div className="space-y-1.5">
         <p className="text-[11px] font-mono tracking-wider text-[#77787c] uppercase">
-          06. CONTACT LOUNGE · DIRECT COMMUNICATION &amp; CV
+          06. RUANG KONTAK · KOMUNIKASI LANGSUNG &amp; CV
         </p>
         <h2 className="font-display text-2xl font-semibold text-[#e8e8e9] tracking-[-0.02em]">
-          Initiate a Conversation
+          Mulai Percakapan
         </h2>
         <p className="text-sm text-[#a7a7aa] leading-relaxed">
-          Available for Project Manager, Technical Project Manager, Product Operations, and Systems Delivery opportunities.
+          Terbuka untuk peluang Guru Koding, IT Project Manager, Technical PM, dan Pengembangan Digitalisasi.
         </p>
       </div>
 
       {/* Direct Action Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-[rgba(255,255,255,0.085)]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-[rgba(255,255,255,0.085)]">
         <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] flex flex-col justify-between space-y-3">
           <div className="space-y-1">
-            <div className="text-xs text-[#77787c]">Direct Email</div>
+            <div className="text-xs text-[#77787c]">Email Langsung</div>
             <div className="text-xs font-mono text-[#e8e8e9] break-all">
               {CONTACT_INFO.email}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <a
-              href={`mailto:${CONTACT_INFO.email}?subject=Project%20Management%20Inquiry%20—%20Riizalhp`}
+              href={`mailto:${CONTACT_INFO.email}?subject=Diskusi%20Kolaborasi%20—%20Rizal%20Hanifa%20Pratama`}
               onClick={() =>
                 trackPortfolioEvent('contact_clicked', { method: 'mailto' })
               }
@@ -954,7 +1139,7 @@ export function ContactLoungeSection() {
 
         <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] flex flex-col justify-between space-y-3">
           <div className="space-y-1">
-            <div className="text-xs text-[#77787c]">Professional Network</div>
+            <div className="text-xs text-[#77787c]">Jaringan Profesional</div>
             <div className="text-xs font-mono text-[#e8e8e9]">
               {CONTACT_INFO.linkedinLabel}
             </div>
@@ -979,15 +1164,40 @@ export function ContactLoungeSection() {
 
         <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] flex flex-col justify-between space-y-3">
           <div className="space-y-1">
+            <div className="text-xs text-[#77787c]">Website Pribadi</div>
+            <div className="text-xs font-mono text-[#e8e8e9]">
+              {CONTACT_INFO.websiteLabel}
+            </div>
+          </div>
+          <div>
+            <a
+              href={CONTACT_INFO.websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() =>
+                trackPortfolioEvent('external_link_opened', {
+                  destination: 'personal_website',
+                })
+              }
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-[#1d1e20] hover:bg-[#28292b] text-[#e8e8e9] border border-[rgba(255,255,255,0.13)] rounded-lg transition-colors whitespace-nowrap"
+            >
+              <span>Kunjungi Web</span>
+              <Globe className="w-3.5 h-3.5 text-[#38bdf8]" />
+            </a>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] flex flex-col justify-between space-y-3">
+          <div className="space-y-1">
             <div className="text-xs text-[#77787c]">Curriculum Vitae</div>
             <div className="text-xs text-[#a7a7aa]">
-              Ringkasan PM &amp; Bukti Delivery
+              Resume Lengkap &amp; Terverifikasi
             </div>
           </div>
           <div>
             <a
               href="/api/cv"
-              download="Rizal_Technical_Project_Manager_CV.pdf"
+              download="Rizal_Hanifa_Pratama_CV.txt"
               onClick={() =>
                 trackPortfolioEvent('cv_downloaded', {
                   source: 'contact_lounge',
@@ -1005,7 +1215,7 @@ export function ContactLoungeSection() {
       {/* Areas of Contribution */}
       <div className="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] space-y-2.5">
         <h3 className="text-[11px] font-mono text-[#77787c] uppercase tracking-wider">
-          CORE AREAS OF PROFESSIONAL CONTRIBUTION
+          BIDANG UTAMA KONTRIBUSI PROFESIONAL
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#a7a7aa]">
           {CONTACT_INFO.focusAreas.map((area, idx) => (

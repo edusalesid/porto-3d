@@ -1,0 +1,407 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import StaticNav from '../../components/StaticNav.astro';
+import StaticFooter from '../../components/StaticFooter.astro';
+import { PORTFOLIO_PROJECTS, type PortfolioProject } from '@/lib/portfolio-data';
+
+export async function getStaticPaths() {
+  return PORTFOLIO_PROJECTS.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: PortfolioProject;
+}
+
+const { project } = Astro.props;
+
+const pageTitle = `${project.title} | Studi Kasus Technical PM — Rizal`;
+const pageDescription = `${project.summary} Peran: ${project.role}. Status: ${project.projectStatus}.`;
+
+const caseJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: project.title,
+  description: project.summary,
+  author: {
+    '@type': 'Person',
+    name: 'Rizal',
+    jobTitle: 'Technical Project Manager'
+  },
+  about: {
+    '@type': 'SoftwareSourceCode',
+    name: project.title
+  },
+  url: `https://rizal.dev/cases/${project.slug}`,
+  datePublished: '2026-01-01'
+};
+---
+
+<Layout title={pageTitle} description={pageDescription} type="article" jsonLd={caseJsonLd}>
+  <StaticNav />
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+    <!-- Breadcrumb & Back -->
+    <div class="flex items-center justify-between gap-4 mb-8 text-xs font-mono text-[#77787c]">
+      <div class="flex items-center gap-2">
+        <a href="/cases" class="hover:text-[#f5d400] transition-colors">← Semua Studi Kasus</a>
+        <span>/</span>
+        <span class="text-[#a7a7aa] truncate max-w-[200px] sm:max-w-none">{project.slug}</span>
+      </div>
+
+      <a
+        href={`/?case=${project.slug}`}
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#18191b] hover:bg-[#232426] text-[#38bdf8] border border-[rgba(255,255,255,0.1)] transition-colors"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-[#38bdf8]"></span>
+        <span>Lihat di 3D Office</span>
+      </a>
+    </div>
+
+    <!-- Case Study Header -->
+    <header class="mb-12 pb-10 border-b border-[rgba(255,255,255,0.08)]">
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        {project.category.map((cat) => (
+          <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-[#18191b] text-[#f5d400] border border-[rgba(245,212,0,0.18)]">
+            {cat}
+          </span>
+        ))}
+        <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-[#18191b] text-[#46c98a] border border-[rgba(70,201,138,0.18)]">
+          {project.projectStatus}
+        </span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-[#e8e8e9] tracking-tight leading-tight mb-6">
+        {project.title}
+      </h1>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.06)] text-xs font-mono">
+        <div>
+          <span class="text-[#77787c] block mb-1">Peran</span>
+          <span class="text-[#e8e8e9] font-medium">{project.role}</span>
+        </div>
+        <div>
+          <span class="text-[#77787c] block mb-1">Periode</span>
+          <span class="text-[#e8e8e9] font-medium">{project.period}</span>
+        </div>
+        <div>
+          <span class="text-[#77787c] block mb-1">Status Rilis</span>
+          <span class="text-[#46c98a] font-medium">{project.projectStatus}</span>
+        </div>
+        <div>
+          <span class="text-[#77787c] block mb-1">Peringkat Dampak</span>
+          <span class="text-[#f5d400] font-medium">Top Tier #{project.relevanceRank}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Media: Demo Video or Banner Image -->
+    {project.demoVideo ? (
+      <div class="mb-12 rounded-2xl overflow-hidden border border-[rgba(255,255,255,0.12)] bg-[#0d0f14] shadow-2xl">
+        <div class="p-3 bg-[#18191b] border-b border-[rgba(255,255,255,0.06)] flex items-center justify-between text-xs font-mono text-[#77787c]">
+          <span class="flex items-center gap-2 text-[#e8e8e9]">
+            <span class="w-2 h-2 rounded-full bg-[#f5d400] animate-pulse"></span>
+            <span>{project.demoVideo.title || `${project.title} Video Walkthrough`}</span>
+          </span>
+          <span class="text-[#38bdf8]">Interactive Demo</span>
+        </div>
+        <video
+          controls
+          playsinline
+          preload="metadata"
+          poster={project.demoVideo.poster || project.bannerImage}
+          class="w-full aspect-video object-contain bg-black"
+        >
+          <source src={project.demoVideo.url} type={project.demoVideo.type || "video/mp4"} />
+          Browser Anda tidak mendukung tag video HTML5.
+        </video>
+        {project.demoVideo.caption && (
+          <p class="p-3 text-xs font-mono text-[#a7a7aa] bg-[#141516] border-t border-[rgba(255,255,255,0.06)]">
+            {project.demoVideo.caption}
+          </p>
+        )}
+      </div>
+    ) : project.bannerImage && (
+      <figure class="mb-12 rounded-2xl overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[#141516]">
+        <img
+          src={project.bannerImage}
+          alt={project.title}
+          class="w-full h-auto max-h-[460px] object-cover"
+          loading="eager"
+        />
+        <figcaption class="p-3 text-xs font-mono text-[#77787c] bg-[#18191b] text-center border-t border-[rgba(255,255,255,0.06)]">
+          Gambar 1.0 — Antarmuka Sistem {project.title}
+        </figcaption>
+      </figure>
+    )}
+
+    <!-- 14-Point Case Study Archive Body -->
+    <div class="space-y-12 text-[#a7a7aa] leading-relaxed">
+      <!-- 1. Ringkasan Eksekutif -->
+      <section class="space-y-4">
+        <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+          <span class="text-[#f5d400]">01.</span> Ringkasan Eksekutif & Konteks
+        </h2>
+        <p class="text-base sm:text-lg text-[#e8e8e9] font-medium bg-[#18191b] p-5 rounded-xl border-l-4 border-[#f5d400] border-[rgba(255,255,255,0.08)]">
+          {project.overview}
+        </p>
+        <p>{project.context}</p>
+      </section>
+
+      <!-- 2. Masalah Operasional & Kendala -->
+      <section class="space-y-4">
+        <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+          <span class="text-[#f5d400]">02.</span> Masalah Operasional & Kendala Teknis
+        </h2>
+        <div class="p-5 rounded-xl bg-[#1d1414] border border-[rgba(231,107,107,0.2)] text-[#e8e8e9]">
+          <h3 class="text-xs font-mono uppercase text-[#e76b6b] mb-2 tracking-wider">Akar Masalah yang Dihadapi:</h3>
+          <p class="text-sm leading-relaxed">{project.problem}</p>
+        </div>
+
+        {project.constraints && project.constraints.length > 0 && (
+          <div class="mt-4">
+            <h3 class="text-sm font-mono text-[#77787c] uppercase mb-2 tracking-wider">Batasan & Hambatan Proyek:</h3>
+            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-[#e8e8e9]">
+              {project.constraints.map((c) => (
+                <li class="p-3 rounded-lg bg-[#18191b] border border-[rgba(255,255,255,0.06)] flex items-start gap-2">
+                  <span class="text-[#e5b84b] shrink-0">⚠</span>
+                  <span>{c}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
+
+      <!-- 3. Sasaran & Tujuan Proyek -->
+      {project.objectives && project.objectives.length > 0 && (
+        <section class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+            <span class="text-[#f5d400]">03.</span> Target & Sasaran Eksekusi
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {project.objectives.map((obj, i) => (
+              <div class="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.06)]">
+                <span class="text-xs font-mono text-[#f5d400] block mb-1">Target 0{i + 1}</span>
+                <p class="text-sm text-[#e8e8e9]">{obj}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- 4. Peran, Tanggung Jawab & Stakeholders -->
+      <section class="space-y-4">
+        <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+          <span class="text-[#f5d400]">04.</span> Tanggung Jawab & Kolaborasi Tim
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.06)]">
+            <h3 class="text-xs font-mono uppercase text-[#77787c] mb-3 tracking-wider">Tanggung Jawab Utama PM:</h3>
+            <ul class="space-y-2 text-sm text-[#e8e8e9]">
+              {project.responsibilities.map((r) => (
+                <li class="flex items-start gap-2">
+                  <span class="text-[#46c98a] shrink-0">→</span>
+                  <span>{r}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.06)]">
+            <h3 class="text-xs font-mono uppercase text-[#77787c] mb-3 tracking-wider">Stakeholder & Tim Terkait:</h3>
+            <ul class="space-y-2 text-sm text-[#e8e8e9]">
+              {project.teamAndStakeholders.map((ts) => (
+                <li class="flex items-start gap-2">
+                  <span class="text-[#6e6edb] shrink-0">•</span>
+                  <span>{ts}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Keputusan Teknis & Trade-Offs -->
+      {project.keyDecisions && project.keyDecisions.length > 0 && (
+        <section class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+            <span class="text-[#f5d400]">05.</span> Keputusan Arsitektur & Trade-Offs
+          </h2>
+          <div class="space-y-3">
+            {project.keyDecisions.map((kd, idx) => (
+              <div class="p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.06)] space-y-2">
+                <div class="flex items-center gap-2 text-xs font-mono text-[#f5d400]">
+                  <span>Keputusan #{idx + 1}:</span>
+                  <span class="text-[#e8e8e9] font-semibold">{kd.decision}</span>
+                </div>
+                <div class="text-xs text-[#a7a7aa]">
+                  <strong class="text-[#e8e8e9]">Rasionalisasi:</strong> {kd.rationale}
+                </div>
+                <div class="text-xs text-[#e5b84b]">
+                  <strong>Trade-off:</strong> {kd.tradeOff}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- 6. Fase Eksekusi & Deliverables -->
+      {project.execution && project.execution.length > 0 && (
+        <section class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+            <span class="text-[#f5d400]">06.</span> Roadmap Eksekusi & Hasil per Fase
+          </h2>
+          <div class="space-y-3">
+            {project.execution.map((phase) => (
+              <div class="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.06)] grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <span class="text-[#77787c] block font-mono">Fase</span>
+                  <span class="text-[#e8e8e9] font-semibold">{phase.phase}</span>
+                </div>
+                <div>
+                  <span class="text-[#77787c] block font-mono">Deliverable</span>
+                  <span class="text-[#a7a7aa]">{phase.deliverable}</span>
+                </div>
+                <div>
+                  <span class="text-[#77787c] block font-mono">Hasil</span>
+                  <span class="text-[#46c98a] font-medium">{phase.outcome}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- 7. Hasil Terverifikasi & Metrik Dampak -->
+      <section class="space-y-4">
+        <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+          <span class="text-[#f5d400]">07.</span> Hasil Terverifikasi & Dampak Nyata
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {project.outcomes.map((outcome, idx) => (
+            <div class="p-4 rounded-xl bg-[#141d17] border border-[rgba(70,201,138,0.2)] flex items-start gap-3">
+              <span class="w-5 h-5 rounded-full bg-[#46c98a]/20 text-[#46c98a] flex items-center justify-center font-mono text-xs shrink-0">
+                ✓
+              </span>
+              <p class="text-xs sm:text-sm text-[#e8e8e9] font-medium">{outcome}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- 8. Pembelajaran & Retrospektif -->
+      {project.lessonsLearned && project.lessonsLearned.length > 0 && (
+        <section class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+            <span class="text-[#f5d400]">08.</span> Retrospektif & Pembelajaran
+          </h2>
+          <div class="p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.06)] space-y-3">
+            <ul class="space-y-2 text-sm text-[#a7a7aa]">
+              {project.lessonsLearned.map((lesson) => (
+                <li class="flex items-start gap-2">
+                  <span class="text-[#f5d400] shrink-0">💡</span>
+                  <span class="text-[#e8e8e9]">{lesson}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      <!-- 9. Galeri Visual & Bukti -->
+      {project.galleryImages && project.galleryImages.length > 0 && (
+        <section class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+            <span class="text-[#f5d400]">09.</span> Bukti Visual & Tangkapan Layar
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {project.galleryImages.map((img) => (
+              <figure class="rounded-xl overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[#141516]">
+                <img
+                  src={img.url}
+                  alt={img.title}
+                  class="w-full h-48 sm:h-56 object-cover hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+                <figcaption class="p-3 text-xs bg-[#18191b]">
+                  <span class="font-semibold text-[#e8e8e9] block">{img.title}</span>
+                  {img.caption && <span class="text-[#77787c] text-[11px]">{img.caption}</span>}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- 10. Bukti Terverifikasi & Video Demo -->
+      {project.evidence && project.evidence.length > 0 && (
+        <section class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] flex items-center gap-2">
+            <span class="text-[#f5d400]">10.</span> Bukti Terverifikasi & Artefak Sistem
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {project.evidence.map((ev) => (
+              <div class="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] flex flex-col justify-between space-y-3">
+                <div class="space-y-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-[#202123] text-[#f5d400] border border-[rgba(255,255,255,0.08)]">
+                      {ev.type}
+                    </span>
+                    <h3 class="text-sm font-semibold text-[#e8e8e9]">{ev.title}</h3>
+                  </div>
+                  <p class="text-xs text-[#a7a7aa]">{ev.caption}</p>
+                </div>
+
+                {ev.metricsOrSpec && ev.metricsOrSpec.length > 0 && (
+                  <ul class="text-[11px] font-mono text-[#77787c] space-y-0.5 pt-2 border-t border-[rgba(255,255,255,0.06)]">
+                    {ev.metricsOrSpec.map((spec) => (
+                      <li class="flex items-center gap-1.5">
+                        <span class="text-[#46c98a]">✓</span>
+                        <span>{spec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <div class="pt-1">
+                  <a
+                    href={ev.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 text-xs text-[#38bdf8] hover:underline font-mono"
+                  >
+                    <span>{ev.type === 'video' ? 'Putar Video Demo ↗' : 'Buka Bukti ↗'}</span>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="mt-16 pt-8 border-t border-[rgba(255,255,255,0.08)] flex flex-wrap items-center justify-between gap-4">
+      <a
+        href="/cases"
+        class="inline-flex items-center gap-2 text-sm font-medium text-[#a7a7aa] hover:text-[#e8e8e9] transition-colors"
+      >
+        <span>← Kembali ke Semua Studi Kasus</span>
+      </a>
+
+      <a
+        href={`/?case=${project.slug}`}
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#f5d400] hover:bg-[#fadb24] text-[#121314] font-semibold text-sm transition-all shadow-md"
+      >
+        <span>Buka Kasus Ini di 3D Virtual Office</span>
+        <span>↗</span>
+      </a>
+    </div>
+  </main>
+
+  <StaticFooter />
+</Layout>

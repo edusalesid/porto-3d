@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { ROOMS, RoomId, getRoomById } from '@/lib/portfolio-data';
+import { ROOMS, type RoomId, getRoomById } from '@/lib/portfolio-data';
 
 export type CameraMode = 'orbit' | 'fps' | 'tps';
 export type VisualStyle3D = 'studio' | 'maquette' | 'cozy';
@@ -808,6 +808,38 @@ export default function VirtualOfficeCanvas({
   const moveJoystickRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const moveStickCenterRef = useRef<{ x: number; y: number } | null>(null);
   const moveStickTouchIdRef = useRef<number | null>(null);
+  const moveStickMaxRadiusRef = useRef<number>(36);
+
+  const [isLandscapeMobile, setIsLandscapeMobile] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkLandscapeMobile = () => {
+      if (typeof window === 'undefined') return;
+      const isLandscape =
+        window.innerWidth > window.innerHeight ||
+        window.matchMedia('(orientation: landscape)').matches;
+      const userAgent = navigator.userAgent || '';
+      const isMobileUA =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      const isCoarseTouch =
+        ('ontouchstart' in window || navigator.maxTouchPoints > 0) &&
+        !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      // Real mobile phone in landscape orientation has small height (<= 520px)
+      const isPhoneLandscapeHeight = window.innerHeight <= 520;
+
+      setIsLandscapeMobile(
+        isLandscape && (isMobileUA || isCoarseTouch) && (isPhoneLandscapeHeight || isMobileUA)
+      );
+    };
+
+    checkLandscapeMobile();
+    window.addEventListener('resize', checkLandscapeMobile);
+    window.addEventListener('orientationchange', checkLandscapeMobile);
+    return () => {
+      window.removeEventListener('resize', checkLandscapeMobile);
+      window.removeEventListener('orientationchange', checkLandscapeMobile);
+    };
+  }, []);
 
   const [moveStickUi, setMoveStickUi] = useState<{
     x: number;
@@ -979,21 +1011,6 @@ export default function VirtualOfficeCanvas({
     if (cameraModeRef.current !== 'orbit') return;
     orbitFocusPlayerRef.current = true;
     isCameraTransitioningRef.current = true;
-    if (requestRenderRef.current) {
-      requestRenderRef.current();
-    }
-  };
-
-  const setPadState = (
-    key: keyof typeof keysPressedRef.current,
-    val: boolean
-  ) => {
-    if (isDrawerOpenRef.current) {
-      keysPressedRef.current[key] = false;
-      return;
-    }
-    keysPressedRef.current[key] = val;
-    if (val) walkTargetRef.current = null;
     if (requestRenderRef.current) {
       requestRenderRef.current();
     }
@@ -1663,13 +1680,13 @@ export default function VirtualOfficeCanvas({
         roomGroup.add(receptionChair);
 
         const lobbyBoardTex = createWhiteboardTexture(
-          'RIZAL OS · DIGITAL OFFICE',
-          '01 · LOBBY',
+          'RIZAL OS · KANTOR DIGITAL',
+          '01 · LOBI UTAMA',
           '#0ea5e9',
           [
-            { title: 'Technical PM', tag: 'Execution', status: '6 ROOMS' },
-            { title: '6 Case Studies', tag: 'Portfolio', status: 'VERIFIED' },
-            { title: 'Systems & AI', tag: 'Workflows', status: 'ACTIVE' },
+            { title: 'Manajemen Proyek IT', tag: 'Eksekusi', status: '6 RUANGAN' },
+            { title: 'Studi Kasus Nyata', tag: 'Portofolio', status: 'TERVERIFIKASI' },
+            { title: 'Sistem & AI Terapan', tag: 'Alur Kerja', status: 'AKTIF' },
           ],
           maxAnisotropy
         );
@@ -1758,12 +1775,10 @@ export default function VirtualOfficeCanvas({
           '02 · PROJECTS',
           '#6366f1',
           [
-            { title: 'mFood POS', tag: 'POS', status: 'SHIPPED' },
-            { title: 'DIAMOND KMS', tag: 'KMS', status: 'SHIPPED' },
-            { title: 'Employr HR', tag: 'SaaS', status: 'SHIPPED' },
-            { title: 'Triagro Ops', tag: 'Agri', status: 'SHIPPED' },
-            { title: 'Prompt Battle', tag: 'AI', status: 'SHIPPED' },
-            { title: 'RevOps Engine', tag: 'Ops', status: 'SHIPPED' },
+            { title: 'Unilever GT2', tag: 'LMS', status: 'SHIPPED' },
+            { title: 'OEE Monitor', tag: 'IoT', status: 'SHIPPED' },
+            { title: 'Employr', tag: 'HR', status: 'SHIPPED' },
+            { title: 'mfood.id', tag: 'POS', status: 'SHIPPED' },
           ],
           maxAnisotropy
         );
@@ -1785,7 +1800,7 @@ export default function VirtualOfficeCanvas({
       }
 
       // -----------------------------------------------------------------------
-      // ROOM 03: SYSTEMS LAB (rx = 11.5, rz = -8.5)
+      // ROOM 03: LABORATORIUM SISTEM (rx = 11.5, rz = -8.5)
       // -----------------------------------------------------------------------
       if (room.id === 'systems') {
         const confTop = new THREE.Mesh(
@@ -1834,16 +1849,16 @@ export default function VirtualOfficeCanvas({
         });
 
         const sysBoardTex = createWhiteboardTexture(
-          'SYSTEMS WAR ROOM · WORKFLOWS',
-          '03 · SYSTEMS',
+          'LABORATORIUM SISTEM',
+          '03 · SISTEM',
           '#10b981',
           [
-            { title: 'PRD-to-Sprint', tag: 'WBS', status: 'VERIFIED' },
-            { title: 'AI RAG Flow', tag: 'AI', status: 'ACTIVE' },
-            { title: 'Offline Sync', tag: 'Queue', status: '99.9%' },
-            { title: 'Risk Matrix', tag: 'Audit', status: 'TRACKED' },
-            { title: 'API Contract', tag: 'Schema', status: 'LOCKED' },
-            { title: 'Release Gate', tag: 'QA', status: 'READY' },
+            { title: 'Antigravity + 9Router', tag: 'AI Proxy', status: 'ACTIVE' },
+            { title: 'Astro + Three.js', tag: '3D Islands', status: 'STABLE' },
+            { title: 'Next.js / NestJS', tag: 'Fullstack', status: 'READY' },
+            { title: 'Postgres + Supabase', tag: 'Database', status: 'SYNCED' },
+            { title: 'Jira & Trello Sprints', tag: 'Agile WBS', status: 'TRACKED' },
+            { title: 'SMA IF Lab 50+ PC', tag: 'Lab Ops', status: 'LIVE' },
           ],
           maxAnisotropy
         );
@@ -1870,19 +1885,19 @@ export default function VirtualOfficeCanvas({
       if (room.id === 'experience') {
         const milestones = [
           {
-            role: 'Technical PM',
-            period: '2023 — NOW',
-            metric: '6 Product Launches',
+            role: 'Guru Koding & Lab',
+            period: '2026 — SEKARANG',
+            metric: '200+ Siswa & ICIF',
           },
           {
-            role: 'Product Ops Lead',
-            period: '2021 — 2023',
-            metric: '+34% Predictability',
+            role: 'IT Lead & Project Manager',
+            period: '2024 — 2026',
+            metric: 'Movio & Cont Solutions',
           },
           {
-            role: 'Solutions Delivery',
-            period: '2019 — 2021',
-            metric: '15+ Rollouts',
+            role: 'Kepala Dept Project Manager',
+            period: '2022 — 2024',
+            metric: '10 Proyek Software',
           },
         ];
 
@@ -1964,7 +1979,7 @@ export default function VirtualOfficeCanvas({
       }
 
       // -----------------------------------------------------------------------
-      // ROOM 06: CONTACT LOUNGE (rx = 0, rz = 11.5)
+      // ROOM 06: RUANG KONTAK (rx = 0, rz = 11.5)
       // -----------------------------------------------------------------------
       if (room.id === 'contact') {
         const leatherMat = new THREE.MeshStandardMaterial({
@@ -3170,7 +3185,11 @@ export default function VirtualOfficeCanvas({
           Note: The circular right-side Camera Analog Joystick has been removed as requested
           because mobile users rotate/orbit the camera directly via native touch gestures on the screen.
          ===================================================================== */}
-      {!isDrawerOpen && (
+      {/* =====================================================================
+          1. MOBILE LEFT-THUMB 360° MOVEMENT ANALOG JOYSTICK
+          HANYA muncul di HP yang dimiringkan (mobile device in landscape)
+         ===================================================================== */}
+      {isLandscapeMobile && !isDrawerOpen && (
         <div
           role="group"
           aria-label="Analog Joystick Pergerakan 360 Derajat"
@@ -3179,19 +3198,25 @@ export default function VirtualOfficeCanvas({
             const touch = e.changedTouches[0];
             if (!touch) return;
             const rect = e.currentTarget.getBoundingClientRect();
+            const dynamicRadius = Math.min(36, Math.max(26, Math.round(rect.width * 0.35)));
+            moveStickMaxRadiusRef.current = dynamicRadius;
             moveStickTouchIdRef.current = touch.identifier;
             moveStickCenterRef.current = {
               x: rect.left + rect.width / 2,
               y: rect.top + rect.height / 2,
             };
-            updateMoveAnalogFromPoint(touch.clientX, touch.clientY, 36);
+            updateMoveAnalogFromPoint(touch.clientX, touch.clientY, dynamicRadius);
           }}
           onTouchMove={(e) => {
             e.stopPropagation();
             for (let i = 0; i < e.changedTouches.length; i++) {
               const t = e.changedTouches[i];
               if (t.identifier === moveStickTouchIdRef.current) {
-                updateMoveAnalogFromPoint(t.clientX, t.clientY, 36);
+                updateMoveAnalogFromPoint(
+                  t.clientX,
+                  t.clientY,
+                  moveStickMaxRadiusRef.current
+                );
                 break;
               }
             }
@@ -3216,17 +3241,23 @@ export default function VirtualOfficeCanvas({
             e.stopPropagation();
             e.currentTarget.setPointerCapture(e.pointerId);
             const rect = e.currentTarget.getBoundingClientRect();
+            const dynamicRadius = Math.min(36, Math.max(26, Math.round(rect.width * 0.35)));
+            moveStickMaxRadiusRef.current = dynamicRadius;
             moveStickCenterRef.current = {
               x: rect.left + rect.width / 2,
               y: rect.top + rect.height / 2,
             };
-            updateMoveAnalogFromPoint(e.clientX, e.clientY, 36);
+            updateMoveAnalogFromPoint(e.clientX, e.clientY, dynamicRadius);
           }}
           onPointerMove={(e) => {
             if (e.pointerType === 'touch' || !moveStickCenterRef.current)
               return;
             e.stopPropagation();
-            updateMoveAnalogFromPoint(e.clientX, e.clientY, 36);
+            updateMoveAnalogFromPoint(
+              e.clientX,
+              e.clientY,
+              moveStickMaxRadiusRef.current
+            );
           }}
           onPointerUp={(e) => {
             if (e.pointerType === 'touch') return;
@@ -3238,9 +3269,11 @@ export default function VirtualOfficeCanvas({
             e.stopPropagation();
             resetMoveAnalog();
           }}
-          className={`md:hidden fixed ${
-            zenMode || !isPlaceSelected ? 'bottom-5' : 'bottom-[74px]'
-          } left-4 z-20 w-26 h-26 rounded-full bg-[#0f1011]/90 border border-[#23252a] flex items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing transition-[bottom] duration-200`}
+          className={`control-mobile-analog fixed ${
+            zenMode || !isPlaceSelected || isLandscapeMobile
+              ? 'bottom-5 landscape:bottom-3.5'
+              : 'bottom-[74px] landscape:bottom-3.5'
+          } left-4 landscape:left-3.5 z-20 w-26 h-26 landscape:w-22 landscape:h-22 sm:landscape:w-24 sm:landscape:h-24 rounded-full bg-[#0f1011]/90 border border-[#23252a] flex items-center justify-center touch-none select-none cursor-grab active:cursor-grabbing transition-[bottom,left,width,height] duration-200`}
         >
           {/* Inner Arena Ring */}
           <div className="pointer-events-none absolute inset-3 rounded-full border border-[#23252a] bg-[#141516]/80" />
@@ -3296,114 +3329,13 @@ export default function VirtualOfficeCanvas({
             style={{
               transform: `translate3d(${moveStickUi.x}px, ${moveStickUi.y}px, 0)`,
             }}
-            className={`pointer-events-none w-11 h-11 rounded-full bg-[#5e6ad2] border border-[#f7f8f8]/40 flex items-center justify-center ${
+            className={`pointer-events-none w-11 h-11 landscape:w-9 landscape:h-9 sm:landscape:w-10 sm:landscape:h-10 rounded-full bg-[#5e6ad2] border border-[#f7f8f8]/40 flex items-center justify-center ${
               moveStickUi.active
                 ? 'scale-105'
                 : 'transition-transform duration-150 ease-out'
             }`}
           >
-            <div className="w-4 h-4 rounded-full bg-[#f7f8f8]/25" />
-          </div>
-        </div>
-      )}
-
-      {/* =====================================================================
-          2. DESKTOP KEYBOARD / BUTTON PAD (Hidden on Mobile, visible on md+)
-         ===================================================================== */}
-      {!zenMode && !isDrawerOpen && (
-        <div
-          aria-label="On-Screen 3D Movement Controls"
-          className="hidden md:flex fixed bottom-4 left-4 z-20 flex-col items-center gap-1.5 p-2 rounded-lg bg-[#0f1011] border border-[#23252a] touch-none select-none"
-        >
-          <div className="font-mono text-[9px] uppercase tracking-wider text-[#62666d]">
-            {cameraMode === 'orbit' ? 'GESER KAMERA' : 'JALAN (WASD)'}
-          </div>
-          <div className="grid grid-cols-3 gap-1">
-            <button
-              type="button"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                setPadState('turnLeft', true);
-              }}
-              onPointerUp={() => setPadState('turnLeft', false)}
-              onPointerCancel={() => setPadState('turnLeft', false)}
-              onPointerLeave={() => setPadState('turnLeft', false)}
-              className="w-9 h-7 rounded-md bg-[#141516] hover:bg-[#18191a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[10px] font-mono text-[#8a8f98] hover:text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
-              title="Putar Kamera Kiri (Q)"
-            >
-              ↺ Q
-            </button>
-            <button
-              type="button"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                setPadState('forward', true);
-              }}
-              onPointerUp={() => setPadState('forward', false)}
-              onPointerCancel={() => setPadState('forward', false)}
-              onPointerLeave={() => setPadState('forward', false)}
-              className="w-9 h-7 rounded-md bg-[#18191a] hover:bg-[#23252a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[11px] font-mono font-medium text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
-              title="Maju (W / Arrow Up)"
-            >
-              ▲ W
-            </button>
-            <button
-              type="button"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                setPadState('turnRight', true);
-              }}
-              onPointerUp={() => setPadState('turnRight', false)}
-              onPointerCancel={() => setPadState('turnRight', false)}
-              onPointerLeave={() => setPadState('turnRight', false)}
-              className="w-9 h-7 rounded-md bg-[#141516] hover:bg-[#18191a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[10px] font-mono text-[#8a8f98] hover:text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
-              title="Putar Kamera Kanan (E)"
-            >
-              E ↻
-            </button>
-
-            <button
-              type="button"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                setPadState('left', true);
-              }}
-              onPointerUp={() => setPadState('left', false)}
-              onPointerCancel={() => setPadState('left', false)}
-              onPointerLeave={() => setPadState('left', false)}
-              className="w-9 h-7 rounded-md bg-[#18191a] hover:bg-[#23252a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[11px] font-mono font-medium text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
-              title="Kiri (A / Arrow Left)"
-            >
-              ◄ A
-            </button>
-            <button
-              type="button"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                setPadState('backward', true);
-              }}
-              onPointerUp={() => setPadState('backward', false)}
-              onPointerCancel={() => setPadState('backward', false)}
-              onPointerLeave={() => setPadState('backward', false)}
-              className="w-9 h-7 rounded-md bg-[#18191a] hover:bg-[#23252a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[11px] font-mono font-medium text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
-              title="Putar Balik / Mundur (S / Arrow Down)"
-            >
-              ▼ S
-            </button>
-            <button
-              type="button"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                setPadState('right', true);
-              }}
-              onPointerUp={() => setPadState('right', false)}
-              onPointerCancel={() => setPadState('right', false)}
-              onPointerLeave={() => setPadState('right', false)}
-              className="w-9 h-7 rounded-md bg-[#18191a] hover:bg-[#23252a] active:bg-[#5e6ad2] active:text-[#f7f8f8] border border-[#23252a] text-[11px] font-mono font-medium text-[#f7f8f8] flex items-center justify-center cursor-pointer touch-none select-none"
-              title="Kanan (D / Arrow Right)"
-            >
-              D ►
-            </button>
+            <div className="w-4 h-4 landscape:w-3.5 landscape:h-3.5 rounded-full bg-[#f7f8f8]/25" />
           </div>
         </div>
       )}
@@ -3447,7 +3379,7 @@ export default function VirtualOfficeCanvas({
       {!zenMode && showFloorPlan && (
         <aside
           aria-label="Digital Office Floor Plan"
-          className="fixed top-26 left-2.5 right-2.5 sm:left-auto sm:right-4 sm:w-[330px] md:top-15 z-30 bg-[#0f1011] border border-[#23252a] rounded-lg p-3.5 shadow-2xl"
+          className="fixed top-26 left-2.5 right-2.5 sm:left-auto sm:right-4 sm:w-[330px] md:top-15 landscape:top-14 landscape:right-3 landscape:w-[310px] max-h-[calc(100vh-70px)] overflow-y-auto z-30 bg-[#0f1011] border border-[#23252a] rounded-lg p-3.5 shadow-2xl"
         >
           <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-[#23252a]">
             <div>
@@ -3525,11 +3457,11 @@ export default function VirtualOfficeCanvas({
                   style={{ backgroundColor: '#38bdf8' }}
                 />
                 <span className="text-xs font-medium text-[#f7f8f8] leading-snug">
-                  Virtual Office Lobby
+                  Lobi Virtual
                 </span>
               </div>
               <div className="text-[10px] text-[#a7a7aa] leading-tight mt-1">
-                Profil ringkas & cara kerja
+                Profil ringkas &amp; ringkasan kompetensi
               </div>
             </button>
 
@@ -3590,7 +3522,7 @@ export default function VirtualOfficeCanvas({
                   style={{ backgroundColor: '#38bdf8' }}
                 />
                 <span className="text-xs font-medium text-[#f7f8f8] leading-snug">
-                  Coffee Bar & Contact Lounge
+                  Bar Kopi & Ruang Kontak
                 </span>
               </div>
               <div className="text-[10px] text-[#a7a7aa] leading-tight mt-1">

@@ -1,0 +1,195 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import StaticNav from '../../components/StaticNav.astro';
+import StaticFooter from '../../components/StaticFooter.astro';
+import { PORTFOLIO_PROJECTS, type PortfolioProject } from '@/lib/portfolio-data';
+
+export async function getStaticPaths() {
+  return PORTFOLIO_PROJECTS.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: PortfolioProject;
+}
+
+const { project } = Astro.props;
+
+const pageTitle = `${project.title} — Detail Proyek | Rizal`;
+const pageDescription = `${project.summary} Peran: ${project.role}. Status: ${project.projectStatus}.`;
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <StaticNav />
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+    <!-- Breadcrumb -->
+    <div class="flex items-center justify-between gap-4 mb-8 text-xs font-mono text-[#77787c]">
+      <div class="flex items-center gap-2">
+        <a href="/projects" class="hover:text-[#38bdf8] transition-colors">← Semua Proyek</a>
+        <span>/</span>
+        <span class="text-[#a7a7aa] truncate">{project.title}</span>
+      </div>
+
+      <a
+        href={`/?case=${project.slug}`}
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#18191b] hover:bg-[#232426] text-[#38bdf8] border border-[rgba(255,255,255,0.1)] transition-colors"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-[#38bdf8]"></span>
+        <span>Buka di 3D Office</span>
+      </a>
+    </div>
+
+    <!-- Header -->
+    <header class="mb-10">
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        {project.category.map((cat) => (
+          <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-[#18191b] text-[#38bdf8] border border-[rgba(56,189,248,0.2)]">
+            {cat}
+          </span>
+        ))}
+        <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-[#18191b] text-[#46c98a]">
+          {project.projectStatus}
+        </span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-[#e8e8e9] tracking-tight mb-4">
+        {project.title}
+      </h1>
+
+      <p class="text-base sm:text-lg text-[#a7a7aa] leading-relaxed">
+        {project.summary}
+      </p>
+    </header>
+
+    <!-- Banner or Demo Video -->
+    {project.demoVideo ? (
+      <div class="mb-10 rounded-2xl overflow-hidden border border-[rgba(255,255,255,0.12)] bg-[#0d0f14] shadow-2xl">
+        <div class="p-3 bg-[#18191b] border-b border-[rgba(255,255,255,0.06)] flex items-center justify-between text-xs font-mono text-[#77787c]">
+          <span class="flex items-center gap-2 text-[#e8e8e9]">
+            <span class="w-2 h-2 rounded-full bg-[#f5d400] animate-pulse"></span>
+            <span>{project.demoVideo.title || `${project.title} Video Showcase`}</span>
+          </span>
+          <span class="text-[#38bdf8]">Video Demo</span>
+        </div>
+        <video
+          controls
+          playsinline
+          preload="metadata"
+          poster={project.demoVideo.poster || project.bannerImage}
+          class="w-full aspect-video object-contain bg-black"
+        >
+          <source src={project.demoVideo.url} type={project.demoVideo.type || "video/mp4"} />
+          Browser Anda tidak mendukung tag video HTML5.
+        </video>
+        {project.demoVideo.caption && (
+          <p class="p-3 text-xs font-mono text-[#a7a7aa] bg-[#141516] border-t border-[rgba(255,255,255,0.06)]">
+            {project.demoVideo.caption}
+          </p>
+        )}
+      </div>
+    ) : project.bannerImage && (
+      <div class="mb-10 rounded-2xl overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[#141516]">
+        <img
+          src={project.bannerImage}
+          alt={project.title}
+          class="w-full h-auto max-h-[460px] object-cover"
+          loading="eager"
+        />
+      </div>
+    )}
+
+    <!-- Quick stats grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.06)] text-xs font-mono mb-10">
+      <div>
+        <span class="text-[#77787c] block mb-1">Peran Utama</span>
+        <span class="text-[#e8e8e9] font-medium">{project.role}</span>
+      </div>
+      <div>
+        <span class="text-[#77787c] block mb-1">Jangka Waktu</span>
+        <span class="text-[#e8e8e9] font-medium">{project.period}</span>
+      </div>
+      <div>
+        <span class="text-[#77787c] block mb-1">Status Proyek</span>
+        <span class="text-[#46c98a] font-medium">{project.projectStatus}</span>
+      </div>
+      <div>
+        <span class="text-[#77787c] block mb-1">Studi Kasus 14-Poin</span>
+        <a href={`/cases/${project.slug}`} class="text-[#f5d400] hover:underline font-semibold">Tersedia Lengkap ↗</a>
+      </div>
+    </div>
+
+    <!-- Overview & Problem -->
+    <div class="space-y-8 text-sm sm:text-base text-[#a7a7aa] leading-relaxed">
+      <section class="space-y-3">
+        <h2 class="text-xl font-display font-semibold text-[#e8e8e9]">Konteks & Gambaran Proyek</h2>
+        <p>{project.overview}</p>
+        <p>{project.context}</p>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-display font-semibold text-[#e8e8e9]">Tantangan Utama yang Diselesaikan</h2>
+        <div class="p-5 rounded-xl bg-[#1d1414] border border-[rgba(231,107,107,0.2)] text-[#e8e8e9]">
+          <p class="text-sm">{project.problem}</p>
+        </div>
+      </section>
+
+      <!-- Key Outcomes -->
+      <section class="space-y-3">
+        <h2 class="text-xl font-display font-semibold text-[#e8e8e9]">Hasil & Dampak Terverifikasi</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {project.outcomes.map((outcome) => (
+            <div class="p-4 rounded-xl bg-[#141d17] border border-[rgba(70,201,138,0.2)] flex items-start gap-3">
+              <span class="text-[#46c98a] shrink-0 font-bold">✓</span>
+              <span class="text-xs sm:text-sm text-[#e8e8e9]">{outcome}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Gallery if available -->
+      {project.galleryImages && project.galleryImages.length > 0 && (
+        <section class="space-y-3">
+          <h2 class="text-xl font-display font-semibold text-[#e8e8e9]">Screenshot & Dokumentasi</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {project.galleryImages.map((g) => (
+              <figure class="rounded-xl overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[#141516]">
+                <img src={g.url} alt={g.title} class="w-full h-48 object-cover" loading="lazy" />
+                <figcaption class="p-3 text-xs bg-[#18191b] text-[#a7a7aa]">
+                  <strong class="text-[#e8e8e9] block">{g.title}</strong>
+                  {g.caption}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+
+    <!-- CTA Section -->
+    <div class="mt-12 p-6 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <h3 class="text-base font-semibold text-[#e8e8e9]">Ingin memahami keputusan teknis & arsitekturnya?</h3>
+        <p class="text-xs text-[#a7a7aa]">Baca arsip 14-poin lengkap termasuk mitigasi risiko dan trade-off.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a
+          href={`/cases/${project.slug}`}
+          class="px-4 py-2 rounded-xl bg-[#f5d400] hover:bg-[#fadb24] text-[#121314] font-semibold text-xs sm:text-sm transition-colors"
+        >
+          Buka Studi Kasus 14-Poin →
+        </a>
+        <a
+          href={`/?case=${project.slug}`}
+          class="px-3.5 py-2 rounded-xl bg-[#1d1e20] hover:bg-[#28292b] text-[#38bdf8] border border-[rgba(255,255,255,0.1)] text-xs sm:text-sm font-medium transition-colors"
+        >
+          Lihat di 3D
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <StaticFooter />
+</Layout>

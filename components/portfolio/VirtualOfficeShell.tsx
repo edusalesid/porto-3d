@@ -1,11 +1,18 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import TopNav from '@/components/navigation/TopNav';
 import VisualNovelGreeting from '@/components/portfolio/VisualNovelGreeting';
-import VirtualOfficeCanvas, {
-  CameraMode,
-} from '@/components/three/VirtualOfficeCanvas';
+import DrawerAvatarCompanion from '@/components/portfolio/DrawerAvatarCompanion';
+import {
+  AVATAR_SPRITES,
+  getAvatarMetaForCard,
+} from '@/lib/avatar-companion-data';
+import type { CameraMode } from '@/components/three/VirtualOfficeCanvas';
+
+const VirtualOfficeCanvas = lazy(
+  () => import('@/components/three/VirtualOfficeCanvas')
+);
 import {
   LobbyOverviewSection,
   ProjectDirectorySection,
@@ -17,8 +24,8 @@ import {
 import {
   ROOMS,
   PORTFOLIO_PROJECTS,
-  RoomId,
-  PortfolioProject,
+  type RoomId,
+  type PortfolioProject,
   getRoomById,
   getProjectBySlug,
 } from '@/lib/portfolio-data';
@@ -66,6 +73,50 @@ export default function VirtualOfficeShell({
   );
   const [sceneErrorReason, setSceneErrorReason] = useState<string>('');
   const [sceneMountKey, setSceneMountKey] = useState<number>(1);
+
+  // Active Card & Drawer Companion State
+  const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const desktopDrawerScrollRef = useRef<HTMLDivElement | null>(null);
+
+  // Active card detection inside drawer via IntersectionObserver
+  useEffect(() => {
+    if (!drawerOpen) {
+      setActiveCardId(null);
+      setHoveredCardId(null);
+      return;
+    }
+
+    const scrollEl = desktopDrawerScrollRef.current;
+    if (!scrollEl) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const intersecting = entries.filter((e) => e.isIntersecting);
+        if (intersecting.length > 0) {
+          const sorted = [...intersecting].sort(
+            (a, b) => b.intersectionRatio - a.intersectionRatio
+          );
+          const topEntry = sorted[0];
+          const cardId =
+            topEntry.target.getAttribute('data-card-id') || topEntry.target.id;
+          if (cardId) {
+            setActiveCardId(cardId);
+          }
+        }
+      },
+      {
+        root: scrollEl,
+        rootMargin: '-15% 0px -40% 0px',
+        threshold: [0.1, 0.3, 0.6, 0.9],
+      }
+    );
+
+    const cards = scrollEl.querySelectorAll('[data-card-id], article[id]');
+    cards.forEach((c) => observer.observe(c));
+
+    return () => observer.disconnect();
+  }, [drawerOpen, activeRoom, activeCaseProject]);
 
   useEffect(() => {
     trackPortfolioEvent('portfolio_view', { entry: 'home' });
@@ -129,7 +180,7 @@ export default function VirtualOfficeShell({
 
       if (e.key === 'Escape') {
         if (showWelcomeModal) {
-          setShowWelcomeModal(false);
+          return;
         } else if (drawerOpen) {
           setDrawerOpen(false);
           setIsPlaceSelected(false);
@@ -231,33 +282,41 @@ export default function VirtualOfficeShell({
       {/* 2. MAIN 3D WORKSPACE STAGE CANVAS */}
       <main className="relative w-full h-full overflow-hidden">
         {sceneStatus !== 'error' && (
-          <VirtualOfficeCanvas
-            key={sceneMountKey}
-            activeRoom={activeRoom}
-            reducedMotion={reducedMotion}
-            cameraMode={cameraMode}
-            zenMode={zenMode}
-            showFloorPlan={showFloorPlan}
-            isDrawerOpen={drawerOpen}
-            isPlaceSelected={isPlaceSelected}
-            onChangeCameraMode={handleChangeCameraMode}
-            onToggleZenMode={() => setZenMode((z) => !z)}
-            onToggleFloorPlan={() => setShowFloorPlan((f) => !f)}
-            onSelectRoom={handleSelectRoom}
-            onClickRoom={handleClickRoom}
-            onDismissPlace={() => setIsPlaceSelected(false)}
-            onOpenRoomDetail={handleOpenRoomDetail}
-            onSceneReady={() => {
-              setSceneStatus('ready');
-              trackPortfolioEvent('scene_ready');
-            }}
-            onSceneError={(reason) => {
-              setSceneErrorReason(reason);
-              setSceneStatus('error');
-              setDrawerOpen(true);
-              trackPortfolioEvent('fallback_activated', { reason });
-            }}
-          />
+          <div
+            className={`w-full h-full transition-opacity duration-700 ease-out ${
+              sceneStatus === 'ready' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          >
+            <Suspense fallback={null}>
+              <VirtualOfficeCanvas
+                key={sceneMountKey}
+                activeRoom={activeRoom}
+                reducedMotion={reducedMotion}
+                cameraMode={cameraMode}
+                zenMode={zenMode}
+                showFloorPlan={showFloorPlan}
+                isDrawerOpen={drawerOpen}
+                isPlaceSelected={isPlaceSelected}
+                onChangeCameraMode={handleChangeCameraMode}
+                onToggleZenMode={() => setZenMode((z) => !z)}
+                onToggleFloorPlan={() => setShowFloorPlan((f) => !f)}
+                onSelectRoom={handleSelectRoom}
+                onClickRoom={handleClickRoom}
+                onDismissPlace={() => setIsPlaceSelected(false)}
+                onOpenRoomDetail={handleOpenRoomDetail}
+                onSceneReady={() => {
+                  setSceneStatus('ready');
+                  trackPortfolioEvent('scene_ready');
+                }}
+                onSceneError={(reason) => {
+                  setSceneErrorReason(reason);
+                  setSceneStatus('error');
+                  setDrawerOpen(true);
+                  trackPortfolioEvent('fallback_activated', { reason });
+                }}
+              />
+            </Suspense>
+          </div>
         )}
 
         {/* Loading Indicator — Hanya muncul jika user lewati intro dan 3D masih proses persiapan */}
@@ -369,9 +428,9 @@ export default function VirtualOfficeShell({
           />
         )}
 
-        {/* 4. CONTROLS GUIDANCE PILL (Featuring rizal-explaining.webp) */}
+        {/* 4. CONTROLS GUIDANCE PILL (Featuring rizal-explaining.webp) - Desktop Keyboard Only */}
         {showControlsGuide && !zenMode && !drawerOpen && (
-          <div className="fixed bottom-4 left-4 z-30 max-w-xs p-3.5 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] shadow-2xl flex items-start gap-3 backdrop-blur-md animate-in slide-in-from-bottom-2 duration-150">
+          <div className="control-desktop-guide fixed bottom-4 left-4 z-30 max-w-xs p-3.5 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] shadow-2xl items-start gap-3 backdrop-blur-md animate-in slide-in-from-bottom-2 duration-150">
             <div className="w-12 h-12 rounded-full p-0.5 bg-[#1d1e20] border border-[rgba(255,255,255,0.13)] shrink-0 overflow-hidden flex items-center justify-center">
               <img
                 src="/avatar/rizal-explaining.webp"
@@ -485,16 +544,35 @@ export default function VirtualOfficeShell({
                 </div>
 
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: currentRoomMeta.accentHex }}
-                    />
-                    <span className="font-display text-xs font-semibold tracking-[-0.01em] text-[#e8e8e9] truncate">
-                      {activeCaseProject
-                        ? activeCaseProject.title
-                        : currentRoomMeta.name}
-                    </span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {/* Mini Reactive Avatar */}
+                    <div className="w-7 h-7 rounded-full bg-[#1d1e20] border border-[rgba(255,255,255,0.12)] shrink-0 overflow-hidden flex items-center justify-center">
+                      <img
+                        key={hoveredCardId || activeCardId || activeRoom}
+                        src={
+                          AVATAR_SPRITES[
+                            getAvatarMetaForCard(
+                              activeRoom,
+                              hoveredCardId || activeCardId,
+                              activeCaseProject
+                            ).pose
+                          ]
+                        }
+                        alt="Rizal Mini Avatar"
+                        className="w-full h-full object-contain transition-opacity duration-150"
+                      />
+                    </div>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ backgroundColor: currentRoomMeta.accentHex }}
+                      />
+                      <span className="font-display text-xs font-semibold tracking-[-0.01em] text-[#e8e8e9] truncate">
+                        {activeCaseProject
+                          ? activeCaseProject.title
+                          : currentRoomMeta.name}
+                      </span>
+                    </div>
                   </div>
 
                   <span className="font-mono text-[10px] font-medium tracking-wider text-[#a7a7aa] shrink-0">
@@ -515,30 +593,36 @@ export default function VirtualOfficeShell({
                       setActiveCaseProject(null);
                       setActiveRoom('projects');
                     }}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'lobby' ? (
                   <LobbyOverviewSection
                     onNavigateRoom={(rId) => setActiveRoom(rId)}
                     onSelectProject={(proj) => handleOpenProjectCase(proj)}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'projects' ? (
                   <ProjectDirectorySection
                     onSelectProject={(proj) => handleOpenProjectCase(proj)}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'systems' ? (
                   <SystemsLabSection
                     onSelectProjectSlug={handleSelectProjectSlug}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'experience' ? (
                   <ExperienceGallerySection
                     onSelectProjectSlug={handleSelectProjectSlug}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'cases' ? (
                   <ProjectDirectorySection
                     onSelectProject={(proj) => handleOpenProjectCase(proj)}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : (
-                  <ContactLoungeSection />
+                  <ContactLoungeSection onCardHover={setHoveredCardId} />
                 )}
               </div>
             </div>
@@ -560,19 +644,53 @@ export default function VirtualOfficeShell({
               }
             }}
           >
-            <div className="relative w-full max-w-3xl h-full bg-[#171819] border-l border-[rgba(255,255,255,0.085)] flex flex-col overflow-hidden animate-in slide-in-from-right duration-150 shadow-2xl">
+            {/* 6.1 INTERACTIVE COMPANION ON THE LEFT ("sisi kiri yang bukan drawer") */}
+            <DrawerAvatarCompanion
+              activeRoom={activeRoom}
+              activeCaseProject={activeCaseProject}
+              activeCardId={hoveredCardId || activeCardId}
+              onSelectCardId={(cardId) => {
+                const scrollEl = desktopDrawerScrollRef.current;
+                const el = scrollEl?.querySelector(`#${cardId}`) as HTMLElement | null;
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }}
+            />
+
+            {/* 6.2 RIGHT SLIDE-OVER DRAWER PANEL */}
+            <div className="relative w-full max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl ml-auto h-full bg-[#171819] border-l border-[rgba(255,255,255,0.085)] flex flex-col overflow-hidden animate-in slide-in-from-right duration-150 shadow-2xl">
               {/* Header */}
-              <div className="px-6 py-3.5 bg-[#18191b] border-b border-[rgba(255,255,255,0.085)] flex items-center justify-between gap-3 shrink-0">
+              <div className="px-4 py-2.5 sm:px-6 sm:py-3.5 bg-[#18191b] border-b border-[rgba(255,255,255,0.085)] flex items-center justify-between gap-3 shrink-0">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: currentRoomMeta.accentHex }}
-                  />
-                  <span className="font-display text-sm font-semibold tracking-[-0.015em] text-[#e8e8e9] truncate">
-                    {activeCaseProject
-                      ? activeCaseProject.title
-                      : currentRoomMeta.name}
-                  </span>
+                  {/* Mini Reactive Avatar (visible when companion is hidden) */}
+                  <div className="w-7 h-7 rounded-full bg-[#1d1e20] border border-[rgba(255,255,255,0.12)] shrink-0 overflow-hidden flex items-center justify-center">
+                    <img
+                      key={hoveredCardId || activeCardId || activeRoom}
+                      src={
+                        AVATAR_SPRITES[
+                          getAvatarMetaForCard(
+                            activeRoom,
+                            hoveredCardId || activeCardId,
+                            activeCaseProject
+                          ).pose
+                        ]
+                      }
+                      alt="Rizal Mini Avatar"
+                      className="w-full h-full object-contain transition-opacity duration-150"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: currentRoomMeta.accentHex }}
+                    />
+                    <span className="font-display text-xs sm:text-sm font-semibold tracking-[-0.015em] text-[#e8e8e9] truncate">
+                      {activeCaseProject
+                        ? activeCaseProject.title
+                        : currentRoomMeta.name}
+                    </span>
+                  </div>
                 </div>
 
                 <button
@@ -583,7 +701,7 @@ export default function VirtualOfficeShell({
                     setActiveCaseProject(null);
                   }}
                   aria-label="Tutup Panel Ruangan"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1f2023] hover:bg-[#28292b] border border-[rgba(255,255,255,0.085)] text-xs font-medium text-[#a7a7aa] hover:text-[#e8e8e9] shrink-0 cursor-pointer transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-[#1f2023] hover:bg-[#28292b] border border-[rgba(255,255,255,0.085)] text-xs font-medium text-[#a7a7aa] hover:text-[#e8e8e9] shrink-0 cursor-pointer transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>Tutup</span>
@@ -591,7 +709,10 @@ export default function VirtualOfficeShell({
               </div>
 
               {/* Scrollable Drawer Content */}
-              <div className="flex-1 overflow-y-auto p-6 sm:p-8 select-text">
+              <div
+                ref={desktopDrawerScrollRef}
+                className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 select-text"
+              >
                 {activeCaseProject ? (
                   <CaseStudyFullView
                     project={activeCaseProject}
@@ -599,30 +720,36 @@ export default function VirtualOfficeShell({
                       setActiveCaseProject(null);
                       setActiveRoom('projects');
                     }}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'lobby' ? (
                   <LobbyOverviewSection
                     onNavigateRoom={(rId) => setActiveRoom(rId)}
                     onSelectProject={(proj) => handleOpenProjectCase(proj)}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'projects' ? (
                   <ProjectDirectorySection
                     onSelectProject={(proj) => handleOpenProjectCase(proj)}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'systems' ? (
                   <SystemsLabSection
                     onSelectProjectSlug={handleSelectProjectSlug}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'experience' ? (
                   <ExperienceGallerySection
                     onSelectProjectSlug={handleSelectProjectSlug}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : activeRoom === 'cases' ? (
                   <ProjectDirectorySection
                     onSelectProject={(proj) => handleOpenProjectCase(proj)}
+                    onCardHover={setHoveredCardId}
                   />
                 ) : (
-                  <ContactLoungeSection />
+                  <ContactLoungeSection onCardHover={setHoveredCardId} />
                 )}
               </div>
             </div>

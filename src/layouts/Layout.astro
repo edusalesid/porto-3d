@@ -1,0 +1,87 @@
+---
+import '../styles/globals.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  canonicalUrl?: string;
+  jsonLd?: Record<string, any>;
+}
+
+const {
+  title = 'Rizal OS — 3D Virtual Office & Technical PM Portfolio',
+  description = 'Explore the work. Understand the thinking. See the impact. Interactive 3D Spatial Virtual Office & Verified Case Studies by Rizal — Technical Project Manager specializing in systems, SaaS, and AI workflows.',
+  image = '/assets/banner-3d-office.jpg',
+  type = 'website',
+  canonicalUrl = Astro.url.href,
+  jsonLd,
+} = Astro.props;
+
+const siteUrl = Astro.site ? Astro.site.toString() : 'https://riizalhp.web.id';
+const ogImage = image.startsWith('http') ? image : `${siteUrl.replace(/\/$/, '')}${image.startsWith('/') ? '' : '/'}${image}`;
+
+const defaultPersonSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Rizal Hanifa Pratama',
+  jobTitle: 'Coding Teacher & IT Project Manager',
+  description: 'Coding Teacher @ SMA IHSANUL FIKRI MUNGKID specializing in bilingual communications, digitalization development, academic quality assurance (SPMI), and IT project management.',
+  url: siteUrl,
+  sameAs: [
+    'https://www.linkedin.com/in/riizalhp',
+    'https://riizalhp.web.id'
+  ]
+};
+---
+
+<!doctype html>
+<html lang="id" class="dark scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#08090a" />
+    <meta name="color-scheme" content="dark" />
+
+    <!-- SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content="Rizal OS — Virtual Office" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalUrl} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={ogImage} />
+
+    <!-- Preload Avatar Sapaan Awal -->
+    <link rel="preload" as="image" href="/avatar/rizal-wave.webp" type="image/webp" />
+
+    <!-- Google Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd || defaultPersonSchema)} />
+  </head>
+  <body class="bg-[#121314] text-[#e8e8e9] font-sans antialiased selection:bg-[#f5d400]/30 selection:text-[#f5d400] min-h-screen">
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mf-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="mf-emerald" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="mf-orange" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="480" fill="url(#mf-bg)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.06" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="90" x2="960" y2="90"/>
+    <line x1="0" y1="190" x2="960" y2="190"/>
+    <line x1="0" y1="290" x2="960" y2="290"/>
+    <line x1="0" y1="390" x2="960" y2="390"/>
+    <line x1="300" y1="0" x2="300" y2="480"/>
+    <line x1="640" y1="0" x2="640" y2="480"/>
+  </g>
+
+  <!-- Window Frame -->
+  <rect x="24" y="24" width="912" height="432" rx="14" fill="#0b1324" stroke="#1e293b" stroke-width="1.5"/>
+
+  <!-- Header -->
+  <path d="M 24 38 Q 24 24 38 24 L 922 24 Q 936 24 936 38 L 936 74 L 24 74 Z" fill="#131e36"/>
+  <circle cx="48" cy="49" r="5" fill="#ef4444" opacity="0.85"/>
+  <circle cx="66" cy="49" r="5" fill="#f59e0b" opacity="0.85"/>
+  <circle cx="84" cy="49" r="5" fill="#10b981" opacity="0.85"/>
+
+  <text x="110" y="53" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#f8fafc">
+    mfood.id · Semua Operasional Kuliner dalam Satu Aplikasi
+  </text>
+
+  <!-- Live Counter Pill -->
+  <rect x="580" y="38" width="130" height="24" rx="12" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="0.8"/>
+  <circle cx="594" cy="50" r="3.5" fill="#10b981"/>
+  <text x="604" y="54" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" fill="#34d399">1.248+ Bisnis Aktif</text>
+
+  <rect x="730" y="38" width="186" height="24" rx="12" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="0.8"/>
+  <text x="750" y="54" font-family="monospace" font-size="11" font-weight="700" fill="#f97316">https://mfood.id</text>
+
+  <!-- Left: POS Order Screen & Table Grid -->
+  <rect x="40" y="90" width="370" height="350" rx="10" fill="#131e36" stroke="#1e293b" stroke-width="1"/>
+  <text x="56" y="116" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Mobile POS · Kasir &amp; Titik Mangkal</text>
+  <text x="56" y="132" font-family="monospace" font-size="9.5" fill="#10b981">Offline-Resilient · IndexedDB Sync</text>
+
+  <!-- Quick Menu Items Grid -->
+  <g transform="translate(56, 145)">
+    <!-- Item 1 -->
+    <rect x="0" y="0" width="160" height="70" rx="6" fill="#1e2b4a" stroke="#2a3b66" stroke-width="1"/>
+    <text x="12" y="24" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Ayam Geprek Sambal</text>
+    <text x="12" y="42" font-family="monospace" font-size="11" font-weight="700" fill="#f97316">Rp 22.000</text>
+    <text x="12" y="58" font-family="Inter, sans-serif" font-size="9" fill="#10b981">Stok: 48 porsi</text>
+
+    <!-- Item 2 -->
+    <rect x="175" y="0" width="160" height="70" rx="6" fill="#1e2b4a" stroke="#2a3b66" stroke-width="1"/>
+    <text x="187" y="24" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Es Kopi Susu Gula Aren</text>
+    <text x="187" y="42" font-family="monospace" font-size="11" font-weight="700" fill="#f97316">Rp 18.000</text>
+    <text x="187" y="58" font-family="Inter, sans-serif" font-size="9" fill="#10b981">Stok: 85 cup</text>
+
+    <!-- Item 3 -->
+    <rect x="0" y="80" width="160" height="70" rx="6" fill="#1e2b4a" stroke="#2a3b66" stroke-width="1"/>
+    <text x="12" y="104" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Mie Pedas Level 3</text>
+    <text x="12" y="122" font-family="monospace" font-size="11" font-weight="700" fill="#f97316">Rp 15.000</text>
+    <text x="12" y="138" font-family="Inter, sans-serif" font-size="9" fill="#10b981">Stok: 32 porsi</text>
+
+    <!-- Item 4 -->
+    <rect x="175" y="80" width="160" height="70" rx="6" fill="#1e2b4a" stroke="#2a3b66" stroke-width="1"/>
+    <text x="187" y="104" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Dimsum Mentai (4pcs)</text>
+    <text x="187" y="122" font-family="monospace" font-size="11" font-weight="700" fill="#f97316">Rp 20.000</text>
+    <text x="187" y="138" font-family="Inter, sans-serif" font-size="9" fill="#10b981">Stok: 19 porsi</text>
+  </g>
+
+  <!-- Cart & Checkout Bottom Pill -->
+  <rect x="56" y="325" width="338" height="50" rx="8" fill="url(#mf-emerald)"/>
+  <text x="76" y="355" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#ffffff">4 Items · Bayar QRIS</text>
+  <text x="370" y="355" text-anchor="end" font-family="monospace" font-size="15" font-weight="800" fill="#ffffff">Rp 75.000</text>
+
+  <!-- Right: Ecosystem Features & Real-Time Stats -->
+  <!-- Feature 1: Real-Time Omzet & WhatsApp -->
+  <rect x="430" y="90" width="490" height="105" rx="10" fill="#131e36" stroke="#1e293b" stroke-width="1"/>
+  <text x="448" y="114" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#94a3b8">REAL-TIME SALES MONITORING</text>
+  <text x="448" y="146" font-family="Inter, sans-serif" font-size="26" font-weight="800" fill="#10b981">Rp 12.450.000</text>
+  <text x="448" y="170" font-family="Inter, sans-serif" font-size="11" fill="#cbd5e1">Omzet Hari Ini · Jam Puncak: 12:00 - 13:00 (Makan Siang)</text>
+  
+  <rect x="740" y="112" width="165" height="42" rx="6" fill="#166534" stroke="#22c55e" stroke-width="1"/>
+  <text x="752" y="130" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#ffffff">WhatsApp Report</text>
+  <text x="752" y="144" font-family="monospace" font-size="9.5" fill="#bbf7d0">Otomatis Terkirim</text>
+
+  <!-- Feature 2: 4 Ecosystem Pillars -->
+  <rect x="430" y="210" width="235" height="110" rx="8" fill="#131e36" stroke="#1e293b" stroke-width="1"/>
+  <text x="446" y="234" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#38bdf8">KITCHEN DISPLAY (KDS)</text>
+  <text x="446" y="258" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#ffffff">Sync Pesanan Dapur</text>
+  <text x="446" y="278" font-family="Inter, sans-serif" font-size="10" fill="#94a3b8">Routing tiket instan via WebSocket lokal, zero delay pesanan.</text>
+  <text x="446" y="300" font-family="monospace" font-size="9.5" fill="#34d399">Avg Prep Time: 7.2 min</text>
+
+  <rect x="685" y="210" width="235" height="110" rx="8" fill="#131e36" stroke="#1e293b" stroke-width="1"/>
+  <text x="701" y="234" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#f97316">TITIK MANGKAL &amp; OUTLET</text>
+  <text x="701" y="258" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#ffffff">Multi-Cabang &amp; Foodtruck</text>
+  <text x="701" y="278" font-family="Inter, sans-serif" font-size="10" fill="#94a3b8">Kontrol inventori terpusat antar cabang dan titik jualan.</text>
+  <text x="701" y="300" font-family="monospace" font-size="9.5" fill="#f97316">Multi-Tenant Cloud Sync</text>
+
+  <!-- Bottom Ecosystem Bar -->
+  <rect x="430" y="335" width="490" height="105" rx="8" fill="#131e36" stroke="#1e293b" stroke-width="1"/>
+  <text x="446" y="360" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#94a3b8">EKOSISTEM BISNIS KULINER TERPADU</text>
+  
+  <g transform="translate(446, 375)">
+    <rect x="0" y="0" width="85" height="45" rx="6" fill="#1e293b"/>
+    <text x="42" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#ffffff">POS Kasir</text>
+    <text x="42" y="36" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#34d399">Fast Tap</text>
+
+    <rect x="95" y="0" width="95" height="45" rx="6" fill="#1e293b"/>
+    <text x="142" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#ffffff">Online Store</text>
+    <text x="142" y="36" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#38bdf8">Web Menu</text>
+
+    <rect x="200" y="0" width="85" height="45" rx="6" fill="#1e293b"/>
+    <text x="242" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#ffffff">CRM &amp; Point</text>
+    <text x="242" y="36" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#f59e0b">Loyalty</text>
+
+    <rect x="295" y="0" width="80" height="45" rx="6" fill="#1e293b"/>
+    <text x="335" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#ffffff">Finance</text>
+    <text x="335" y="36" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#10b981">Auto Rec</text>
+
+    <rect x="385" y="0" width="75" height="45" rx="6" fill="#1e293b"/>
+    <text x="422" y="22" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#ffffff">Kitchen</text>
+    <text x="422" y="36" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#f97316">Display</text>
+  </g>
+</svg>

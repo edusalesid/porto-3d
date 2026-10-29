@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="100%" height="100%">
+  <defs>
+    <linearGradient id="uni-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="uni-blue" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1f3578"/>
+      <stop offset="100%" stop-color="#3b5cc4"/>
+    </linearGradient>
+    <linearGradient id="accent-cyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="480" fill="url(#uni-bg)"/>
+
+  <!-- Grid lines -->
+  <g opacity="0.06" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="80" x2="960" y2="80"/>
+    <line x1="0" y1="180" x2="960" y2="180"/>
+    <line x1="0" y1="280" x2="960" y2="280"/>
+    <line x1="0" y1="380" x2="960" y2="380"/>
+    <line x1="280" y1="0" x2="280" y2="480"/>
+    <line x1="620" y1="0" x2="620" y2="480"/>
+  </g>
+
+  <!-- Application Window Frame -->
+  <rect x="24" y="24" width="912" height="432" rx="14" fill="#0b1120" stroke="#1e293b" stroke-width="1.5"/>
+
+  <!-- Window Header -->
+  <path d="M 24 38 Q 24 24 38 24 L 922 24 Q 936 24 936 38 L 936 72 L 24 72 Z" fill="#0f172a"/>
+  <circle cx="48" cy="48" r="5.5" fill="#ef4444" opacity="0.8"/>
+  <circle cx="66" cy="48" r="5.5" fill="#f59e0b" opacity="0.8"/>
+  <circle cx="84" cy="48" r="5.5" fill="#10b981" opacity="0.8"/>
+  
+  <text x="110" y="52" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="#f8fafc">
+    Portal Belajar GT2 Unilever · E-Learning &amp; SCORM 1.2 Simulation
+  </text>
+  
+  <rect x="740" y="38" width="170" height="22" rx="11" fill="rgba(56,189,248,0.12)" stroke="#38bdf8" stroke-width="0.8"/>
+  <circle cx="754" cy="49" r="3.5" fill="#38bdf8"/>
+  <text x="764" y="53" font-family="monospace" font-size="10.5" font-weight="600" fill="#38bdf8">unilever.riizalhp.web.id</text>
+
+  <!-- Left Sidebar (Navigation) -->
+  <rect x="24" y="72" width="240" height="384" fill="#0d1527" stroke="#1e293b" stroke-width="1"/>
+  
+  <!-- Unilever Brand Block -->
+  <rect x="40" y="90" width="208" height="46" rx="8" fill="#1e293b" opacity="0.6"/>
+  <rect x="48" y="98" width="30" height="30" rx="6" fill="#1f3578"/>
+  <text x="56" y="118" font-family="sans-serif" font-size="15" font-weight="900" fill="#ffffff">U</text>
+  <text x="86" y="111" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Unilever GT2</text>
+  <text x="86" y="125" font-family="Inter, sans-serif" font-size="9.5" fill="#94a3b8">Internal DSR Training</text>
+
+  <!-- Sidebar Nav items -->
+  <text x="40" y="160" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#64748b" letter-spacing="0.05em">MATERI PELATIHAN</text>
+  
+  <rect x="36" y="174" width="216" height="34" rx="6" fill="#1f3578" opacity="0.85"/>
+  <text x="50" y="196" font-family="Inter, sans-serif" font-size="11.5" font-weight="600" fill="#ffffff">01. Ringkasan Materi</text>
+
+  <rect x="36" y="214" width="216" height="34" rx="6" fill="#131e36"/>
+  <text x="50" y="236" font-family="Inter, sans-serif" font-size="11" fill="#cbd5e1">02. Modul General Trade 2</text>
+
+  <rect x="36" y="254" width="216" height="34" rx="6" fill="#131e36"/>
+  <text x="50" y="276" font-family="Inter, sans-serif" font-size="11" fill="#cbd5e1">03. GT Interactive Learning</text>
+
+  <rect x="36" y="294" width="216" height="34" rx="6" fill="#131e36"/>
+  <text x="50" y="316" font-family="Inter, sans-serif" font-size="11" fill="#cbd5e1">04. Video Simulasi DSR</text>
+
+  <!-- SCORM Status pill -->
+  <rect x="36" y="380" width="216" height="60" rx="8" fill="#162038" stroke="#25355a" stroke-width="1"/>
+  <text x="48" y="402" font-family="monospace" font-size="10" font-weight="600" fill="#38bdf8">SCORM 1.2 SHIM ACTIVE</text>
+  <text x="48" y="420" font-family="Inter, sans-serif" font-size="9" fill="#94a3b8">Standalone browser runtime</text>
+  <text x="48" y="432" font-family="Inter, sans-serif" font-size="9" fill="#94a3b8">No external LMS required</text>
+
+  <!-- Main Content Area -->
+  <!-- Hero Banner in Main -->
+  <rect x="284" y="92" width="632" height="150" rx="10" fill="url(#uni-blue)" stroke="#3b5cc4" stroke-width="1"/>
+  <text x="310" y="128" font-family="Inter, sans-serif" font-size="20" font-weight="800" fill="#ffffff">Modul Pelatihan General Trade 2</text>
+  <text x="310" y="152" font-family="Inter, sans-serif" font-size="12" fill="#e2e8f0">Tugas dan Tanggung Jawab Direct Sales Representative (DSR) Unilever Indonesia</text>
+  <text x="310" y="170" font-family="Inter, sans-serif" font-size="11" fill="#cbd5e1">Simulasi interaktif Adobe Captivate + Full Video Walkthrough tanpa hambatan LMS pusat.</text>
+
+  <rect x="310" y="194" width="130" height="32" rx="6" fill="#f97316"/>
+  <text x="334" y="215" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#ffffff">Buka Modul 01</text>
+
+  <rect x="450" y="194" width="140" height="32" rx="6" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <text x="472" y="215" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#ffffff">Putar Video</text>
+
+  <!-- 3 Summary Metrics Cards -->
+  <rect x="284" y="260" width="198" height="180" rx="10" fill="#0d1527" stroke="#1e293b" stroke-width="1"/>
+  <text x="304" y="288" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#94a3b8">MODUL SCORM 1.2</text>
+  <text x="304" y="322" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#38bdf8">2 Modul</text>
+  <text x="304" y="348" font-family="Inter, sans-serif" font-size="11" fill="#cbd5e1">Adobe Captivate HTML5</text>
+  <text x="304" y="366" font-family="Inter, sans-serif" font-size="10.5" fill="#64748b">Direct API shim window.API</text>
+  <rect x="304" y="390" width="158" height="6" rx="3" fill="#1e293b"/>
+  <rect x="304" y="390" width="158" height="6" rx="3" fill="#38bdf8"/>
+  <text x="304" y="416" font-family="monospace" font-size="9" fill="#10b981">● Status: 100% Ready</text>
+
+  <rect x="501" y="260" width="198" height="180" rx="10" fill="#0d1527" stroke="#1e293b" stroke-width="1"/>
+  <text x="521" y="288" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#94a3b8">VIDEO SIMULASI</text>
+  <text x="521" y="322" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#10b981">Walkthrough</text>
+  <text x="521" y="348" font-family="Inter, sans-serif" font-size="11" fill="#cbd5e1">Rekaman Layar Interaktif</text>
+  <text x="521" y="366" font-family="Inter, sans-serif" font-size="10.5" fill="#64748b">Simulasi kunjungan toko riil</text>
+  <rect x="521" y="390" width="158" height="6" rx="3" fill="#1e293b"/>
+  <rect x="521" y="390" width="128" height="6" rx="3" fill="#10b981"/>
+  <text x="521" y="416" font-family="monospace" font-size="9" fill="#10b981">● Audio &amp; Subtitle Synced</text>
+
+  <rect x="718" y="260" width="198" height="180" rx="10" fill="#0d1527" stroke="#1e293b" stroke-width="1"/>
+  <text x="738" y="288" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#94a3b8">ACCESSIBILITY &amp; CDN</text>
+  <text x="738" y="322" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#f59e0b">Cloudflare</text>
+  <text x="738" y="348" font-family="Inter, sans-serif" font-size="11" fill="#cbd5e1">Mobile Responsive</text>
+  <text x="738" y="366" font-family="Inter, sans-serif" font-size="10.5" fill="#64748b">Edge caching super cepat</text>
+  <rect x="738" y="390" width="158" height="6" rx="3" fill="#1e293b"/>
+  <rect x="738" y="390" width="145" height="6" rx="3" fill="#f59e0b"/>
+  <text x="738" y="416" font-family="monospace" font-size="9" fill="#38bdf8">● Latency: &lt; 50ms Edge</text>
+</svg>

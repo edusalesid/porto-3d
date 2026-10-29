@@ -1,0 +1,165 @@
+---
+import Layout from '../layouts/Layout.astro';
+import StaticNav from '../components/StaticNav.astro';
+import StaticFooter from '../components/StaticFooter.astro';
+import { EXPERIENCE_TIMELINE, PORTFOLIO_PROJECTS, CONTACT_INFO } from '@/lib/portfolio-data';
+
+const title = 'Riwayat Pengalaman & Deliverables | Rizal Hanifa Pratama';
+const description = 'Rekam jejak pengajaran coding, rekayasa produk, pengelolaan stakeholder lintas fungsi, dan delivery hasil nyata oleh Rizal Hanifa Pratama.';
+---
+
+<Layout title={title} description={description}>
+  <StaticNav />
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+    <!-- Header -->
+    <div class="mb-12 max-w-3xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#18191b] border border-[rgba(255,255,255,0.08)] text-xs font-mono text-[#46c98a] mb-4">
+        <span class="w-2 h-2 rounded-full bg-[#46c98a] animate-pulse"></span>
+        <span>Pengalaman Profesional</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight text-[#e8e8e9] mb-4">
+        Pengalaman Kerja &amp; Rekam Jejak
+      </h1>
+      <p class="text-base sm:text-lg text-[#a7a7aa] leading-relaxed">
+        {CONTACT_INFO.summary}
+      </p>
+    </div>
+
+    <!-- Timeline List -->
+    <div class="relative pl-6 sm:pl-8 border-l-2 border-[rgba(255,255,255,0.08)] space-y-12">
+      {EXPERIENCE_TIMELINE.map((item) => (
+        <article class="relative group">
+          <!-- Timeline Indicator Dot -->
+          <span class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-4 h-4 rounded-full bg-[#18191b] border-2 border-[#f5d400] group-hover:scale-125 transition-transform shadow-[0_0_8px_#f5d400]/40"></span>
+
+          <div class="p-6 sm:p-8 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] space-y-4">
+            <!-- Period & Role -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-[#232426] text-[#f5d400]">
+                {item.period}
+              </span>
+              <div class="flex items-center gap-2 text-xs font-mono text-[#77787c]">
+                <span class="text-[#a7a7aa] font-medium">{item.organization}</span>
+                {item.location && <span>· {item.location}</span>}
+              </div>
+            </div>
+
+            <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9]">
+              {item.role}
+            </h2>
+
+            <p class="text-sm text-[#a7a7aa] leading-relaxed">
+              {item.summary}
+            </p>
+
+            <div class="text-xs font-mono text-[#77787c]">
+              <span class="text-[#e8e8e9] font-medium">Fokus:</span> {item.scope}
+            </div>
+
+            <!-- Key Contributions -->
+            <div>
+              <h3 class="text-xs font-mono uppercase text-[#77787c] tracking-wider mb-2">Poin Kontribusi:</h3>
+              <ul class="space-y-2 text-sm text-[#e8e8e9]">
+                {item.contributions.map((c) => (
+                  <li class="flex items-start gap-2">
+                    <span class="text-[#46c98a] shrink-0">✓</span>
+                    <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <!-- Related Cases -->
+            {item.relatedCaseSlugs && item.relatedCaseSlugs.length > 0 && (
+              <div class="pt-4 border-t border-[rgba(255,255,255,0.06)] flex flex-wrap items-center gap-2">
+                <span class="text-xs font-mono text-[#77787c]">Studi Kasus:</span>
+                {item.relatedCaseSlugs.map((slug) => {
+                  const proj = PORTFOLIO_PROJECTS.find((p) => p.slug === slug);
+                  return (
+                    <a
+                      href={`/cases/${slug}`}
+                      class="text-xs font-mono px-2.5 py-1 rounded-md bg-[#141516] hover:bg-[#232426] text-[#38bdf8] border border-[rgba(255,255,255,0.06)] transition-colors"
+                    >
+                      {proj ? proj.title.split('—')[0].trim() : slug} ↗
+                    </a>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <!-- Education, Certifications & Skills Grid -->
+    <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Education -->
+      <div class="p-6 sm:p-8 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] space-y-4">
+        <h3 class="text-xs font-mono uppercase text-[#f5d400] tracking-wider flex items-center gap-2">
+          <span>🎓</span>
+          <span>Pendidikan Formal</span>
+        </h3>
+        <div class="space-y-4 text-sm">
+          {CONTACT_INFO.education.map((edu) => (
+            <div class="border-l-2 border-[rgba(255,255,255,0.1)] pl-3 space-y-1">
+              <h4 class="font-semibold text-[#e8e8e9]">{edu.institution}</h4>
+              <p class="text-xs text-[#f5d400] font-mono">{edu.degree}</p>
+              <p class="text-xs text-[#77787c]">{edu.period}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Certifications -->
+      <div class="p-6 sm:p-8 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] space-y-4">
+        <h3 class="text-xs font-mono uppercase text-[#38bdf8] tracking-wider flex items-center gap-2">
+          <span>📜</span>
+          <span>Sertifikasi & Pelatihan</span>
+        </h3>
+        <ul class="space-y-2.5 text-xs text-[#e8e8e9]">
+          {CONTACT_INFO.certifications.map((cert) => (
+            <li class="flex items-start gap-2">
+              <span class="text-[#38bdf8] shrink-0">✦</span>
+              <span>{cert}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Top Skills -->
+      <div class="md:col-span-2 p-6 sm:p-8 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] space-y-4">
+        <h3 class="text-xs font-mono uppercase text-[#46c98a] tracking-wider flex items-center gap-2">
+          <span>⚡</span>
+          <span>Keahlian Utama</span>
+        </h3>
+        <div class="flex flex-wrap gap-2">
+          {CONTACT_INFO.topSkills.map((skill) => (
+            <span class="text-xs font-mono px-3 py-1.5 rounded-lg bg-[#232426] text-[#e8e8e9] border border-[rgba(255,255,255,0.06)]">
+              {skill}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Download CV Banner -->
+    <div class="mt-12 p-6 sm:p-8 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="space-y-1 text-center sm:text-left">
+        <h3 class="text-base sm:text-lg font-semibold text-[#e8e8e9]">Unduh Resume Lengkap</h3>
+        <p class="text-xs text-[#a7a7aa]">Format teks terstruktur siap cetak atau dibaca sistem ATS.</p>
+      </div>
+
+      <a
+        href="/api/cv"
+        download="Rizal_Hanifa_Pratama_CV.txt"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#f5d400] hover:bg-[#fadb24] text-[#121314] font-semibold text-sm transition-colors shrink-0 shadow-md"
+      >
+        <span>Unduh CV (.txt)</span>
+        <span>↓</span>
+      </a>
+    </div>
+  </main>
+
+  <StaticFooter />
+</Layout>

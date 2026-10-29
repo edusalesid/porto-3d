@@ -1,0 +1,92 @@
+---
+import { CONTACT_INFO, ROOMS } from '@/lib/portfolio-data';
+---
+
+<footer class="w-full border-t border-[rgba(255,255,255,0.08)] bg-[#121314] text-[#a7a7aa] mt-24">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+      <!-- Col 1: Bio -->
+      <div class="md:col-span-2 space-y-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#f5d400]"></span>
+          <span class="font-display font-semibold text-lg text-[#e8e8e9]">{CONTACT_INFO.fullName || CONTACT_INFO.name}</span>
+          <span class="text-xs font-mono text-[#77787c]">/ Coding Teacher &amp; IT PM</span>
+        </div>
+        <p class="text-xs sm:text-sm text-[#a7a7aa] max-w-md leading-relaxed">
+          {CONTACT_INFO.positioning}
+        </p>
+      </div>
+
+      <!-- Col 2: 3D Office Zones -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-mono uppercase tracking-wider text-[#77787c]">3D Virtual Office</h4>
+        <ul class="space-y-2 text-sm">
+          {ROOMS.map((room) => (
+            <li>
+              <a
+                href={`/?room=${room.id}`}
+                class="hover:text-[#f5d400] transition-colors flex items-center gap-1.5"
+              >
+                <span class="text-xs text-[#77787c]">→</span>
+                <span>{room.name}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Col 3: Direct Connect -->
+      <div class="space-y-3">
+        <h4 class="text-xs font-mono uppercase tracking-wider text-[#77787c]">Kontak &amp; Profil</h4>
+        <ul class="space-y-2 text-sm">
+          <li>
+            <a
+              href={CONTACT_INFO.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-[#f5d400] transition-colors"
+            >
+              LinkedIn Profile ↗
+            </a>
+          </li>
+          <li>
+            <a
+              href={CONTACT_INFO.websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-[#f5d400] transition-colors"
+            >
+              Personal Website ↗
+            </a>
+          </li>
+          <li>
+            <a
+              href={`mailto:${CONTACT_INFO.email}`}
+              class="hover:text-[#f5d400] transition-colors"
+            >
+              {CONTACT_INFO.email}
+            </a>
+          </li>
+          <li>
+            <a
+              href="/api/cv"
+              download="Rizal_Hanifa_Pratama_CV.txt"
+              class="text-[#46c98a] hover:underline"
+            >
+              Unduh CV Lengkap (.txt) ↓
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom line -->
+    <div class="pt-8 border-t border-[rgba(255,255,255,0.06)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#77787c]">
+      <p>© {new Date().getFullYear()} Rizal Hanifa Pratama. All rights reserved.</p>
+      <div class="flex items-center gap-4">
+        <span>Built with Astro + Three.js + Tailwind CSS</span>
+        <a href="/" class="text-[#f5d400] hover:underline">Kembali ke 3D Virtual Office ↑</a>
+      </div>
+    </div>
+  </div>
+</footer>

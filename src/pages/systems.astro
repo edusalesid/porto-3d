@@ -1,0 +1,181 @@
+---
+import Layout from '../layouts/Layout.astro';
+import StaticNav from '../components/StaticNav.astro';
+import StaticFooter from '../components/StaticFooter.astro';
+import { SYSTEMS_WORKFLOWS, TECH_STACK_SYSTEMS } from '@/lib/portfolio-data';
+import { TechLogo } from '@/components/portfolio/TechLogos';
+
+const title = 'Laboratorium Sistem, Metodologi & Tech Stack | Rizal';
+const description = 'Katalog tech stack aktif, alur kerja agentic AI, metodologi agile sprint, serta arsitektur sistem nyata yang digunakan oleh Rizal Hanifa Pratama.';
+
+// Group tech stack by category
+const categories = Array.from(new Set(TECH_STACK_SYSTEMS.map((t) => t.category)));
+---
+
+<Layout title={title} description={description}>
+  <StaticNav />
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+    <!-- Header -->
+    <div class="mb-14 max-w-3xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#18191b] border border-[rgba(255,255,255,0.08)] text-xs font-mono text-[#6e6edb] mb-4">
+        <span class="w-2 h-2 rounded-full bg-[#6e6edb] animate-pulse"></span>
+        <span>Laboratorium Sistem & Arsitektur</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight text-[#e8e8e9] mb-4">
+        Metodologi Kerja & Tech Stack Aktif
+      </h1>
+      <p class="text-base sm:text-lg text-[#a7a7aa] leading-relaxed">
+        Tools tidak pernah menggantikan pemikiran terstruktur. Di bawah ini adalah kumpulan teknologi harian, alur kerja agentic AI, dan metodologi eksekusi nyata yang saya gunakan dalam mengelola proyek, mengajar coding, dan membangun sistem web.
+      </p>
+    </div>
+
+    <!-- Section 1: Active Tech Stack & Tooling Arsenal -->
+    <section class="mb-16">
+      <div class="flex items-center justify-between mb-6 pb-3 border-b border-[rgba(255,255,255,0.08)]">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-display font-bold text-[#e8e8e9]">
+            Tech Stack & Alat Kerja Aktif
+          </h2>
+          <p class="text-xs sm:text-sm text-[#a7a7aa] mt-1">
+            Teknologi, proxy cerdas, framework, dan software produktivitas harian
+          </p>
+        </div>
+        <span class="font-mono text-xs px-2.5 py-1 rounded-md bg-[#232426] text-[#38bdf8] font-semibold">
+          17 TOOLS AKTIF
+        </span>
+      </div>
+
+      <div class="space-y-8">
+        {categories.map((cat) => {
+          const tools = TECH_STACK_SYSTEMS.filter((t) => t.category === cat);
+          return (
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#6e6edb]"></span>
+                <h3 class="text-xs font-mono uppercase tracking-wider text-[#77787c] font-semibold">
+                  {cat}
+                </h3>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                {tools.map((tool) => (
+                  <div class="p-4 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.18)] hover:bg-[#1c1d20] transition-all flex flex-col justify-between group">
+                    <div>
+                      <div class="flex items-center justify-between mb-2.5">
+                        <div class="flex items-center gap-2.5">
+                          <div class="w-8 h-8 rounded-lg bg-[#141516] border border-[rgba(255,255,255,0.08)] flex items-center justify-center p-1.5 group-hover:scale-105 transition-transform">
+                            <TechLogo name={tool.id} className="w-full h-full" />
+                          </div>
+                          <span class="font-display text-sm font-semibold text-[#e8e8e9]">
+                            {tool.name}
+                          </span>
+                        </div>
+                        <span
+                          class="text-[10px] font-mono px-2 py-0.5 rounded-md font-medium"
+                          style={{
+                            color: tool.badgeHex,
+                            backgroundColor: `${tool.badgeHex}15`,
+                            border: `1px solid ${tool.badgeHex}30`,
+                          }}
+                        >
+                          {tool.role.split(' ')[0]}
+                        </span>
+                      </div>
+                      <p class="text-xs text-[#a7a7aa] leading-relaxed line-clamp-2">
+                        {tool.description}
+                      </p>
+                    </div>
+                    <div class="mt-3 pt-2.5 border-t border-[rgba(255,255,255,0.04)] text-[11px] font-mono text-[#77787c]">
+                      {tool.role}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- Section 2: Systems Workflows List -->
+    <section>
+      <div class="mb-8 pb-3 border-b border-[rgba(255,255,255,0.08)]">
+        <h2 class="text-xl sm:text-2xl font-display font-bold text-[#e8e8e9]">
+          4 Pilar Alur Kerja & Eksekusi Lapangan
+        </h2>
+        <p class="text-xs sm:text-sm text-[#a7a7aa] mt-1">
+          Bagaimana tools di atas diintegrasikan dalam proyek dan operasional nyata
+        </p>
+      </div>
+
+      <div class="space-y-10">
+        {SYSTEMS_WORKFLOWS.map((wf) => (
+          <article class="p-6 sm:p-8 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.16)] transition-all">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="font-mono text-sm px-2.5 py-1 rounded-md bg-[#232426] text-[#6e6edb] font-bold">
+                SISTEM {wf.number}
+              </span>
+              <span class="text-xs font-mono text-[#77787c]">Arsitektur Alur Kerja</span>
+            </div>
+
+            <h3 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] mb-2">
+              {wf.title}
+            </h3>
+            <p class="text-sm font-medium text-[#f5d400] mb-4">
+              {wf.subtitle}
+            </p>
+            <p class="text-sm text-[#a7a7aa] leading-relaxed mb-6">
+              {wf.description}
+            </p>
+
+            <!-- Core Practices -->
+            <div class="mb-6">
+              <h4 class="text-xs font-mono uppercase text-[#77787c] tracking-wider mb-3">
+                Praktik & Standar Eksekusi:
+              </h4>
+              <ul class="space-y-2 text-sm text-[#e8e8e9]">
+                {wf.practices.map((practice) => (
+                  <li class="flex items-start gap-2.5 p-3 rounded-xl bg-[#141516] border border-[rgba(255,255,255,0.04)]">
+                    <span class="text-[#6e6edb] shrink-0 font-bold">▪</span>
+                    <span>{practice}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <!-- Tools in Action -->
+            <div class="mb-6">
+              <h4 class="text-xs font-mono uppercase text-[#77787c] tracking-wider mb-3">
+                Tools & Konteks Penerapan Riil:
+              </h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {wf.toolsUsed.map((tool) => (
+                  <div class="p-4 rounded-xl bg-[#141516] border border-[rgba(255,255,255,0.04)]">
+                    <div class="text-xs font-mono text-[#e8e8e9] font-semibold mb-1">{tool.name}</div>
+                    <p class="text-xs text-[#a7a7aa]">{tool.applicationContext}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <!-- Case reference footer -->
+            <div class="pt-4 border-t border-[rgba(255,255,255,0.06)] flex items-center justify-between text-xs">
+              <span class="text-[#77787c]">
+                Penerapan Terverifikasi: <strong class="text-[#e8e8e9]">{wf.appliedInTitle}</strong>
+              </span>
+              <a
+                href={`/cases/${wf.appliedInSlug}`}
+                class="inline-flex items-center gap-1 text-[#f5d400] hover:underline font-semibold"
+              >
+                <span>Pelajari di Studi Kasus</span>
+                <span>→</span>
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <StaticFooter />
+</Layout>

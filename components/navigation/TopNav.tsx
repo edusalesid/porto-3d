@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { RoomId } from '@/lib/portfolio-data';
+import type { RoomId } from '@/lib/portfolio-data';
 import { trackPortfolioEvent } from '@/lib/analytics';
-import { CameraMode } from '@/components/three/VirtualOfficeCanvas';
+import type { CameraMode } from '@/components/three/VirtualOfficeCanvas';
 import { Map as MapIcon, EyeOff, FileDown, Box } from 'lucide-react';
 
 interface TopNavProps {

@@ -1,0 +1,83 @@
+---
+const pathname = Astro.url.pathname;
+
+const navLinks = [
+  { href: '/', label: '3D Office', is3D: true },
+  { href: '/cases', label: 'Case Studies' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/systems', label: 'Lab Sistem' },
+  { href: '/experience', label: 'Experience' },
+];
+---
+
+<header class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#121314]/85 border-b border-[rgba(255,255,255,0.08)]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+    <!-- Brand -->
+    <a href="/" class="flex items-center gap-2.5 group">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#f5d400] group-hover:scale-125 transition-transform shadow-[0_0_8px_#f5d400]"></span>
+      <span class="font-display font-semibold text-base sm:text-lg tracking-tight text-[#e8e8e9] group-hover:text-white">
+        Rizal OS
+      </span>
+      <span class="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 rounded-md bg-[#1d1e20] text-[#a7a7aa] border border-[rgba(255,255,255,0.06)]">
+        Technical PM
+      </span>
+    </a>
+
+    <!-- Nav Links Desktop -->
+    <nav class="hidden md:flex items-center gap-1">
+      {navLinks.map((link) => {
+        const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+        return (
+          <a
+            href={link.href}
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              isActive
+                ? 'bg-[#28292b] text-[#f5d400] shadow-xs'
+                : 'text-[#a7a7aa] hover:text-[#e8e8e9] hover:bg-[#1d1e20]'
+            }`}
+          >
+            {link.label}
+          </a>
+        );
+      })}
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-2.5">
+      <a
+        href="/"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-[#1d1e20] hover:bg-[#28292b] text-[#e8e8e9] border border-[rgba(255,255,255,0.12)] transition-colors"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-[#38bdf8]"></span>
+        <span>3D Office</span>
+      </a>
+
+      <a
+        href="/api/cv"
+        download="Rizal_Technical_Project_Manager_CV.txt"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-[#f5d400] hover:bg-[#fadb24] text-[#121314] font-semibold transition-colors shadow-xs"
+      >
+        <span>Download CV</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Mobile Subnav Bar -->
+  <div class="md:hidden flex items-center justify-start gap-1 overflow-x-auto px-4 py-2 border-t border-[rgba(255,255,255,0.05)] no-scrollbar text-xs">
+    {navLinks.map((link) => {
+      const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+      return (
+        <a
+          href={link.href}
+          class={`px-2.5 py-1 rounded-md whitespace-nowrap transition-colors ${
+            isActive
+              ? 'bg-[#28292b] text-[#f5d400] font-medium'
+              : 'text-[#a7a7aa] hover:text-[#e8e8e9]'
+          }`}
+        >
+          {link.label}
+        </a>
+      );
+    })}
+  </div>
+</header>

@@ -1,0 +1,107 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import StaticNav from '../../components/StaticNav.astro';
+import StaticFooter from '../../components/StaticFooter.astro';
+import { PORTFOLIO_PROJECTS } from '@/lib/portfolio-data';
+
+const title = 'Arsip Studi Kasus Terverifikasi | Rizal — Technical Project Manager';
+const description = 'Dokumentasi mendalam mengenai penyelesaian kendala operasional, arsitektur sistem perangkat lunak, mitigasi dependensi teknis, dan hasil nyata proyek.';
+---
+
+<Layout title={title} description={description}>
+  <StaticNav />
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20">
+    <!-- Header -->
+    <div class="mb-12 md:mb-16 max-w-3xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#18191b] border border-[rgba(255,255,255,0.08)] text-xs font-mono text-[#f5d400] mb-4">
+        <span class="w-2 h-2 rounded-full bg-[#f5d400] animate-pulse"></span>
+        <span>Verified Case Archives</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight text-[#e8e8e9] mb-4">
+        Studi Kasus & Eksekusi Sistem
+      </h1>
+      <p class="text-base sm:text-lg text-[#a7a7aa] leading-relaxed">
+        Setiap studi kasus di bawah ini mendokumentasikan masalah operasional riil, keputusan trade-off teknis, arsitektur solusi, dan metrik hasil yang terverifikasi.
+      </p>
+    </div>
+
+    <!-- Case Studies Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+      {PORTFOLIO_PROJECTS.map((project, idx) => (
+        <article class="flex flex-col justify-between p-6 sm:p-8 rounded-2xl bg-[#18191b] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.18)] transition-all hover:-translate-y-1 group">
+          <div>
+            <!-- Badges -->
+            <div class="flex flex-wrap items-center gap-2 mb-4">
+              <span class="text-xs font-mono px-2.5 py-1 rounded-md bg-[#232426] text-[#f5d400] border border-[rgba(245,212,0,0.2)]">
+                Case 0{idx + 1}
+              </span>
+              {project.category.map((cat) => (
+                <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-[#1d1e20] text-[#a7a7aa]">
+                  {cat}
+                </span>
+              ))}
+              <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-[#1d1e20] text-[#46c98a]">
+                {project.projectStatus}
+              </span>
+            </div>
+
+            <!-- Title -->
+            <h2 class="text-xl sm:text-2xl font-display font-semibold text-[#e8e8e9] group-hover:text-white mb-3">
+              <a href={`/cases/${project.slug}`} class="hover:underline">
+                {project.title}
+              </a>
+            </h2>
+
+            <!-- Meta details -->
+            <div class="flex items-center gap-4 text-xs font-mono text-[#77787c] mb-4">
+              <span>Peran: {project.role}</span>
+              <span>•</span>
+              <span>Periode: {project.period}</span>
+            </div>
+
+            <!-- Problem & Summary -->
+            <p class="text-sm text-[#a7a7aa] leading-relaxed mb-6">
+              {project.summary}
+            </p>
+
+            <!-- Key Metric / Outcomes highlights -->
+            <div class="p-4 rounded-xl bg-[#141516] border border-[rgba(255,255,255,0.05)] mb-6 space-y-2">
+              <div class="text-[11px] font-mono text-[#77787c] uppercase tracking-wider">Hasil Terverifikasi:</div>
+              <ul class="text-xs text-[#e8e8e9] space-y-1">
+                {project.outcomes.slice(0, 2).map((outcome) => (
+                  <li class="flex items-start gap-2">
+                    <span class="text-[#46c98a] shrink-0">✓</span>
+                    <span>{outcome}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-between pt-4 border-t border-[rgba(255,255,255,0.06)] gap-3">
+            <a
+              href={`/cases/${project.slug}`}
+              class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#f5d400] hover:underline"
+            >
+              <span>Baca Studi Kasus Lengkap</span>
+              <span>→</span>
+            </a>
+
+            <a
+              href={`/?case=${project.slug}`}
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1d1e20] hover:bg-[#28292b] text-[#38bdf8] border border-[rgba(255,255,255,0.1)] transition-colors"
+              title="Buka langsung di 3D Virtual Office"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-[#38bdf8]"></span>
+              <span>Buka di 3D</span>
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </main>
+
+  <StaticFooter />
+</Layout>

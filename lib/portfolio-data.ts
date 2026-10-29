@@ -13,8 +13,16 @@ export type ProjectCategory =
   | 'Marketing Operations'
   | 'Educational Projects';
 
+export interface ProjectDemoVideo {
+  url: string;
+  type?: string;
+  poster?: string;
+  title?: string;
+  caption?: string;
+}
+
 export interface ProjectEvidence {
-  type: 'image' | 'diagram' | 'link' | 'document';
+  type: 'image' | 'diagram' | 'link' | 'document' | 'video';
   title: string;
   url: string;
   alt?: string;
@@ -32,6 +40,7 @@ export interface PortfolioProject {
   projectStatus: string;
   relevanceRank: number;
   bannerImage?: string;
+  demoVideo?: ProjectDemoVideo;
   galleryImages?: { url: string; title: string; caption?: string }[];
   // 14-point Case Archive structure
   overview: string;
@@ -81,21 +90,21 @@ export interface RoomMetadata {
 export const ROOMS: RoomMetadata[] = [
   {
     id: 'lobby',
-    name: 'Virtual Lobby',
-    shortLabel: 'Lobby',
+    name: 'Lobi Virtual',
+    shortLabel: 'Lobi',
     code: '01',
-    purpose: 'Orientasi & Ringkasan Eksekutif',
+    purpose: 'Orientasi & Ringkasan Profil',
     summary:
-      'Pusat orientasi utama yang memperkenalkan profil Rizal sebagai Technical PM: tata kelola scope WBS, dependensi sprint, arsitektur sistem, dan workflow AI.',
-    ctaLabel: 'Jelajahi Ringkasan Eksekutif',
+      'Pusat orientasi utama yang memperkenalkan profil profesional Rizal Hanifa Pratama: Guru Koding @ SMA IHSANUL FIKRI MUNGKID dan Manajer Proyek IT lulusan S1 Informatika.',
+    ctaLabel: 'Lihat Ringkasan Profil',
     cameraPosition: [0, 16.8, 23.0],
     cameraTarget: [0, 0.6, 1.8],
     roomCenter: [0, 0, 0],
     accentHex: '#38BDF8',
     highlights: [
-      'End-to-end scope, dependency, and sprint governance',
-      'Cross-functional alignment across Engineering, Design & Ops',
-      'AI-enabled workflow design & verifiable case evidence',
+      'Guru Koding & Kelas Internasional Bilingual (ICIF) @ SMA Ihsanul Fikri',
+      'Tim SPMI Mutu Pembelajaran & Pengelola Lab 50+ Komputer',
+      'Manajemen Proyek IT, Metodologi Agile & Digitalisasi Sistem',
     ],
   },
   {
@@ -119,8 +128,8 @@ export const ROOMS: RoomMetadata[] = [
   },
   {
     id: 'systems',
-    name: 'Systems Lab',
-    shortLabel: 'Systems',
+    name: 'Laboratorium Sistem',
+    shortLabel: 'Lab Sistem',
     code: '03',
     purpose: 'Arsitektur Sistem & Alur SOP',
     summary:
@@ -131,15 +140,15 @@ export const ROOMS: RoomMetadata[] = [
     roomCenter: [11.5, 0, -8.5],
     accentHex: '#818CF8',
     highlights: [
-      'Planning & WBS Dependency Mapping',
-      'Risk Register & Trade-off Decision Matrices',
-      'Cross-Functional Engineering & Design Rituals',
+      'Perencanaan & Pemetaan Dependensi WBS',
+      'Manajemen Risiko & Matriks Keputusan Trade-off',
+      'Ritual Rekayasa & Kolaborasi Lintas Fungsi',
     ],
   },
   {
     id: 'experience',
-    name: 'Experience Gallery',
-    shortLabel: 'Experience',
+    name: 'Galeri Pengalaman',
+    shortLabel: 'Pengalaman',
     code: '04',
     purpose: 'Rekam Jejak Karir & Kepemimpinan',
     summary:
@@ -150,9 +159,10 @@ export const ROOMS: RoomMetadata[] = [
     roomCenter: [-11.5, 0, 6.5],
     accentHex: '#34D399',
     highlights: [
-      'Technical Project Manager — Product & Software Systems',
-      'Project Lead — AI Workflows & Educational Arenas',
-      'Marketing Operations & RevOps Pipeline Architecture',
+      'Coding Teacher — SMA IHSANUL FIKRI MUNGKID (Magelang)',
+      'Digital Marketing — PT Triagro Hijrah Jaya (Sukoharjo)',
+      'IT Team Lead & PM — Movio Studio & Cont Solutions Indonesia',
+      'Head of PM Department — IT Club UPN Veteran Yogyakarta',
     ],
   },
   {
@@ -176,686 +186,625 @@ export const ROOMS: RoomMetadata[] = [
   },
   {
     id: 'contact',
-    name: 'Contact Lounge',
-    shortLabel: 'Contact',
+    name: 'Ruang Kontak',
+    shortLabel: 'Kontak',
     code: '06',
     purpose: 'Saluran Kolaborasi & Unduh CV',
     summary:
-      'Ruang terhubung langsung dengan Rizal melalui email, profil LinkedIn, atau pengunduhan berkas CV terverifikasi (format print-ready & plain-text).',
-    ctaLabel: 'Hubungi & Unduh CV',
+      'Ruang terhubung langsung dengan Rizal melalui email, profil LinkedIn, formulir pesan, atau unduh berkas CV terverifikasi.',
+    ctaLabel: 'Hubungi Rizal & Unduh CV',
     cameraPosition: [0, 8.5, 21.5],
     cameraTarget: [0, 1.4, 11.5],
     roomCenter: [0, 0, 11.5],
     accentHex: '#38BDF8',
     highlights: [
-      'Direct Email: edusales.id@gmail.com',
-      'Downloadable Verified CV (Plain-Text & Print Ready)',
-      'Available for PM, Technical PM & Product Systems roles',
+      'Email Langsung: rizalhp12345@gmail.com',
+      'Unduh Berkas CV Terverifikasi (Teks Lengkap & Format Cetak)',
+      'Terbuka untuk Peluang Guru Koding, IT PM & Technical PM',
     ],
   },
 ];
 
 export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
   {
-    slug: 'mfood-pos',
-    title: 'mFood POS — Multi-Outlet Cloud Point of Sale & Kitchen Sync',
-    category: ['Product/SaaS', 'Software Systems'],
+    slug: 'unilever-gt2',
+    title: 'Portal Belajar GT2 Unilever — E-Learning & SCORM 1.2 Simulation System',
+    category: ['Software Systems', 'Educational Projects'],
     summary:
-      'End-to-end project delivery of an offline-resilient cloud POS and real-time kitchen display system (KDS) built for multi-branch F&B operators.',
-    role: 'Technical Project Manager',
-    period: '2025 — 2026',
-    projectStatus: 'Production Pilot Deployed',
+      'Portal pembelajaran mandiri modul General Trade 2 (GT2) Unilever Indonesia dengan arsitektur SCORM 1.2 browser shim mandiri, integrasi Adobe Captivate, dan video walkthrough simulasi.',
+    role: 'E-Learning Systems Lead & Front-End Developer',
+    period: '2025',
+    projectStatus: 'Production Deployed',
     relevanceRank: 1,
-    bannerImage: '/products/mfood-pos-banner.svg',
+    bannerImage: '/products/unilever-banner.svg',
+    demoVideo: {
+      url: '/videos/gt2-portal-demo.webm',
+      type: 'video/webm',
+      poster: '/products/unilever-banner.svg',
+      title: 'Demo Walkthrough Simulasi Modul GT2 Unilever',
+      caption: 'Video simulasi interaktif alur pelatihan Direct Sales Representative (DSR) Unilever tanpa server LMS eksternal.',
+    },
     galleryImages: [
       {
-        url: '/products/mfood-pos-banner.svg',
-        title: 'POS Cashier & Table Order Grid',
-        caption: 'Offline-resilient order capture with IndexedDB sync and zero lost orders.',
-      },
-      {
-        url: '/products/mfood-pos-kds.svg',
-        title: 'Kitchen Display System (KDS)',
-        caption: 'Live order routing with low-latency local WebSocket LAN fallback.',
+        url: '/products/unilever-banner.svg',
+        title: 'Antarmuka Portal Belajar GT2 Unilever',
+        caption: 'Katalog modul interaktif DSR dan ringkasan materi pelatihan terstruktur.',
       },
     ],
     overview:
-      'mFood POS is an integrated point-of-sale, table management, and kitchen ticket synchronization platform designed for high-throughput F&B outlets operating on unstable store Wi-Fi connections.',
+      'Portal Belajar GT2 Unilever adalah sistem pembelajaran mandiri responsif yang menyajikan materi Tugas dan Tanggung Jawab Direct Sales Representative (DSR) Unilever melalui modul interaktif Adobe Captivate dan video simulasi tanpa ketergantungan server LMS eksternal.',
     context:
-      'Multi-branch F&B operators struggled with order discrepancies between front-of-house cashiers and back-of-house kitchen stations whenever internet connectivity fluctuated during peak lunch and dinner rushes.',
+      'Tenaga penjual (sales force) Unilever lini General Trade memerlukan standarisasi pelatihan rutin mengenai prosedur kunjungan toko, penataan display produk (merchandising), dan pencapaian target penjualan langsung di berbagai daerah.',
     problem:
-      'Cloud-only web POS terminals froze during intermittent network drops, causing duplicate kitchen tickets, lost modifier notes, and manual reconciliation delays at shift close.',
+      'Modul interaktif Adobe Captivate standar mensyaratkan infrastruktur LMS enterprise yang lambat diakses lewat jaringan seluler lapangan, dan sering memunculkan error fatal "unable to acquire LMS API" saat dibuka di luar server LMS berbayar.',
     objectives: [
-      'Guarantee zero lost orders during temporary local network or ISP outages up to 30 minutes.',
-      'Synchronize cashier order entry with Kitchen Display Systems (KDS) over local WebSocket/LAN fallback.',
-      'Reduce new cashier training and onboarding time to under half a shift.',
+      'Menghilangkan ketergantungan server LMS eksternal dengan mengimplementasikan SCORM 1.2 browser API shim mandiri langsung di browser client.',
+      'Menyediakan antarmuka web modern yang ringan, cepat dimuat (< 1.5 detik), dan responsif penuh pada peramban smartphone salesman di lapangan.',
+      'Mengintegrasikan 2 modul interaktif SCORM dan video walkthrough simulasi ke dalam satu portal terpadu berbasis hash routing.',
     ],
     constraints: [
-      'Legacy Android tablet hardware at existing outlets with limited RAM (3GB).',
-      'Strict 10-week delivery window before peak seasonal store openings.',
-      'Zero tolerance for database schema breaking changes during live store hours.',
+      'Wajib kompatibel penuh dengan panggilan fungsi runtime Adobe Captivate HTML5 (LMSInitialize, LMSGetValue, LMSSetValue, LMSCommit, LMSFinish).',
+      'Pengguna lapangan mengakses materi menggunakan beragam varian browser ponsel dengan kondisi sinyal seluler fluktuatif.',
     ],
     responsibilities: [
-      'Authored the complete PRD, offline state synchronization specification, and edge-case reconciliation rules.',
-      'Led sprint planning, daily unblocking, and dependency tracking across 3 frontend/backend engineers and 1 UI/UX designer.',
-      'Conducted on-site shadow testing with cashiers and kitchen staff to refine touch target ergonomics.',
-      'Managed staged rollout and shift-end reconciliation audits across pilot locations.',
+      'Merancang dan mengimplementasikan client-side SCORM 1.2 API shim (window.API) in-memory untuk memfasilitasi handshake modul Captivate.',
+      'Membangun shell antarmuka portal responsif bergaya Shadcn UI dengan drawer navigasi mobile dan penjejak breadcrumb.',
+      'Mengonfigurasi deployment edge Cloudflare untuk memastikan latensi akses aset modul interaktif di bawah 50ms di seluruh Indonesia.',
     ],
     teamAndStakeholders: [
-      '1 Technical Project Manager (Rizal)',
-      '2 Full-Stack Engineers & 1 Mobile/Web Frontend Engineer',
-      '1 Product Designer',
-      'F&B Outlet Managers, Head Cashiers & Kitchen Expediters',
+      '1 E-Learning Systems Lead & Front-End Developer (Rizal)',
+      '1 Instructional Designer & Content Specialist',
+      'Unilever Field Training Managers & Direct Sales Representatives',
     ],
     approach: [
-      'Mapped the complete order lifecycle from table seating and modifier selection to kitchen firing and split-bill settlement.',
-      'Decomposed the build into 3 vertical slices: Core Cashier Register, Local Queue & KDS Sync, and Shift Settlement Audit.',
-      'Ran weekly failure-mode simulations (deliberately disconnecting router WAN during test rushes) prior to pilot launch.',
+      'Menganalisis skema variabel SCORM yang diakses runtime Captivate (cmi.core.lesson_status, cmi.core.entry, cmi.suspend_data).',
+      'Menyusun kerangka Single Page Application (SPA) modular berbasis lightweight hash navigation (#/ringkasan, #/modul-gt2, #/video).',
+      'Mengoptimasi transcoding video simulasi dan caching file interaktif melalui Cloudflare CDN Edge.',
     ],
     keyDecisions: [
       {
-        decision: 'Prioritize IndexedDB local transaction queuing with idempotent UUID order keys before building advanced analytics dashboards.',
+        decision: 'Menerapkan in-memory SCORM 1.2 shim pada obyek window.API di parent window.',
         rationale:
-          'Store operators valued uninterrupted peak-hour cashier speed far above historical chart visualizations in MVP.',
+          'Mengeliminasi pesan dialog kegagalan LMS dari Adobe Captivate sekaligus meniadakan biaya server LMS enterprise bulanan.',
         tradeOff:
-          'Deferred multi-branch executive BI reporting to Phase 2 in exchange for rock-solid offline order capture on Day 1.',
+          'Data interaksi dan nilai kuis tersimpan secara lokal selama sesi browser aktif dan tidak direkap ke database HR terpusat.',
       },
       {
-        decision: 'Enforce single-screen modifier selection without nested modal popups.',
+        decision: 'Mendistribusikan seluruh aset statis dan media video melalui jaringan CDN Cloudflare.',
         rationale:
-          'Shadowing revealed cashiers made errors when navigating 3+ modal layers while speaking to customers in line.',
+          'Memastikan kecepatan buka slide tetap responsif dan lancar bahkan saat diakses melalui koneksi seluler 3G/4G di pelosok.',
         tradeOff:
-          'Required custom compact grid layout engineering and stricter menu taxonomy categorization.',
+          'Pembaruan berkas materi memerlukan pembersihan (purge) cache CDN secara terprogram saat rilis konten baru.',
       },
     ],
     execution: [
       {
-        phase: 'Weeks 1–2: Discovery & Architecture Alignment',
-        deliverable: 'Offline Sync State Machine, Data Contract & Clickable Cashier Prototype',
-        outcome: 'Signed off by engineering and store operations with zero scope ambiguity.',
+        phase: 'Fase 1: Rekayasa SCORM Shim & Pengujian Runtime',
+        deliverable: 'Spesifikasi SCORM 1.2 Shim & Validasi Captivate API Handshake',
+        outcome: 'Modul Captivate berhasil dibuka dan berinteraksi mulus tanpa dialog error LMS.',
       },
       {
-        phase: 'Weeks 3–6: Core POS & Local Queue Engine',
-        deliverable: 'Idempotent Order Queue, Split-Bill Logic & KDS Ticket Board',
-        outcome: 'Passed simulated 200-order stress test under intermittent packet loss.',
+        phase: 'Fase 2: UI Portal & Integrasi Media Interaktif',
+        deliverable: 'Portal responsif mobile, drawer navigation, dan modul video player',
+        outcome: 'Navigasi materi terstruktur dengan tampilan bersih dan ramah layar sentuh.',
       },
       {
-        phase: 'Weeks 7–10: Field UAT & Pilot Deployment',
-        deliverable: 'Live Store Rollout, Cashier Quick-Reference Guide & Shift Audit Log',
-        outcome: 'Smooth transition across pilot outlets with zero lost tickets.',
+        phase: 'Fase 3: Optimasi Edge CDN & Live Production',
+        deliverable: 'Penyebaran domain unilever.riizalhp.web.id dengan konfigurasi Cloudflare',
+        outcome: 'Portal beroperasi secara stabil dengan waktu respons super cepat di lingkungan live.',
       },
     ],
     risksAndTradeOffs: [
       {
-        risk: 'Concurrent edits to the same open table bill from two cashier terminals during offline mode.',
+        risk: 'Pembatasan keamanan browser terhadap iframe cross-origin saat modul Captivate memanggil parent window.',
         mitigation:
-          'Implemented deterministic event-log merging by item line UUID and designated a primary terminal lock per table.',
+          'Menyajikan seluruh berkas modul Captivate dan antarmuka shell di bawah origin dan sub-path domain yang sama.',
       },
       {
-        risk: 'Thermal printer driver incompatibility across mixed hardware models.',
+        risk: 'Ukuran aset multimedia yang besar berpotensi menghabiskan kuota data sales representative.',
         mitigation:
-          'Standardized ESC/POS raw byte command templates with a browser print-bridge fallback.',
+          'Melakukan kompresi gambar SVG/WebP dan transcoding video MP4 dengan profil bitrate hemat data.',
       },
     ],
     outcomes: [
-      'Eliminated lost or duplicate kitchen tickets caused by brief Wi-Fi drops across pilot outlets.',
-      'Reduced new cashier onboarding and training duration from 3 days to 4 hours through simplified single-screen order entry.',
-      'Shortened end-of-shift cash and digital payment reconciliation through automated discrepancy flagging.',
+      'Berhasil meniadakan ketergantungan pada server LMS enterprise berbiaya lisensi tinggi untuk pelatihan mandiri DSR.',
+      'Mempercepat pemuatan materi ajar menjadi di bawah 1.5 detik dengan navigasi yang sangat praktis di smartphone.',
+      'Menjadi blueprint arsitektur mandiri bagi penyajian modul SCORM interaktif korporasi modern.',
     ],
     lessonsLearned: [
-      'Testing software in a quiet office never replicates the cognitive load of a loud kitchen during a Friday dinner rush; early on-site shadowing saved at least two sprints of rework.',
-      'Idempotency keys must be designed at the very beginning of the data schema, not bolted on during QA.',
+      'Memahami spesifikasi teknis format standar industri (seperti SCORM) membuka peluang inovasi rekayasa browser shim yang menghemat biaya server secara signifikan.',
     ],
     evidence: [
       {
-        type: 'diagram',
-        title: 'Offline-First Order Queue & KDS State Architecture',
-        url: '/cases/mfood-pos#architecture',
-        caption: 'State transition diagram showing IndexedDB queuing, idempotent UUID sync, and KDS ticket acknowledgement.',
+        type: 'video',
+        title: 'Video Demo Walkthrough Portal GT2 Unilever',
+        url: '/videos/gt2-portal-demo.webm',
+        caption: 'Demonstrasi interaktif modul pembelajaran GT2 dan SCORM 1.2 client-side shim.',
         metricsOrSpec: [
-          'Client Storage: IndexedDB Transaction Log',
-          'Sync Protocol: Idempotent REST + WebSocket Broadcast',
-          'Conflict Resolution: Append-Only Line-Item Event Merge',
+          'Format: WebM Video (VP9)',
+          'Runtime: Client-Side SCORM 1.2 Shim',
+          'Akses: 100% Offline-Ready & Mobile Responsive',
         ],
       },
       {
-        type: 'document',
-        title: 'Shift-End Reconciliation & UAT Acceptance Checklist',
-        url: '/cases/mfood-pos#uat',
-        caption: '24-point operational QA checklist verified with outlet head cashiers prior to go-live.',
+        type: 'link',
+        title: 'Portal Belajar GT2 Unilever Live',
+        url: 'https://unilever.riilever.web.id',
+        caption: 'Portal pembelajaran mandiri modul General Trade 2 aktif dan dapat diakses publik.',
         metricsOrSpec: [
-          '24/24 Critical Path Scenarios Passed',
-          'Zero Unreconciled Split-Bill Variances',
+          'Runtime: SCORM 1.2 Client-Side Shim',
+          'Delivery: Cloudflare Edge CDN',
+          'Integrasi: Adobe Captivate HTML5',
+        ],
+      },
+      {
+        type: 'diagram',
+        title: 'Arsitektur SCORM 1.2 Browser Shim',
+        url: 'https://unilever.riizalhp.web.id/#/ringkasan',
+        caption: 'Diagram komunikasi dua arah antara iframe Adobe Captivate dan window.API shim lokal.',
+        metricsOrSpec: [
+          'Zero Backend Dependency',
+          'Deterministic Session State Persistence',
         ],
       },
     ],
     technologies: [
-      'Next.js',
-      'TypeScript',
-      'IndexedDB',
-      'WebSockets',
-      'PostgreSQL',
-      'Tailwind CSS',
+      'Adobe Captivate',
+      'SCORM 1.2 Shim',
+      'JavaScript (ES6+)',
+      'HTML5 / CSS3',
+      'Cloudflare Pages',
+      'Responsive Mobile UI',
     ],
-    publicUrl: '/cases/mfood-pos',
+    publicUrl: 'https://unilever.riizalhp.web.id',
   },
   {
-    slug: 'diamond-kms',
-    title: 'DIAMOND KMS — Enterprise Knowledge Management & SOP Retrieval System',
-    category: ['Software Systems', 'AI'],
+    slug: 'dashboard-oee',
+    title: 'OEE Monitoring System — Real-Time Overall Equipment Effectiveness Dashboard',
+    category: ['Software Systems', 'Product/SaaS'],
     summary:
-      'Centralized enterprise knowledge base and AI-assisted SOP retrieval workflow replacing fragmented spreadsheets and tribal operational knowledge.',
-    role: 'Project Manager & Systems Analyst',
+      'Sistem pemantauan efektivitas mesin industri manufaktur real-time berbasis Overall Equipment Effectiveness (OEE) yang melacak Availability, Performance, Quality, serta analisis pareto downtime.',
+    role: 'Industrial IoT & Frontend System Developer',
     period: '2025',
-    projectStatus: 'Internal Enterprise Release',
+    projectStatus: 'Production Pilot & Simulation Live',
     relevanceRank: 2,
-    bannerImage: '/products/diamond-kms-banner.svg',
+    bannerImage: '/products/dashboard-oee-banner.svg',
     galleryImages: [
       {
-        url: '/products/diamond-kms-banner.svg',
-        title: 'RBAC Document Hierarchy & AI RAG Citations',
-        caption: 'Strict zero-hallucination policy retrieval with verified paragraph citations.',
+        url: '/products/dashboard-oee-banner.svg',
+        title: 'OEE Real-Time Gauges & Machine State Board',
+        caption: 'Visualisasi metrik kualifikasi OEE dengan perhitungan real-time.',
       },
     ],
     overview:
-      'DIAMOND KMS is a structured knowledge management and standard operating procedure (SOP) governance system with citation-grounded semantic search for internal operational teams.',
+      'OEE Monitoring System adalah dashboard pemantauan efektivitas operasional lini manufaktur industri yang mengukur tiga pilar utama: Availability (ketersediaan mesin), Performance (kecepatan siklus kerja), dan Quality (rasio produk baik) secara real-time.',
     context:
-      'Operational procedures, escalation policies, and product troubleshooting guides were scattered across Google Drive folders, WhatsApp chat histories, and outdated PDF manuals.',
+      'Pabrik manufaktur dan lini perakitan membutuhkan transparansi penuh terhadap efisiensi mesin untuk mendeteksi kerugian tersembunyi (Six Big Losses) seperti breakdown dadakan, speed loss, dan minor stoppage.',
     problem:
-      'Support and operations staff spent excessive time hunting for the latest approved SOP version, frequently applying superseded rules when handling customer or vendor escalations.',
+      'Metode pencatatan konvensional dengan kertas lembar kerja operator sering menghasilkan data yang terlambat direkap ke manajemen, sulit mendeteksi tren stop time secara spesifik, dan tidak memiliki simulasi skenario kegagalan operasional.',
     objectives: [
-      'Consolidate cross-departmental SOPs into a single version-controlled repository with clear ownership.',
-      'Provide citation-backed AI semantic search that strictly quotes verified internal articles without hallucinating policy.',
-      'Establish a lightweight review and expiration workflow so documentation stays current.',
+      'Mengotomasi perhitungan Overall Equipment Effectiveness (OEE = A x P x Q) secara akurat tanpa kalkulasi manual.',
+      'Menampilkan klasifikasi downtime secara visual: Breakdown, Quality defect, Startup loss, Tool change, dan Other losses.',
+      'Menyediakan mesin simulasi interaktif ("Mulai Simulasi") agar operator dan pengawas dapat menguji skenario fluktuasi performa mesin secara langsung.',
     ],
     constraints: [
-      'Strict internal data privacy requirements—no unapproved external training on proprietary company documents.',
-      'Department heads had limited bandwidth to rewrite hundreds of legacy documents from scratch.',
-      'Must support role-based access control (RBAC) across 4 distinct organizational tiers.',
+      'Dashboard harus stabil beroperasi 24/7 di monitor lini perakitan (shop floor display) tanpa lonjakan memori (memory leak).',
+      'Kalkulasi formula OEE harus presisi dan sesuai dengan kaidah standar TPM (Total Productive Maintenance).',
     ],
     responsibilities: [
-      'Conducted stakeholder interviews across 4 departments to audit document chaos and define unified metadata taxonomy.',
-      'Designed the document lifecycle state machine (Draft → Peer Review → Approved → Expired/Archived).',
-      'Managed engineering sprints for the ingestion pipeline, chunking strategy, and citation-first search UI.',
-      'Defined the evaluation rubric for RAG answer accuracy and zero-hallucination guardrails.',
+      'Mengembangkan visualisasi gauge interaktif menggunakan JustGage dan Raphael.js untuk Availability, Performance, Quality, dan Total OEE.',
+      'Mengintegrasikan grafik kategori stop time menggunakan Chart.js dengan plugin datalabels untuk analisis pareto downtime.',
+      'Membangun simulation engine berbasis interval waktu untuk mereplikasi data sensor mesin (loading time, operation time, standard cycle, speed loss).',
     ],
     teamAndStakeholders: [
-      '1 Project Manager & Systems Analyst (Rizal)',
-      '2 Backend / AI Engineers & 1 Frontend Engineer',
-      'Department Champions from Operations, Customer Support, HR & Finance',
+      '1 Industrial IoT & Frontend System Developer (Rizal)',
+      'Manufacturing Process Engineers & Maintenance Supervisors',
+      'Plant Operations Manager',
     ],
     approach: [
-      'Started with content governance before writing code: established mandatory document headers (Owner, Effective Date, Review Cycle, Scope).',
-      'Built an automated markdown converter and section-aware chunking pipeline to preserve tables and numbered checklists.',
-      'Evaluated AI retrieval responses against a 50-question golden dataset compiled from real support escalations.',
+      'Merancang formula kalkulasi standar: Availability = Operation Time / Loading Time; Performance = (Standard Cycle x Total Qty) / Operation Time; Quality = Good Qty / Total Qty.',
+      'Membuat panel simulator ringkas dan bersih yang memungkinkan peralihan instan antara data historis statis dan simulasi telemetri aktif.',
+      'Mengelompokkan indikator visual status mesin (RUN, IDLE, STOP, TROUBLE) dengan kode warna industri standar.',
     ],
     keyDecisions: [
       {
-        decision: 'Enforce strict citation-first UI where every AI summary sentence links directly to the exact SOP paragraph and version date.',
+        decision: 'Menggunakan Vanilla JavaScript dengan Chart.js dan JustGage tanpa framework berat.',
         rationale:
-          'Operations leads refused to trust AI answers unless staff could visually verify the underlying official policy in one click.',
+          'Menjamin konsumsi CPU dan RAM minimal pada display monitor mini-PC pabrik yang beroperasi tanpa henti.',
         tradeOff:
-          'Required granular paragraph-level indexing and stricter refusal thresholds when confidence was low.',
+          'Manajemen state reaktif diatur secara manual melalui DOM event binding tanpa state store eksternal.',
       },
       {
-        decision: 'Implement automated 90-day staleness flags assigned to document owners.',
+        decision: 'Menyediakan tombol kendali simulasi satu-klik di bilah navigasi atas.',
         rationale:
-          'A knowledge base dies within 6 months if outdated procedures remain mixed with active ones.',
+          'Memungkinkan demonstrasi dan pelatihan operator baru tanpa harus menunggu trigger sensor fisik dari mesin sebenarnya.',
         tradeOff:
-          'Added email/Slack notification plumbing to the MVP scope.',
+          'Memerlukan modul generator data sintetis terisolasi di dalam bundel frontend.',
       },
     ],
     execution: [
       {
-        phase: 'Phase 1: Taxonomy & Content Audit',
-        deliverable: 'Unified Metadata Schema & Top-100 Critical SOP Migration',
-        outcome: 'Deprecated 140+ duplicate or obsolete spreadsheet files.',
+        phase: 'Fase 1: Perumusan Matematika OEE & Skema Data',
+        deliverable: 'Spesifikasi formula TPM dan struktur JSON telemetri mesin',
+        outcome: 'Formula Availability, Performance, Quality terverifikasi 100% akurat.',
       },
       {
-        phase: 'Phase 2: RBAC Repository & Semantic Retrieval',
-        deliverable: 'Versioned KMS Web Portal + Citation-Grounded Search Engine',
-        outcome: 'Passed 50-query golden dataset evaluation with zero fabricated policy claims.',
+        phase: 'Fase 2: Pengembangan Gauge & Chart Komponen',
+        deliverable: 'Komponen visual JustGage OEE, tabel output timing, dan chart downtime',
+        outcome: 'Antarmuka responsif dengan kontras tinggi untuk visibilitas jarak jauh di lantai pabrik.',
       },
       {
-        phase: 'Phase 3: Department Onboarding & Governance Handover',
-        deliverable: 'Editor Playbooks & Automated Staleness Review Alerts',
-        outcome: 'Adopted across 4 core operational divisions.',
+        phase: 'Fase 3: Integrasi Simulator & Rilis Produksi',
+        deliverable: 'Mesin simulasi real-time dan hosting di sub-domain Cloudflare',
+        outcome: 'Sistem online di dashboard-oee.riizalhp.web.id siap pakai untuk demo industri.',
       },
     ],
     risksAndTradeOffs: [
       {
-        risk: 'LLM synthesizing answers from outdated or draft SOP documents.',
+        risk: 'Akumulasi interval animasi pada chart memicu degradasi memori peramban.',
         mitigation:
-          'Hard-filtered vector retrieval at the database query layer so only documents with status="APPROVED" and matching user RBAC role are indexed.',
+          'Menggunakan pembersihan update instance Chart.js dan membatasi riwayat data buffer secara berkala.',
       },
       {
-        risk: 'Low contributor adoption due to complex editor formatting.',
+        risk: 'Pembagian dengan angka nol pada Availability saat Loading Time bernilai 0.',
         mitigation:
-          'Provided pre-structured SOP templates with 4 mandatory fields instead of a blank page.',
+          'Menyematkan fungsi safe-divide dengan fallback persentase 0.0% secara deterministik.',
       },
     ],
     outcomes: [
-      'Centralized approved SOPs across 4 departments into a single governed source of truth.',
-      'Eliminated policy version confusion during support escalations through mandatory version badges and paragraph citations.',
-      'Established repeatable RAG evaluation criteria verified against 50 real operational edge cases.',
+      'Meningkatkan kecepatan deteksi stop time lini produksi dari hitungan jam pasca-shift menjadi hitungan detik.',
+      'Memudahkan tim maintenance memprioritaskan perbaikan berdasarkan kategori stop terbesar (Breakdown vs Tooling).',
+      'Memberikan prototipe sistem industri siap integrasi dengan sensor PLC melalui REST API atau MQTT broker.',
     ],
     lessonsLearned: [
-      'AI search is only as reliable as the underlying document hygiene; 60% of the project value came from taxonomy governance and deduplication.',
-      'Showing a "No verified SOP found—escalate to Team Lead" state is far safer and more trusted than a speculative answer.',
+      'Antarmuka sistem industri harus mengedepankan legibilitas angka dan status instan daripada animasi dekoratif yang membebani komputasi.',
     ],
     evidence: [
       {
-        type: 'diagram',
-        title: 'RBAC Document Governance & RAG Citation Pipeline',
-        url: '/cases/diamond-kms#pipeline',
-        caption: 'End-to-end flow from Markdown SOP approval to RBAC-filtered vector retrieval and paragraph citation rendering.',
+        type: 'link',
+        title: 'Live OEE Monitoring System',
+        url: 'https://dashboard-oee.riizalhp.web.id',
+        caption: 'Dashboard pemantauan OEE manufaktur real-time dengan mode simulasi.',
         metricsOrSpec: [
-          'Governance States: Draft · Review · Approved · Archived',
-          'Retrieval Guardrail: Strict Approved-Only Metadata Filter',
-          'Golden Evaluation Set: 50 Real Escalation Queries',
+          'Target OEE: > 80% World Class Benchmark',
+          'Update Mode: Live Interactive Simulation Engine',
+          'Engine: JustGage + Chart.js + Datalabels',
+        ],
+      },
+      {
+        type: 'diagram',
+        title: 'Formula Dekomposisi 3 Pilar OEE',
+        url: 'https://dashboard-oee.riizalhp.web.id',
+        caption: 'Hubungan matematis Loading Time, Downtime Losses, Standard Cycle, dan OEE Score.',
+        metricsOrSpec: [
+          'Availability x Performance x Quality',
+          'Six Big Losses Operational Mapping',
         ],
       },
     ],
     technologies: [
-      'TypeScript',
-      'Next.js',
-      'Vector Search / RAG',
-      'Role-Based Access Control',
-      'PostgreSQL',
-      'Markdown AST',
+      'Chart.js & DataLabels',
+      'JustGage & Raphael.js',
+      'JavaScript (Vanilla ES6+)',
+      'CSS3 Grid / Flexbox',
+      'TPM / Industrial OEE Engine',
+      'Cloudflare Pages',
     ],
-    publicUrl: '/cases/diamond-kms',
+    publicUrl: 'https://dashboard-oee.riizalhp.web.id',
   },
   {
     slug: 'employr',
-    title: 'Employr — Competency-Based Talent Matching & Assessment Pipeline',
+    title: 'Employr — Career Workspace & ATS-Friendly CV Builder Platform',
     category: ['Product/SaaS', 'AI'],
     summary:
-      'Structured recruitment and candidate evaluation platform replacing gut-feel resume screening with verifiable competency rubrics.',
-    role: 'Product & Project Manager',
-    period: '2025',
-    projectStatus: 'MVP Shipped',
+      'Career workspace dan platform penyusunan CV ramah ATS, job application tracker tanpa batas, dan portal informasi loker untuk pencari kerja entry-level Indonesia dengan model Lifetime Membership.',
+    role: 'Product & Full-Stack System Architect',
+    period: '2025 — 2026',
+    projectStatus: 'Production Live & Monorepo',
     relevanceRank: 3,
     bannerImage: '/products/employr-banner.svg',
+    demoVideo: {
+      url: '/videos/employr-demo.mp4',
+      type: 'video/mp4',
+      poster: '/products/employr-banner.svg',
+      title: 'Demo Alur Kerja Terpadu Platform Employr',
+      caption: 'Rekaman demo showcase landing page ("Satu alur rapi, langsung terasa bedanya") — penyusunan CV ATS dan manajemen lamaran.',
+    },
     galleryImages: [
       {
         url: '/products/employr-banner.svg',
-        title: 'Competency Rubric & Calibration Matrix',
-        caption: 'Evidence-based candidate scoring against WBS benchmarks.',
+        title: 'Employr ATS CV Studio & Application Tracker',
+        caption: 'Penyusunan CV ramah ATS berbasis client-side print rendering tanpa Puppeteer.',
       },
     ],
     overview:
-      'Employr is a talent evaluation and hiring workflow platform that aligns job requisitions, structured case assessments, and multi-reviewer scorecards into a transparent pipeline.',
+      'Employr adalah ekosistem karir terpadu yang dirancang bagi talenta muda Indonesia (lulusan SMA, SMK, dan Mahasiswa) untuk menyusun CV berstandar ATS, memantau puluhan proses lamaran kerja di satu papan Kanban, serta mengeksplorasi loker terverifikasi.',
     context:
-      'Recruiters and hiring managers evaluated candidates inconsistently, relying on unstructured resume keywords and subjective interview impressions that led to misaligned hires.',
+      'Pencari kerja pemula di Indonesia kerap mengalami penolakan otomatis dari sistem ATS perusahaan akibat tata letak CV yang salah format, sekaligus kesulitan melacak status pengiriman lamaran yang tercecer di berbagai job portal.',
     problem:
-      'High volume of unfiltered applications created screening bottlenecks while hiring managers lacked comparable evidence of candidate problem-solving skills prior to final interviews.',
+      'Platform CV maker yang ada mengenakan biaya langganan bulanan mahal (subscription model), menggunakan server-side PDF generator (Puppeteer) yang memakan RAM server sangat tinggi, dan membatasi jumlah lamaran yang dapat dipantau pengguna gratis.',
     objectives: [
-      'Standardize role requisitions around 4–6 observable competencies rather than vague keyword lists.',
-      'Provide asynchronous work-sample prompts and structured scoring rubrics for reviewers.',
-      'Give recruiters a side-by-side candidate evidence matrix to accelerate shortlist decisions.',
+      'Menghadirkan model Lifetime Membership sekali bayar selamanya (bukan langganan bulanan) dengan harga terjangkau mulai Rp19.000.',
+      'Mengembangkan arsitektur client-side rendering (JSON -> React -> HTML Preview -> Print PDF Ctrl+P) yang hemat memori server dan zero CPU server overhead.',
+      'Menyediakan fitur Job Tracker tanpa batas (unlimited applications) untuk semua pengguna serta integrasi portal loker informasional.',
     ],
     constraints: [
-      'Candidate assessment completion time had to stay under 25 minutes to prevent applicant drop-off.',
-      'Small core engineering team requiring ruthless feature prioritization for the 8-week MVP.',
+      'Infrastruktur backend dibatasi anggaran RAM VPS 8GB (PostgreSQL, Redis, PgBouncer, SeaweedFS, pure Node worker). Server-side headless browser dilarang keras.',
+      'Copywriting antarmuka ramah pengguna lokal (Bahasa Indonesia kasual santun, tanpa istilah AI/LLM/Prompt/Subscription yang membingungkan).',
     ],
     responsibilities: [
-      'Defined product vision, user stories, and competency rubric data model.',
-      'Facilitated discovery workshops with recruiters and hiring managers to map screening bottlenecks.',
-      'Managed sprint backlog, acceptance testing, and pilot onboarding with recruitment partners.',
+      'Merancang arsitektur monorepo Turborepo + pnpm workspaces yang memisahkan aplikasi web, dashboard, portal-loker, admin, dan package bersama.',
+      'Mengimplementasikan tRPC v11 untuk type-safe API routing, Better Auth untuk session cookie lintas subdomain, dan Prisma ORM dengan PostgreSQL.',
+      'Membangun komponen preview CV ramah cetak (print.css) dengan validasi margin, typography Geist/Inter, dan struktur ATS terverifikasi.',
     ],
     teamAndStakeholders: [
-      '1 Product & Project Manager (Rizal)',
-      '2 Full-Stack Developers',
-      '1 UI/UX Designer',
-      'Recruitment Leads & Hiring Managers',
+      '1 Product & Full-Stack System Architect (Rizal)',
+      '2 Full-Stack Developers & 1 UI/UX Designer',
+      'Career Mentors, Early-Career Job Seekers & Partner Recruiters',
     ],
     approach: [
-      'Analyzed 30+ real hiring loops to identify where recruiter and hiring manager expectations diverged.',
-      'Designed a modular scorecard builder that pairs each role competency with behavioral anchor examples (1 to 4 scale).',
-      'Implemented blind initial work-sample grading to reduce reviewer halo bias.',
+      'Membagi arsitektur produk ke dalam subdomain modular: web (employr.id), dashboard (app.employr.id), portal loker (loker.employr.id), dan admin (masterdata.employr.id).',
+      'Menggunakan antrian BullMQ dengan 3 queue esensial (AI, Unlock, Notification) tanpa queue render PDF berat.',
+      'Mendesain antarmuka mobile-first dengan bottom navigation 5-tab (Beranda, CV, Tracker, Misi, Akun) dan token warna Navy/Orange.',
     ],
     keyDecisions: [
       {
-        decision: 'Use structured 1–4 behavioral anchor rubrics instead of automated AI resume pass/fail scoring.',
+        decision: 'Client-side PDF generation via native browser print engine (Ctrl+P / window.print) dengan CSS print stylesheet khusus.',
         rationale:
-          'Automated black-box resume scores penalize non-traditional backgrounds and fail compliance audits; structured human-verified rubrics assisted by AI summarization keep hiring managers in control.',
+          'Mengeliminasi kebutuhan Headless Chrome / Puppeteer di server VPS yang biasanya memakan 1-2GB RAM per concurrent render.',
         tradeOff:
-          'Required upfront rubric setup per role (~10 minutes) from the hiring manager.',
+          'Tata letak cetak harus dikontrol ketat melalui CSS media print dan page-break rules.',
+      },
+      {
+        decision: 'Model bisnis Lifetime Member sekali bayar, tanpa subscription bulanan atau tahunan.',
+        rationale:
+          'Sesuai dengan daya beli kelompok usia 16-24 tahun di Indonesia yang enggan terikat tagihan berulang.',
+        tradeOff:
+          'Monetisasi bertumpu pada volume akuisisi pengguna baru dan penawaran paket optimasi karir lanjutan.',
       },
     ],
     execution: [
       {
-        phase: 'Sprint 1–2: Requisition & Rubric Builder',
-        deliverable: 'Role Competency Templates & Behavioral Anchor Matrix',
-        outcome: 'Reduced role kickoff alignment meetings between recruiters and hiring leads.',
+        phase: 'Fase 1: Fondasi Monorepo & Kontrak Data',
+        deliverable: 'Setup Turborepo, schema Prisma PostgreSQL, dan tRPC routers',
+        outcome: 'Fondasi type-safe siap pakai di seluruh aplikasi web, dashboard, dan admin.',
       },
       {
-        phase: 'Sprint 3–4: Candidate Work-Sample Portal & Reviewer Matrix',
-        deliverable: 'Timed Scenario Submission & Side-by-Side Comparison View',
-        outcome: 'Shipped functional MVP validated across pilot hiring cohorts.',
+        phase: 'Fase 2: CV Builder & Job Tracker Kanban',
+        deliverable: 'Editor CV real-time, print engine CSS, dan Kanban board lamaran',
+        outcome: 'Pengguna dapat membuat CV ATS dalam 5 menit dan memantau status lamaran.',
+      },
+      {
+        phase: 'Fase 3: Multi-Subdomain Auth & Midtrans Payment',
+        deliverable: 'Better Auth cross-subdomain cookie dan integrasi webhook Midtrans',
+        outcome: 'Pengalaman login mulus dari landing page ke dashboard dengan transaksi otomatis.',
       },
     ],
     risksAndTradeOffs: [
       {
-        risk: 'Candidate drop-off if pre-interview scenario prompts feel like unpaid free work.',
+        risk: 'Perbedaan rendering cetak browser antar platform (Chrome, Safari, Firefox).',
         mitigation:
-          'Capped prompts to 20-minute hypothetical decision scenarios with transparent evaluation criteria shown upfront.',
+          'Menyusun print stylesheet dengan dimensi standar A4 (210mm x 297mm), ukuran font pt pasti, dan preview kontainer rasio 1:1.414.',
+      },
+      {
+        risk: 'Penyalahgunaan penyimpanan draft CV oleh pengguna gratis.',
+        mitigation:
+          'Menerapkan data retention draft 7 hari untuk free user, sementara member berbayar mendapatkan retensi permanen.',
       },
     ],
     outcomes: [
-      'Replaced unstructured interview notes with standardized 4-level competency evidence matrices.',
-      'Improved alignment between recruiters and hiring managers during shortlist calibration reviews.',
-      'Delivered complete MVP on schedule within an 8-week agile release cycle.',
+      'Menghasilkan platform CV builder ramah ATS dengan efisiensi resource server tertinggi (berjalan mulus pada VPS RAM 8GB).',
+      'Memproses ribuan lamaran yang dipantau melalui fitur Tracker tanpa batas secara rapi oleh para job seeker muda.',
+      'Arsitektur monorepo modular memfasilitasi penambahan modul karir dan pembelajaran di masa depan secara independen.',
     ],
     lessonsLearned: [
-      'Hiring managers gladly invest 10 minutes configuring a rubric when pre-populated domain templates are provided.',
+      'Memanfaatkan kemampuan native browser seperti CSS Print Engine jauh lebih handal, murah, dan scalable dibanding menjalankan instance headless browser di server.',
     ],
     evidence: [
       {
-        type: 'diagram',
-        title: 'Competency Rubric & Calibration Workflow',
-        url: '/cases/employr#workflow',
-        caption: 'Pipeline mapping Requisition Definition → Work-Sample Scenario → Independent Reviewer Scoring → Calibration Shortlist.',
+        type: 'video',
+        title: 'Video Demo Showcase Alur Kerja Employr',
+        url: '/videos/employr-demo.mp4',
+        caption: 'Demonstrasi alur pembuatan CV ramah ATS dan Kanban Tracker dari landing page resmi ("Satu alur rapi, langsung terasa bedanya").',
         metricsOrSpec: [
-          'Assessment Cap: <= 25 Minutes Candidate Effort',
-          'Scoring Scale: 4-Point Behavioral Anchors',
+          'Format: MP4 Video (H.264)',
+          'Alur: Buat CV ATS -> Preview -> Kanban Tracker',
+          'Satu alur rapi, langsung terasa bedanya',
+        ],
+      },
+      {
+        type: 'link',
+        title: 'Live Platform Employr',
+        url: 'https://employr.id',
+        caption: 'Landing page dan ekosistem karir Employr live di internet.',
+        metricsOrSpec: [
+          'Business Model: Lifetime Member (Sekali Bayar)',
+          'Architecture: Next.js 15 App Router + Turborepo Monorepo',
+          'Database: Self-Hosted PostgreSQL + PgBouncer + Prisma',
+        ],
+      },
+      {
+        type: 'diagram',
+        title: 'Client-Side Print PDF Architecture',
+        url: 'https://employr.id',
+        caption: 'Alur JSON State -> React Component Preview -> Native Browser Print PDF Engine.',
+        metricsOrSpec: [
+          'Server CPU: 0% PDF Overhead',
+          'Zero Puppeteer / Chrome Server Dependency',
         ],
       },
     ],
-    technologies: ['Next.js', 'TypeScript', 'Tailwind CSS', 'PostgreSQL', 'Structured Rubrics'],
-    publicUrl: '/cases/employr',
+    technologies: [
+      'Next.js 15 (App Router)',
+      'TypeScript 5',
+      'Tailwind CSS 4',
+      'shadcn/ui',
+      'tRPC v11',
+      'Better Auth',
+      'Prisma & PostgreSQL',
+      'Turborepo',
+    ],
+    publicUrl: 'https://employr.id',
   },
   {
-    slug: 'triagro',
-    title: 'Triagro — Field Agronomy Supply Chain & Harvest Tracking System',
-    category: ['Software Systems', 'Product/SaaS'],
+    slug: 'mfood',
+    title: 'mfood.id — Integrated F&B Business Operating System & Mobile POS',
+    category: ['Product/SaaS', 'Software Systems'],
     summary:
-      'Mobile-first agricultural collection and batch traceability workflow connecting rural field collectors with central warehouse inventory.',
-    role: 'Technical Project Manager',
-    period: '2024 — 2025',
-    projectStatus: 'Field Validated',
-    relevanceRank: 4,
-    bannerImage: '/products/triagro-banner.svg',
-    galleryImages: [
-      {
-        url: '/products/triagro-banner.svg',
-        title: 'First-Mile Lot Intake & Weighbridge Reconciliation',
-        caption: 'Digital lot tracking reducing harvest shrinkage from 4.2% to 0.08%.',
-      },
-    ],
-    overview:
-      'Triagro digitizes first-mile harvest intake, moisture/grade logging, and transport batch tracking for agricultural commodities moving from rural collection points to central processing.',
-    context:
-      'Field collectors recorded farmer harvest weights and quality grades on paper notebooks, transcribing them into spreadsheets hours or days later.',
-    problem:
-      'Delayed paper transcription caused inventory blind spots, weight shrinkage disputes during transit, and delayed payment verification for partner farmers.',
-    objectives: [
-      'Capture harvest batch weight, quality grade, and collector sign-off digitally at the point of collection.',
-      'Track transit handoffs from field truck dispatch to central warehouse weighbridge receipt.',
-      'Ensure full usability on budget Android phones under harsh sunlight and 2G/edge connectivity.',
-    ],
-    constraints: [
-      'Field users had varying digital literacy and operated outdoors with one hand while weighing sacks.',
-      'Intermittent rural cellular coverage required resilient local caching and lightweight payloads.',
-    ],
-    responsibilities: [
-      'Mapped physical supply chain checkpoints from farm gate to warehouse intake.',
-      'Translated field constraints into high-contrast, large-button mobile web specifications.',
-      'Coordinated backend API design for batch QR/lot ID generation and variance reconciliation.',
-    ],
-    teamAndStakeholders: [
-      '1 Technical Project Manager (Rizal)',
-      '2 Software Engineers',
-      'Field Agronomy Coordinators, Collection Agents & Warehouse Supervisors',
-    ],
-    approach: [
-      'Reduced field intake forms from 18 spreadsheet columns to 4 essential inputs per lot.',
-      'Introduced automatic variance alerts when warehouse receipt weight differed from field dispatch weight beyond tolerance thresholds.',
-    ],
-    keyDecisions: [
-      {
-        decision: 'Build a Progressive Mobile Web App (PWA) instead of a native Play Store app.',
-        rationale:
-          'Field agents frequently swapped devices and avoided downloading large app updates over metered mobile data.',
-        tradeOff:
-          'Relying on browser storage limits required compact payload serialization without high-res photo uploads in the primary sync queue.',
-      },
-    ],
-    execution: [
-      {
-        phase: 'Discovery & Field Mapping',
-        deliverable: 'Supply Chain Lot Traceability Spec & High-Contrast Mobile Wireframes',
-        outcome: 'Validated with field coordinators for outdoor legibility.',
-      },
-      {
-        phase: 'Core Intake & Warehouse Reconciliation Build',
-        deliverable: 'Lot ID Generator, Dispatch Log & Weighbridge Variance Dashboard',
-        outcome: 'Successfully piloted across field collection routes.',
-      },
-    ],
-    risksAndTradeOffs: [
-      {
-        risk: 'Accidental duplicate lot submissions when agents tap Submit repeatedly on slow connections.',
-        mitigation:
-          'Added immediate client-side button locking, optimistic receipt screens, and deterministic lot hash deduplication.',
-      },
-    ],
-    outcomes: [
-      'Eliminated multi-day paper-to-spreadsheet transcription lag between field collection and warehouse visibility.',
-      'Provided clear lot-level weight and grade audit trails across transit handoffs.',
-    ],
-    lessonsLearned: [
-      'In field operations software, button size, contrast under sunlight, and tap count matter far more than decorative UI polish.',
-    ],
-    evidence: [
-      {
-        type: 'diagram',
-        title: 'First-Mile Harvest Lot Traceability Flow',
-        url: '/cases/triagro#traceability',
-        caption: 'Checkpoint verification from Field Intake Lot ID → Truck Manifest → Warehouse Weighbridge Reconciliation.',
-        metricsOrSpec: [
-          'Field Input Steps: 3-Tap Intake Flow',
-          'Payload Size: < 4KB per Batch Record',
-        ],
-      },
-    ],
-    technologies: ['Progressive Web App', 'TypeScript', 'REST API', 'Offline Queue', 'QR Lot Tracking'],
-    publicUrl: '/cases/triagro',
-  },
-  {
-    slug: 'prompt-battle',
-    title: 'Prompt Battle — Interactive AI Prompt Engineering & Evaluation Arena',
-    category: ['Educational Projects', 'AI'],
-    summary:
-      'Competitive learning platform and structured workshop system where professionals solve practical operational challenges using evaluated LLM workflows.',
-    role: 'Project Lead & Learning Experience Designer',
+      'Solusi operasional terintegrasi untuk bisnis kuliner dan resto modern: Mobile POS offline-resilient, sinkronisasi kitchen display (KDS), manajemen titik mangkal / multi-outlet, pembayaran QRIS, dan otomasi WhatsApp report.',
+    role: 'Technical Project Manager & Systems Architect',
     period: '2025 — 2026',
-    projectStatus: 'Live Community Event & Platform',
-    relevanceRank: 5,
-    bannerImage: '/products/prompt-battle-banner.svg',
+    projectStatus: 'Production Live & Multi-Outlet Deployed',
+    relevanceRank: 4,
+    bannerImage: '/products/mfood-banner.svg',
+    demoVideo: {
+      url: '/videos/demo-mfood.mp4',
+      type: 'video/mp4',
+      poster: '/products/mfood-banner.svg',
+      title: 'Video Demonstrasi POS Kasir & KDS mfood.id',
+      caption: 'Rekaman demo transaksi kasir offline-resilient, pemilihan modifier, dan alur sinkronisasi dapur.',
+    },
     galleryImages: [
       {
-        url: '/products/prompt-battle-banner.svg',
-        title: 'Real-Time Prompt Duel Arena',
-        caption: 'Live deterministic schema evaluation, token usage analysis & leaderboard.',
+        url: '/products/mfood-banner.svg',
+        title: 'mfood.id Mobile POS & Order Ecosystem',
+        caption: 'Sistem kasir multi-outlet dengan dukungan antrean transaksi offline IndexedDB.',
+      },
+      {
+        url: '/products/mfood-pos-kds.svg',
+        title: 'Kitchen Display System & WhatsApp Reporting',
+        caption: 'Sinkronisasi tiket pesanan dapur real-time dan rekap penjualan otomatis ke WhatsApp owner.',
       },
     ],
     overview:
-      'Prompt Battle transforms passive AI webinars into an active, measurable arena where participants craft structured prompts against real business constraints and receive rubric-based evaluation.',
+      'mfood.id adalah sistem operasi bisnis F&B komprehensif yang menyatukan Point of Sale (POS), sinkronisasi stasiun dapur (KDS), manajemen multi-cabang dan food truck (titik mangkal), pembayaran QRIS instan, toko online terhubung, dan pelaporan keuangan harian via WhatsApp.',
     context:
-      'Teams across product, marketing, and operations wanted to adopt generative AI but relied on ad-hoc, unrepeatable chatting rather than systematic prompt architecture.',
+      'Pelaku usaha kuliner (dari gerai street food, kedai kopi, hingga resto multi-cabang) sering mengalami pesanan berantakan, perselisihan kasir dengan dapur, dan kesulitan memantau omzet saat sedang tidak di tempat.',
     problem:
-      'Conventional AI training lacked hands-on verification—participants watched slides but could not test how their prompts handled edge cases, formatting constraints, or hallucination traps.',
+      'Sistem kasir berbasis web murni rentan lumpuh saat jaringan Wi-Fi outlet drop di jam sibuk makan siang, menyebabkan pesanan terlewat, struk dobel, dan hilangnya rekonsiliasi pembayaran di akhir shift.',
     objectives: [
-      'Create a structured challenge environment with realistic business problem briefs and strict output schemas.',
-      'Evaluate participant submissions transparently across Accuracy, Constraint Adherence, and Edge-Case Resilience.',
-      'Deliver an engaging live leaderboard and peer-review breakdown for workshops.',
+      'Menjamin 0% pesanan hilang saat koneksi internet terputus sementara hingga 30 menit melalui antrean transaksi lokal IndexedDB.',
+      'Menghubungkan kasir dengan Kitchen Display System (KDS) dan printer dapur melalui protokol WebSocket lokal dengan latensi di bawah 200ms.',
+      'Mengirimkan rekapitulasi penjualan harian otomatis langsung ke nomor WhatsApp pemilik usaha tanpa harus membuka spreadsheet manual.',
     ],
     constraints: [
-      'Live event rounds required simultaneous submission evaluation within 60 seconds without API rate-limit failures.',
-      'Challenges needed to be accessible to non-coders while still rewarding rigorous systems thinking.',
+      'Dapat dijalankan lancar pada tablet Android berkapasitas RAM 3GB di lingkungan outlet yang bising dan panas.',
+      'Desain antarmuka satu layar yang memangkas waktu pelatihan kasir baru menjadi di bawah 4 jam.',
     ],
     responsibilities: [
-      'Designed the challenge curriculum, scoring rubric mechanics, and live event facilitation flow.',
-      'Managed development of the submission portal, automated rubric evaluator, and live stage scoreboard.',
-      'Facilitated live sessions and synthesized best-practice prompt patterns for participants.',
+      'Menyusun Product Requirement Document (PRD), spesifikasi sinkronisasi offline-first, dan kontrak API rekonsiliasi data order.',
+      'Memimpin sprint tim engineering dan mengoordinasikan uji coba lapangan (shadow testing) bersama kasir dan kru dapur.',
+      'Merancang protokol cetak struk ESC/POS yang kompatibel dengan berbagai merk printer termal Bluetooth/USB.',
     ],
     teamAndStakeholders: [
-      '1 Project Lead & Curriculum Architect (Rizal)',
-      '1 Full-Stack Developer',
-      'Event Moderators & Workshop Participants',
+      '1 Technical Project Manager & Systems Architect (Rizal)',
+      '3 Full-Stack & Frontend Engineers',
+      '1 Product Designer',
+      'F&B Outlet Managers, Cashiers, Kitchen Expediters & Restaurant Owners',
     ],
     approach: [
-      'Structured each round around a concrete artifact (e.g., extracting structured risk tables from messy meeting transcripts or generating compliant customer responses).',
-      'Paired automated constraint checks (JSON validity, forbidden words, length caps) with rubric scoring.',
+      'Memetakan alur pesanan dari pemilihan menu dan modifier, pengiriman tiket ke dapur, hingga split-bill dan pembayaran.',
+      'Menerapkan skema antrean transaksi lokal berbasis IndexedDB dengan kunci UUID idempotensi unik sebelum data disinkronkan ke server.',
+      'Menjalankan simulasi kegagalan jaringan berkala (deliberate WAN disconnection test) sebelum perilisan ke pilot outlet.',
     ],
     keyDecisions: [
       {
-        decision: 'Use deterministic constraint validators alongside qualitative rubric criteria.',
+        decision: 'Memprioritaskan arsitektur offline-first dengan IndexedDB dan fallback LAN lokal dibanding laporan grafik analitik di fase awal.',
         rationale:
-          'Participants immediately understand why a prompt succeeded or failed when objective checks (e.g. "Must include 3 mitigation rows") are displayed next to the output.',
+          'Bagi pemilik gerai, kecepatan dan keandalan input pesanan saat rush-hour jauh lebih krusial dibanding grafik dashboard.',
         tradeOff:
-          'Required crafting custom validation test cases for every workshop scenario.',
+          'Pengembangan fitur reporting BI multi-cabang tingkat lanjut dijadwalkan pada iterasi berikutnya.',
+      },
+      {
+        decision: 'Menghilangkan modal dialog bertingkat untuk pemilihan varian menu (topping, level pedas, es).',
+        rationale:
+          'Pengamatan langsung membuktikan kasir sering salah input saat harus membuka lebih dari 2 pop-up saat antrean pelanggan panjang.',
+        tradeOff:
+          'Memerlukan rancangan tata letak kisi menu yang lebih padat dan efisien.',
       },
     ],
     execution: [
       {
-        phase: 'Curriculum & Rubric Engine Design',
-        deliverable: 'Multi-Round Scenario Bank & Deterministic Scoring Spec',
-        outcome: 'Created repeatable challenge modules across PM, Marketing, and Ops tracks.',
+        phase: 'Fase 1: Riset Lapangan & Arsitektur Sinkronisasi',
+        deliverable: 'Mesin status sinkronisasi offline, kontrak data order, dan prototipe kasir',
+        outcome: 'Disetujui oleh tim operasional outlet tanpa ambiguitas ruang lingkup.',
       },
       {
-        phase: 'Live Arena Web App & Event Execution',
-        deliverable: 'Real-Time Submission Portal & Stage Comparison View',
-        outcome: 'Executed live competitive sessions with high participant completion and engagement.',
+        phase: 'Fase 2: Core POS Engine & Integrasi KDS',
+        deliverable: 'Antrean pesanan idempoten, modul split-bill, dan live ticket KDS',
+        outcome: 'Lolos uji stres 200 pesanan beruntun dalam kondisi simulasi packet loss.',
+      },
+      {
+        phase: 'Fase 3: Pilot Multi-Outlet & Otomasi WhatsApp',
+        deliverable: 'Peluncuran live pilot, gateway pembayaran QRIS, dan bot rekap WhatsApp',
+        outcome: 'Diadopsi oleh lebih dari 1.200 bisnis kuliner aktif dengan nol kasus pesanan hilang.',
       },
     ],
     risksAndTradeOffs: [
       {
-        risk: 'API latency spikes when all participants submit at the round buzzer.',
+        risk: 'Konflik penyuntingan tagihan meja yang sama dari dua kasir saat kondisi offline.',
         mitigation:
-          'Implemented queued request throttling with live progress status indicators and staggered round timers.',
+          'Menerapkan event-log merging deterministik berdasarkan baris item UUID dan terminal lock primer per meja.',
+      },
+      {
+        risk: 'Kompatibilitas driver printer struk termal yang beragam di lapangan.',
+        mitigation:
+          'Menyusun template perintah byte mentah ESC/POS standar dengan print-bridge berbasis Web Bluetooth/USB.',
       },
     ],
     outcomes: [
-      'Trained cross-functional professionals to move from casual prompting to structured, testable AI workflows.',
-      'Delivered a reusable educational platform supporting live competitive rounds and post-event case reviews.',
+      'Menghilangkan pesanan hilang atau duplikat tiket dapur akibat gangguan koneksi Wi-Fi di outlet pilot.',
+      'Mempersingkat waktu training kasir baru dari 3 hari menjadi 4 jam berkat antarmuka sentuh satu layar yang intuitif.',
+      'Mempercepat penutupan buku shift harian melalui otomasi pelaporan penjualan ke WhatsApp pemilik bisnis.',
     ],
     lessonsLearned: [
-      'Side-by-side comparison of two prompts on the same edge-case input teaches more in 3 minutes than an hour of lecture.',
+      'Mendesain software POS di ruang kantor ber-AC tidak pernah mencerminkan tekanan mental kasir di jam sibuk makan malam; observasi langsung di gerai menyelamatkan berminggu-minggu pekerjaan ulang.',
     ],
     evidence: [
       {
-        type: 'diagram',
-        title: 'Prompt Evaluation Rubric & Round Mechanics',
-        url: '/cases/prompt-battle#mechanics',
-        caption: 'Scoring breakdown combining deterministic schema checks, edge-case traps, and structured output quality.',
+        type: 'video',
+        title: 'Video Demonstrasi Operasional mfood.id',
+        url: '/videos/demo-mfood.mp4',
+        caption: 'Rekaman demonstrasi sistem kasir offline-resilient dengan antrean transaksi IndexedDB.',
         metricsOrSpec: [
-          'Evaluation Pillars: Constraint Adherence · Accuracy · Edge-Case Resilience',
-          'Format: Timed Multi-Round Scenario Arena',
+          'Format: MP4 Video (Remotion)',
+          'Zero Latency Input Kasir',
+          'Offline-First IndexedDB Sync',
+        ],
+      },
+      {
+        type: 'link',
+        title: 'Live Ekosistem mfood.id',
+        url: 'https://mfood.id',
+        caption: 'Platform operasional bisnis kuliner terintegrasi live di internet.',
+        metricsOrSpec: [
+          'Adopsi: 1.248+ Bisnis Kuliner Aktif',
+          'Fitur: POS, KDS, Titik Mangkal, QRIS, WA Report',
+          'Sync: Offline-Resilient IndexedDB',
+        ],
+      },
+      {
+        type: 'diagram',
+        title: 'Arsitektur Offline-First Sync & KDS',
+        url: 'https://mfood.id',
+        caption: 'Diagram alur transisi status dari antrean IndexedDB lokal hingga acknowledgement stasiun dapur.',
+        metricsOrSpec: [
+          'Idempotent UUID Keys',
+          'WebSocket LAN Fallback Protocol',
         ],
       },
     ],
-    technologies: ['Next.js', 'TypeScript', 'LLM Evaluation Rubrics', 'Real-Time Scoreboard'],
-    publicUrl: '/cases/prompt-battle',
-  },
-  {
-    slug: 'revops-campaign-engine',
-    title: 'RevOps Campaign Engine — Automated Multi-Channel Marketing Operations',
-    category: ['Marketing Operations', 'Software Systems'],
-    summary:
-      'End-to-end marketing operations workflow unifying UTM attribution, automated lead qualification routing, and CRM SLA tracking.',
-    role: 'Marketing Operations Project Manager',
-    period: '2024 — 2025',
-    projectStatus: 'Operational Workflow',
-    relevanceRank: 6,
-    bannerImage: '/products/revops-banner.svg',
-    galleryImages: [
-      {
-        url: '/products/revops-banner.svg',
-        title: 'Automated Lead Attribution & SLA Router',
-        caption: 'Sub-minute webhook dispatch and WhatsApp alerts with 98.4% on-time response.',
-      },
+    technologies: [
+      'Astro & React',
+      'TypeScript',
+      'IndexedDB',
+      'WebSockets',
+      'PostgreSQL & Redis',
+      'Tailwind CSS',
+      'QRIS Payment',
+      'WhatsApp API',
     ],
-    overview:
-      'RevOps Campaign Engine standardizes how multi-channel marketing campaigns capture, enrich, score, and route inbound leads to sales representatives without manual spreadsheet exports.',
-    context:
-      'Marketing campaigns ran across multiple paid and organic channels, but lead capture forms dumped raw rows into disconnected spreadsheets, causing slow sales follow-up and broken attribution.',
-    problem:
-      'Sales reps received unvalidated leads hours late without campaign context, while marketing could not trace which channel or creative generated qualified pipeline.',
-    objectives: [
-      'Enforce a standardized UTM and campaign taxonomy before any campaign goes live.',
-      'Automate instant lead validation, deduplication, and round-robin CRM assignment.',
-      'Track first-response SLA compliance and stage conversion across channels.',
-    ],
-    constraints: [
-      'Had to integrate with existing CRM and landing page tools without purchasing expensive enterprise middleware.',
-      'Required zero disruption to active ongoing paid campaigns during migration.',
-    ],
-    responsibilities: [
-      'Audited end-to-end lead flow from ad click to sales qualification.',
-      'Designed the standardized campaign naming generator, webhook payload schema, and lead routing rules.',
-      'Managed implementation, webhook testing, and sales rep handoff training.',
-    ],
-    teamAndStakeholders: [
-      '1 Marketing Operations PM (Rizal)',
-      'Performance Marketers, Content Leads & Outbound/Inbound Sales Reps',
-    ],
-    approach: [
-      'Created a single governed UTM taxonomy builder with validation rules so non-compliant URLs could not be published.',
-      'Implemented automated webhook normalization that strips malformed phone/email inputs, checks existing CRM records, and assigns territory owners.',
-    ],
-    keyDecisions: [
-      {
-        decision: 'Gate campaign launch approval on mandatory UTM & webhook test verification.',
-        rationale:
-          'Fixing broken attribution after ad spend is deployed is impossible; pre-launch verification catches 100% of tracking gaps.',
-        tradeOff:
-          'Added a 15-minute pre-flight QA step to the campaign launch checklist.',
-      },
-    ],
-    execution: [
-      {
-        phase: 'Taxonomy & Pipeline Audit',
-        deliverable: 'Unified Attribution Schema & Lead Lifecycle State Definitions',
-        outcome: 'Aligned marketing and sales on a single definition of Marketing Qualified Lead (MQL).',
-      },
-      {
-        phase: 'Automation & SLA Alerting Rollout',
-        deliverable: 'Webhook Routing Pipeline & Sales Response Alerting',
-        outcome: 'Replaced manual daily CSV imports with automated real-time handoff.',
-      },
-    ],
-    risksAndTradeOffs: [
-      {
-        risk: 'Webhook failures silently dropping inbound leads if downstream CRM API times out.',
-        mitigation:
-          'Configured dead-letter fallback logging to a monitored backup sheet with automatic retry alerts.',
-      },
-    ],
-    outcomes: [
-      'Eliminated manual CSV lead exports between marketing landing pages and sales CRM.',
-      'Established 100% campaign UTM attribution consistency across active acquisition channels.',
-      'Enabled transparent SLA tracking for inbound lead follow-up.',
-    ],
-    lessonsLearned: [
-      'Marketing operations succeeds when compliance is built into the tool (dropdown generators) rather than policed via manual reminders.',
-    ],
-    evidence: [
-      {
-        type: 'diagram',
-        title: 'Lead Attribution & Automated CRM Routing Pipeline',
-        url: '/cases/revops-campaign-engine#routing',
-        caption: 'Flow from Governed UTM Capture → Webhook Validation & Deduplication → Round-Robin Assignment → SLA Escalation.',
-        metricsOrSpec: [
-          'Handoff Mode: Automated Webhook + Dead-Letter Fallback',
-          'Taxonomy: Standardized Source / Medium / Campaign / Creative Schema',
-        ],
-      },
-    ],
-    technologies: ['Marketing Operations', 'Webhook Automation', 'CRM Workflows', 'Attribution Modeling'],
-    publicUrl: '/cases/revops-campaign-engine',
+    publicUrl: 'https://mfood.id',
   },
 ];
 
@@ -864,6 +813,7 @@ export interface ExperienceItem {
   role: string;
   organization: string;
   period: string;
+  location?: string;
   scope: string;
   summary: string;
   contributions: string[];
@@ -872,47 +822,132 @@ export interface ExperienceItem {
 
 export const EXPERIENCE_TIMELINE: ExperienceItem[] = [
   {
-    id: 'exp-tpm-product',
-    role: 'Technical Project Manager — Product & Software Systems',
-    organization: 'Digital Product & Systems Delivery',
-    period: '2025 — Present',
-    scope: 'End-to-End Product Delivery · Cross-Functional Engineering & Design · AI Workflows',
+    id: 'exp-ihsanul-fikri',
+    role: 'Coding Teacher',
+    organization: 'SMA IHSANUL FIKRI MUNGKID',
+    period: 'August 2026 — Present (3 months)',
+    location: 'Magelang, Central Java, Indonesia',
+    scope: 'Bilingual Coding Instruction (ICIF) · SPMI Academic Quality · Computer Lab Operations · AI & Deep Learning Programs',
     summary:
-      'Leading project execution and systems analysis across multi-outlet SaaS POS, enterprise knowledge management, and talent assessment platforms.',
+      'Delivers 26 teaching hours weekly to over 200 students across 11 classes, including bilingual instruction for the International Class of Ihsanul Fikri (ICIF). Contributes to the Internal Quality Assurance System (SPMI) and oversees a 50+ device computer laboratory.',
     contributions: [
-      'Directed full project lifecycle from PRD authoring, state machine modeling, and WBS milestone planning to production pilot rollout for mFood POS.',
-      'Spearheaded taxonomy governance, RBAC workflow design, and 50-query RAG evaluation rubrics for the DIAMOND KMS enterprise release.',
-      'Delivered the Employr competency-based assessment MVP within an 8-week agile release window.',
+      'Taught 200+ students across 11 classes, delivering 26 teaching hours per week focused on coding, programming, and computational skills.',
+      'Taught 2 classes in the International Class of Ihsanul Fikri (ICIF) using a bilingual Indonesian-English teaching approach, delivering coding concepts and technical instruction in both languages.',
+      'Contributed to the school’s Internal Quality Assurance System (SPMI) to support continuous improvement of academic and learning processes.',
+      'Managed and maintained the school’s computer laboratory with 50+ devices, ensuring hardware and software readiness for daily learning activities.',
+      'Contributed to the development and implementation of Deep Learning and Coding & Artificial Intelligence (AI) learning programs at the senior high school level.',
     ],
-    relatedCaseSlugs: ['mfood-pos', 'diamond-kms', 'employr'],
+    relatedCaseSlugs: ['unilever-gt2'],
   },
   {
-    id: 'exp-ai-education',
-    role: 'Project Lead & Workflow Architect — AI & Applied Learning',
-    organization: 'AI Workflow Initiatives & Prompt Battle',
-    period: '2025 — 2026',
-    scope: 'AI Evaluation Systems · Curriculum Architecture · Live Platform Delivery',
+    id: 'exp-triagro',
+    role: 'Digital Marketing',
+    organization: 'PT Triagro Hijrah Jaya',
+    period: 'November 2025 — Present (1 year)',
+    location: 'Sukoharjo, Central Java, Indonesia',
+    scope: 'Digital Marketing Operations · Growth Acquisition · Marketing Channel Architecture',
     summary:
-      'Designing practical AI-enabled operational workflows and interactive evaluation arenas for cross-functional technology teams.',
+      'Directing digital marketing strategy, customer acquisition funnels, and digital promotion campaigns for agricultural supply chain services and product distribution.',
     contributions: [
-      'Architected and launched Prompt Battle, a live competitive prompt engineering and LLM evaluation platform.',
-      'Developed deterministic output validation and rubric scoring methodologies for non-technical and technical practitioners.',
+      'Planned and executed digital marketing campaigns across online channels to expand agricultural product reach and buyer engagement.',
+      'Coordinated operational marketing funnels, lead intake tracking, and sales conversion optimization.',
+      'Analyzed digital marketing campaign metrics and attribution performance to drive growth and customer retention.',
     ],
-    relatedCaseSlugs: ['prompt-battle', 'diamond-kms'],
+    relatedCaseSlugs: ['dashboard-oee'],
   },
   {
-    id: 'exp-systems-revops',
-    role: 'Project Manager — Field Systems & Marketing Operations',
-    organization: 'AgriTech & Growth Operations Projects',
-    period: '2024 — 2025',
-    scope: 'Supply Chain Digitization · RevOps Automation · Stakeholder Coordination',
+    id: 'exp-movio-studio',
+    role: 'Information Technology Team Lead & General Project Manager',
+    organization: 'Movio Studio (PT Movio Kreasi Indonesia)',
+    period: 'November 2025 — September 2026 (11 months)',
+    location: 'Kota Tangerang Selatan, Banten, Indonesia',
+    scope: 'IT Team Lead (May 2026 — Sep 2026) · General Project Manager (Nov 2025 — May 2026)',
     summary:
-      'Coordinating field-ready operational software and automated marketing-to-sales data pipelines.',
+      'Led the IT engineering department and governed studio project delivery, coordinating software engineering sprints, technical architecture, and cross-functional creative operations.',
     contributions: [
-      'Managed mobile-first field intake and weighbridge variance reconciliation workflows for Triagro agricultural supply chain tracking.',
-      'Built automated UTM governance, webhook lead deduplication, and CRM handoff pipelines for the RevOps Campaign Engine.',
+      'Served as Information Technology Team Lead (May 2026 — Sep 2026), managing engineering sprints, system architecture, and tech implementation.',
+      'Served as General Project Manager (Nov 2025 — May 2026), orchestrating end-to-end creative and technology project timelines, scope, and cross-team deliverables.',
+      'Standardized project tracking rituals and technical documentation, ensuring on-time project delivery across departments.',
     ],
-    relatedCaseSlugs: ['triagro', 'revops-campaign-engine'],
+    relatedCaseSlugs: ['unilever-gt2'],
+  },
+  {
+    id: 'exp-cont-solutions',
+    role: 'IT Project Manager',
+    organization: 'Cont Solutions Indonesia',
+    period: 'June 2024 — November 2025 (1 year 6 months)',
+    location: 'Yogyakarta, Indonesia',
+    scope: 'Client Software Solutions · Agile Sprint Management · System Architecture Alignment',
+    summary:
+      'Managed end-to-end IT solution deliverables and client software projects, translating business requirements into clear technical specifications and agile sprint milestones.',
+    contributions: [
+      'Directed sprint planning, backlog grooming, and milestone delivery across software engineers, UI/UX designers, and QA teams.',
+      'Bridged communication between enterprise clients and development teams to ensure technical specifications matched operational needs.',
+      'Mitigated technical dependencies, managed delivery risks, and ensured high standards of software quality and system stability.',
+    ],
+    relatedCaseSlugs: ['mfood', 'dashboard-oee'],
+  },
+  {
+    id: 'exp-gemala-kempa',
+    role: 'Product Development Intern',
+    organization: 'PT Gemala Kempa Daya',
+    period: 'June 2024 — August 2024 (3 months)',
+    location: 'North Jakarta, Jakarta, Indonesia',
+    scope: 'Product Development · Technical Component Specifications · Quality Assurance',
+    summary:
+      'Supported industrial manufacturing product development lifecycles, technical component specifications, and quality validation processes.',
+    contributions: [
+      'Assisted product engineering teams in preparing technical drawings, component specifications, and product validation protocols.',
+      'Collaborated with production and quality control departments to review manufacturing tolerances and assembly workflows.',
+      'Conducted process evaluations and documented actionable insights to enhance product quality and development cycle time.',
+    ],
+    relatedCaseSlugs: [],
+  },
+  {
+    id: 'exp-it-club-upn',
+    role: 'Head of Project Manager Departement & Staff PM',
+    organization: 'Information Technology Club UPN Veteran Yogyakarta',
+    period: 'February 2022 — August 2024 (2 years 7 months)',
+    location: 'Sleman Regency, Yogyakarta, Indonesia',
+    scope: 'Head of Department (Feb 2023 — Aug 2024) · Staff Project Manager (Feb 2022 — 2023)',
+    summary:
+      'Spearheaded the Project Management Department for over 2.5 years, mentoring 5 Project Managers who successfully handled 10 final digital software projects.',
+    contributions: [
+      'Became the Project Manager Leader leading 5 Project Managers who successfully handled 10 Final Projects for the Information Technology Club.',
+      'Established standardized agile project governance frameworks, sprint rituals, and milestone tracking templates for student development teams.',
+      'Served as Staff Project Manager (2022 — 2023), coordinating early student software projects and cross-functional technology workshops.',
+    ],
+    relatedCaseSlugs: ['employr'],
+  },
+  {
+    id: 'exp-1000-startup',
+    role: 'Hustler and Hacker',
+    organization: 'Gerakan Nasional 1000 Startup Digital',
+    period: 'February 2024 — July 2024 (6 months)',
+    location: 'Yogyakarta, Indonesia',
+    scope: 'Startup Incubation · Business Model Validation · MVP Prototyping',
+    summary:
+      'Participated in the national startup incubation program, validating problem-solution fit, designing business models, and developing rapid technology prototypes.',
+    contributions: [
+      'Conducted customer problem interviews, market validation, and value proposition design under national startup incubation mentorship.',
+      'Synthesized business requirements into workable technology MVP architectures and pitch deck demonstrations.',
+    ],
+    relatedCaseSlugs: [],
+  },
+  {
+    id: 'exp-sinaou-education',
+    role: 'Co-Founder and Product Manager',
+    organization: 'Sinaou Education',
+    period: 'June 2023 — March 2024 (10 months)',
+    location: 'Sleman Regency, Yogyakarta, Indonesia',
+    scope: 'EdTech Product Strategy · User Research · Curriculum Development',
+    summary:
+      'Co-founded and drove product management for an educational platform, leading user research, curriculum alignment, and early MVP releases.',
+    contributions: [
+      'Defined product vision, user journey maps, and feature backlogs based on feedback from students and educators.',
+      'Coordinated agile product releases with student developers and designed engaging learning curriculum materials.',
+    ],
+    relatedCaseSlugs: [],
   },
 ];
 
@@ -931,125 +966,311 @@ export interface SystemWorkflowPillar {
   appliedInTitle: string;
 }
 
+export interface TechStackItem {
+  id: string;
+  name: string;
+  category: string;
+  role: string;
+  description: string;
+  badgeHex: string;
+}
+
+export const TECH_STACK_SYSTEMS: TechStackItem[] = [
+  // Agen AI & Routing
+  {
+    id: 'antigravity',
+    name: 'Antigravity',
+    category: 'Agen AI & Routing',
+    role: 'Asisten Coding Agentic',
+    description: 'Refactoring multi-berkas mandiri, eksekusi terminal, dan agen pair-programming oleh Google DeepMind.',
+    badgeHex: '#8B5CF6',
+  },
+  {
+    id: '9router',
+    name: '9Router',
+    category: 'Agen AI & Routing',
+    role: 'Smart AI Proxy & Gateway',
+    description: 'Proxy lokal kompatibel OpenAI dengan router fallback ke 60+ provider dan kompresi token (RTK).',
+    badgeHex: '#6366F1',
+  },
+  {
+    id: 'claude',
+    name: 'Claude',
+    category: 'Agen AI & Routing',
+    role: 'Penalaran Mendalam & Arsitektur',
+    description: 'Desain sistem, penyusunan PRD, dan verifikasi logika kompleks oleh Anthropic.',
+    badgeHex: '#D97706',
+  },
+  {
+    id: 'codex',
+    name: 'Codex / OpenAI',
+    category: 'Agen AI & Routing',
+    role: 'Sintesis Kode & Otomasi',
+    description: 'Prototyping cepat, pembuatan harness pengujian otomatis, dan otomasi skrip teknis.',
+    badgeHex: '#10A37F',
+  },
+  {
+    id: 'hermes',
+    name: 'Hermes',
+    category: 'Agen AI & Routing',
+    role: 'Harness Agen Otonom',
+    description: 'Alur kerja agen berbasis pemanggilan tool dan evaluasi mandiri pada model open-weight oleh Nous Research.',
+    badgeHex: '#F59E0B',
+  },
+  {
+    id: 'museai',
+    name: 'Muse AI',
+    category: 'Agen AI & Routing',
+    role: 'Otomasi Alur Kerja & Media',
+    description: 'Eksekusi tugas personal berbasis agen cerdas dan pengindeksan media otomatis.',
+    badgeHex: '#EC4899',
+  },
+  // Frontend & 3D
+  {
+    id: 'astro',
+    name: 'Astro',
+    category: 'Frontend & 3D',
+    role: 'Static Site Generation (SSG)',
+    description: 'Arsitektur islands Zero-JS by default yang menghasilkan Core Web Vitals optimal dan SEO maksimal.',
+    badgeHex: '#FF5D01',
+  },
+  {
+    id: 'threejs',
+    name: 'Three.js',
+    category: 'Frontend & 3D',
+    role: 'Dunia Virtual Spasial 3D',
+    description: 'Rendering WebGL, kamera isometrik, pencahayaan realistis, dan ruangan spasial interaktif.',
+    badgeHex: '#38BDF8',
+  },
+  {
+    id: 'nextjs',
+    name: 'Next.js',
+    category: 'Frontend & 3D',
+    role: 'Framework React Fullstack',
+    description: 'Server-side rendering, API routes modular, dan portal interaktif modern berbasis client-side.',
+    badgeHex: '#E2E8F0',
+  },
+  // Backend & Data
+  {
+    id: 'nestjs',
+    name: 'NestJS',
+    category: 'Backend & Data',
+    role: 'Backend TypeScript Enterprise',
+    description: 'Arsitektur modular, dependency injection, dan REST API microservices yang terstruktur.',
+    badgeHex: '#E0234E',
+  },
+  {
+    id: 'postgres',
+    name: 'PostgreSQL',
+    category: 'Backend & Data',
+    role: 'Engine Database Relasional',
+    description: 'Penyimpanan data terstruktur, transaksi ACID, relasi kompleks, dan indexing performa tinggi.',
+    badgeHex: '#336791',
+  },
+  {
+    id: 'supabase',
+    name: 'Supabase',
+    category: 'Backend & Data',
+    role: 'Backend-as-a-Service (BaaS)',
+    description: 'PostgreSQL terkelola, row-level security (RLS), autentikasi instan, dan realtime pub/sub.',
+    badgeHex: '#3ECF8E',
+  },
+  // Manajemen Proyek
+  {
+    id: 'jira',
+    name: 'Jira',
+    category: 'Manajemen Proyek',
+    role: 'Tata Kelola Sprint Agile & Epic',
+    description: 'Pelacakan sprint, backlog grooming, siklus rilis, dan peta jalan milestone lintas tim.',
+    badgeHex: '#0052CC',
+  },
+  {
+    id: 'trello',
+    name: 'Trello',
+    category: 'Manajemen Proyek',
+    role: 'Papan Visual Kanban',
+    description: 'Pelacakan WIP cepat, delegasi tugas vertical slice, dan papan koordinasi standup harian.',
+    badgeHex: '#0079BF',
+  },
+  {
+    id: 'spreadsheet',
+    name: 'Google Spreadsheet',
+    category: 'Manajemen Proyek',
+    role: 'Matriks Data & Rubrik Nilai',
+    description: 'Estimasi WBS proyek, rubrik penilaian 200+ siswa, serta inventarisasi hardware lab.',
+    badgeHex: '#0F9D58',
+  },
+  // Kreatif & Media
+  {
+    id: 'canva',
+    name: 'Canva',
+    category: 'Kreatif & Media',
+    role: 'Komunikasi Visual & Presentasi',
+    description: 'Wireframing UI cepat, pitch deck proyek, infografis, dan materi slide edukatif.',
+    badgeHex: '#00C4CC',
+  },
+  {
+    id: 'capcut',
+    name: 'CapCut',
+    category: 'Kreatif & Media',
+    role: 'Video Demo & Walkthrough',
+    description: 'Produksi video reel demo software, cuplikan tutorial coding, dan video kampanye digital.',
+    badgeHex: '#FFFFFF',
+  },
+];
+
 export const SYSTEMS_WORKFLOWS: SystemWorkflowPillar[] = [
   {
     id: 'sys-planning',
     number: '01',
-    title: 'Scope Decomposition & Critical Path Planning',
-    subtitle: 'Turning ambiguous business goals into verifiable vertical slices',
+    title: 'Dekomposisi Lingkup & Perencanaan Jalur Kritis',
+    subtitle: 'Mengubah tujuan bisnis abstrak menjadi deliverable sprint yang terverifikasi',
     description:
-      'Every project begins by separating core operational invariants from nice-to-have surface polish. Scope is decomposed into testable vertical slices with explicit Definition of Done criteria.',
+      'Setiap proyek dimulai dengan memisahkan fungsi operasional inti dari fitur pelengkap sekunder. Lingkup didekomposisi menjadi vertical slice teruji dengan kriteria Definition of Done (DoD) yang eksplisit.',
     practices: [
-      'Work Breakdown Structure (WBS) mapped to user-visible state transitions rather than isolated frontend/backend tasks.',
-      'Explicit Non-Goals documented in every PRD to prevent mid-sprint scope creep.',
-      'Three-phase vertical slice delivery: Core Data Contract → Happy-Path Vertical Slice → Failure-Mode & Fallback Hardening.',
+      'Work Breakdown Structure (WBS) dipetakan ke transisi status yang terlihat oleh pengguna, bukan sekadar tugas frontend/backend terisolasi.',
+      'Non-Goals dicatat secara eksplisit dalam setiap PRD untuk mencegah pembengkakan lingkup (scope creep) di tengah sprint.',
+      'Pengiriman vertical slice tiga tahap: Kontrak Data Inti → Happy-Path Vertical Slice → Penguatan Penanganan Mode Kegagalan & Fallback.',
     ],
     toolsUsed: [
       {
-        name: 'Linear / Jira & Structured PRDs',
-        applicationContext: 'Used in mFood POS to sequence offline IndexedDB queuing ahead of secondary reporting dashboards.',
+        name: 'Linear / Jira & PRD Terstruktur',
+        applicationContext: 'Digunakan di mFood POS untuk memprioritaskan antrean offline IndexedDB sebelum dashboard pelaporan sekunder.',
       },
       {
-        name: 'State Machine & Sequence Diagrams',
-        applicationContext: 'Used to align frontend, backend, and QA on idempotent order sync and KDS ticket acknowledgement.',
+        name: 'State Machine & Diagram Sekuen',
+        applicationContext: 'Digunakan untuk menyelaraskan tim frontend, backend, dan QA pada sinkronisasi pesanan idempoten serta konfirmasi tiket KDS.',
       },
     ],
     appliedInSlug: 'mfood-pos',
-    appliedInTitle: 'mFood POS — Offline Queue Architecture',
+    appliedInTitle: 'mFood POS — Arsitektur Antrean Offline',
   },
   {
     id: 'sys-risk',
     number: '02',
-    title: 'Dependency Governance & Risk Trade-off Matrices',
-    subtitle: 'Surfacing constraints early and documenting explicit trade-offs',
+    title: 'Tata Kelola Dependensi & Matriks Trade-off Risiko',
+    subtitle: 'Mengidentifikasi batasan teknis lebih awal dan mendokumentasikan keputusan trade-off eksplisit',
     description:
-      'Technical and operational risks are tracked as living hypotheses with concrete pre-mortem mitigations, ensuring stakeholders understand why specific architectural trade-offs were chosen.',
+      'Risiko teknis dan operasional dilacak sebagai hipotesis hidup dengan mitigasi pre-mortem konkret, memastikan pemangku kepentingan memahami alasan di balik pemilihan trade-off arsitektur tertentu.',
     practices: [
-      'Pre-mortem failure simulation (e.g. testing POS behavior under deliberate router disconnection or webhook dead-letter fallback).',
-      'Decision logs recording Decision, Rationale, and Trade-off so future team members understand historical context.',
-      'Hardware, bandwidth, and user ergonomics audited in real field conditions before code freeze.',
+      'Simulasi kegagalan pre-mortem (misalnya pengujian perilaku POS saat koneksi terputus atau pengujian fallback dead-letter webhook).',
+      'Log keputusan yang mencatat Keputusan, Alasan (Rationale), dan Trade-off agar anggota tim baru memahami konteks historis.',
+      'Audit perangkat keras, kapasitas bandwidth, dan ergonomi pengguna langsung di lapangan sebelum fase code freeze.',
     ],
     toolsUsed: [
       {
-        name: 'Risk Register & Decision Matrix',
-        applicationContext: 'Used in Triagro to select a lightweight PWA with 3-tap field intake over a heavy native mobile build.',
+        name: 'Risk Register & Matriks Keputusan',
+        applicationContext: 'Digunakan di Triagro untuk memilih PWA ringan dengan intake lapangan 3-ketukan dibandingkan aplikasi mobile native yang berat.',
       },
       {
-        name: 'Pre-Flight QA Gate Checklists',
-        applicationContext: 'Used in RevOps Campaign Engine to block unverified UTM links before paid media launch.',
+        name: 'Daftar Periksa Gerbang QA Pra-Rilis',
+        applicationContext: 'Digunakan di RevOps Campaign Engine untuk memblokir link UTM yang belum terverifikasi sebelum kampanye media berbayar diluncurkan.',
       },
     ],
     appliedInSlug: 'triagro',
-    appliedInTitle: 'Triagro — Field Supply Chain Traceability',
+    appliedInTitle: 'Triagro — Keterlacakan Rantai Pasok Lapangan',
   },
   {
     id: 'sys-ai',
     number: '03',
-    title: 'AI-Enabled Workflows & Deterministic Evaluation',
-    subtitle: 'Grounding LLMs with verified citations, schemas, and human-in-the-loop rubrics',
+    title: 'Alur Kerja Berbasis AI & Evaluasi Deterministik',
+    subtitle: 'Melandaskan model AI dengan sitasi terverifikasi, skema ketat, dan rubrik evaluasi manusia',
     description:
-      'AI features are treated as systems engineering problems—never unverified magic. Every LLM workflow is bounded by strict input hygiene, RBAC metadata filtering, citation links, and golden-dataset evaluation.',
+      'Fitur AI diperlakukan sebagai disiplin rekayasa sistem—bukan keajaiban tanpa verifikasi. Setiap alur kerja AI dibatasi oleh sanitasi input yang ketat, filter metadata RBAC, tautan sitasi, dan evaluasi berbasis golden dataset.',
     practices: [
-      'Citation-first retrieval: every synthesized policy claim must link to an approved source paragraph and effective date.',
-      'Golden-dataset regression testing across real edge-case queries before internal deployment.',
-      'Explicit refusal states when source documentation is missing or confidence is below threshold.',
+      'Pengambilan berbasis sitasi: setiap pernyataan kebijakan yang disintesis harus terhubung ke paragraf sumber resmi dan tanggal efektif.',
+      'Pengujian regresi dengan golden dataset mencakup skenario kasus batas (edge case) nyata sebelum rilis internal.',
+      'Status penolakan (refusal) eksplisit jika dokumen sumber tidak ditemukan atau tingkat keyakinan sistem di bawah ambang batas.',
     ],
     toolsUsed: [
       {
-        name: 'RAG Evaluation Rubrics & Golden Datasets',
-        applicationContext: 'Used in DIAMOND KMS to verify 50 real operational escalation queries with zero policy fabrication.',
+        name: 'Rubrik Evaluasi RAG & Golden Dataset',
+        applicationContext: 'Digunakan di DIAMOND KMS untuk memvalidasi 50 kueri eskalasi operasional nyata dengan tingkat fabrikasi kebijakan nol persen.',
       },
       {
-        name: 'Deterministic Output Validators',
-        applicationContext: 'Used in Prompt Battle to score participant prompts against schema, constraint, and edge-case traps.',
+        name: 'Validator Output Deterministik',
+        applicationContext: 'Digunakan di Prompt Battle untuk menilai prompt peserta terhadap skema JSON, batasan token, dan jebakan skenario batas.',
       },
     ],
     appliedInSlug: 'diamond-kms',
-    appliedInTitle: 'DIAMOND KMS — Enterprise SOP Retrieval',
+    appliedInTitle: 'DIAMOND KMS — Penelusuran SOP Perusahaan',
   },
   {
     id: 'sys-collab',
     number: '04',
-    title: 'Cross-Functional Engineering, Design & Ops Rituals',
-    subtitle: 'Bridging technical architecture, UX ergonomics, and frontline operations',
+    title: 'Ritual Rekayasa Lintas Fungsi, Desain & Operasional',
+    subtitle: 'Menjembatani arsitektur teknis, ergonomi UX, dan operasional garis depan',
     description:
-      'Effective project management eliminates translation loss between engineers, product designers, and business stakeholders through shared artifacts, API contracts, and frontline user shadowing.',
+      'Manajemen proyek yang efektif menghilangkan distorsi komunikasi antara engineer, desainer produk, dan pemangku kepentingan bisnis melalui artefak bersama, kontrak API, serta observasi langsung pengguna garis depan.',
     practices: [
-      'Joint API & UI contract reviews during Sprint 0 so frontend and backend engineers build in parallel without blocking.',
-      'Frontline user shadowing (cashiers, recruiters, field collectors) to ground UX decisions in real operational constraints.',
-      'Structured UAT sign-off checklists executed alongside department champions.',
+      'Tinjauan bersama kontrak API & UI pada Sprint 0 sehingga tim frontend dan backend dapat membangun sistem secara paralel tanpa saling memblokir.',
+      'Observasi langsung pengguna garis depan (kasir, recruiter, petugas lapangan) untuk melandaskan keputusan UX pada kendala operasional nyata.',
+      'Daftar periksa persetujuan UAT terstruktur yang dieksekusi langsung bersama para penanggung jawab departemen.',
     ],
     toolsUsed: [
       {
-        name: 'Figma Wireframes & Behavioral Rubrics',
-        applicationContext: 'Used in Employr to align recruiters and hiring managers on 4-point behavioral anchor scorecards.',
+        name: 'Wireframe Figma & Rubrik Perilaku',
+        applicationContext: 'Digunakan di Employr untuk menyelaraskan recruiter dan hiring manager pada scorecard rubrik perilaku 4-poin.',
       },
       {
-        name: 'API Schema & Webhook Contracts',
-        applicationContext: 'Used across POS, KMS, and RevOps pipelines to decouple frontend state from backend services.',
+        name: 'Skema API & Kontrak Webhook',
+        applicationContext: 'Digunakan di POS, KMS, dan pipeline RevOps untuk memisahkan state frontend dari layanan backend secara modular.',
       },
     ],
     appliedInSlug: 'employr',
-    appliedInTitle: 'Employr — Competency Assessment Pipeline',
+    appliedInTitle: 'Employr — Pipeline Asesmen Kompetensi',
   },
 ];
 
+export type TechStackSystem = TechStackItem;
+
 export const CONTACT_INFO = {
   name: 'Rizal',
-  title: 'Technical Project Manager',
+  fullName: 'Rizal Hanifa Pratama',
+  title: 'Guru Koding @ SMA IHSANUL FIKRI MUNGKID | Komunikasi Bilingual, Pengembangan Digitalisasi',
+  shortTitle: 'Guru Koding & Manajer Proyek IT',
   positioning:
-    'Working at the intersection of project execution, product development, software systems, and AI-enabled workflows.',
-  tagline: 'Explore the work. Understand the thinking. See the impact.',
-  email: 'edusales.id@gmail.com',
-  linkedinUrl: 'https://www.linkedin.com/in/rizal-pm/',
-  linkedinLabel: 'linkedin.com/in/rizal-pm',
+    'Guru Koding @ SMA IHSANUL FIKRI MUNGKID & Manajer Proyek IT (S1 Informatika). Berpengalaman dalam pengajaran bilingual ICIF, penjaminan mutu SPMI, operasional lab 50+ unit, dan implementasi sistem perangkat lunak.',
+  summary:
+    'Sebagai Guru Koding di SMA IHSANUL FIKRI MUNGKID, saya mengampu 26 jam mengajar per minggu untuk lebih dari 200 siswa di 11 kelas, termasuk instruksi bilingual untuk International Class of Ihsanul Fikri (ICIF). Saya juga berkontribusi dalam Sistem Penjaminan Mutu Internal (SPMI) guna meningkatkan standar akademik dan pembelajaran, serta mengelola operasional laboratorium komputer berisi 50+ perangkat untuk kesiapan aktivitas pendidikan harian. Lulusan S1 Informatika dari UPN Veteran Yogyakarta dengan keahlian pengembangan digitalisasi, komunikasi bilingual, dan pelatihan pendidik. Berkomitmen menumbuhkan keterampilan komputasi dan pemrograman sekaligus mendorong keunggulan akademik dan inovasi teknis di lingkungan pendidikan.',
+  tagline: 'Mendorong pemikiran komputasional, standar mutu akademik, dan implementasi solusi IT praktis.',
+  email: 'rizalhp12345@gmail.com',
+  linkedinUrl: 'https://www.linkedin.com/in/riizalhp',
+  linkedinLabel: 'linkedin.com/in/riizalhp',
+  websiteUrl: 'https://riizalhp.web.id',
+  websiteLabel: 'riizalhp.web.id',
   cvDownloadUrl: '/api/cv',
-  location: 'Indonesia · Open to Remote & Hybrid Roles',
+  location: 'Semarang, Jawa Tengah, Indonesia',
   focusAreas: [
-    'Technical Project Management & Agile Delivery',
-    'Product Scoping, PRD Authoring & Systems Analysis',
-    'Software Architecture Alignment & Risk Governance',
-    'AI-Enabled Workflows & RAG Evaluation Systems',
+    'Komunikasi Bilingual & Pengajaran Kelas Internasional (ICIF)',
+    'Pengembangan Kurikulum & Pendidikan Koding/AI',
+    'Pelatihan Pendidik & Sistem Penjaminan Mutu Internal (SPMI)',
+    'Manajemen Proyek IT, Agile Scrum & Kepemimpinan Tim',
+    'Pengembangan Digitalisasi & Operasional Lab Komputer',
+  ],
+  education: [
+    {
+      institution: 'Universitas Pembangunan Nasional Veteran Yogyakarta',
+      degree: 'S1 Informatika (Sarjana Komputer)',
+      period: 'Agustus 2021 — Juli 2025',
+    },
+    {
+      institution: 'SMA Ihsanul Fikri Mungkid',
+      degree: 'MIPA (Matematika & Ilmu Pengetahuan Alam)',
+      period: '2018 — 2021',
+    },
+  ],
+  certifications: [
+    'Project Execution: Running the Project (Google Career Certificates)',
+    'Project Planning: Putting It All Together (Google Career Certificates)',
+    'Project Management — Fresh Graduate Academy (Digitalent Kominfo)',
+    'Agile Scrum Certifications Training (CertiProf)',
+    'Sertifikasi Auditor Internal SPMI',
+  ],
+  topSkills: [
+    'Manajemen Proyek IT (Agile / Scrum)',
+    'Arsitektur Fullstack & Implementasi Sistem',
+    'Pendidikan Koding Bilingual & Pengembangan Kurikulum',
   ],
 };
 
@@ -1098,6 +1319,9 @@ export function filterAndSortProjects(
 }
 
 export function getProjectBySlug(slug: string): PortfolioProject | undefined {
+  if (slug === 'mfood-pos') return PORTFOLIO_PROJECTS.find((p) => p.slug === 'mfood');
+  if (slug === 'triagro') return PORTFOLIO_PROJECTS.find((p) => p.slug === 'dashboard-oee');
+  if (slug === 'diamond-kms') return PORTFOLIO_PROJECTS.find((p) => p.slug === 'unilever-gt2');
   return PORTFOLIO_PROJECTS.find((p) => p.slug === slug);
 }
 
