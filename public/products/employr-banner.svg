@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="100%" height="100%">
+  <defs>
+    <linearGradient id="emp-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#141517"/>
+      <stop offset="100%" stop-color="#18191c"/>
+    </linearGradient>
+    <linearGradient id="score-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="480" fill="url(#emp-bg)"/>
+
+  <!-- Subtle Grid -->
+  <g opacity="0.05" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="120" x2="960" y2="120"/>
+    <line x1="0" y1="240" x2="960" y2="240"/>
+    <line x1="0" y1="360" x2="960" y2="360"/>
+    <line x1="320" y1="0" x2="320" y2="480"/>
+    <line x1="640" y1="0" x2="640" y2="480"/>
+  </g>
+
+  <!-- Window Frame -->
+  <rect x="24" y="24" width="912" height="432" rx="12" fill="#17181a" stroke="#25272c" stroke-width="1.5"/>
+
+  <!-- Header -->
+  <path d="M 24 36 Q 24 24 36 24 L 924 24 Q 936 24 936 36 L 936 68 L 24 68 Z" fill="#1d1e22"/>
+  <circle cx="48" cy="46" r="5" fill="#e76b6b" opacity="0.8"/>
+  <circle cx="64" cy="46" r="5" fill="#e5b84b" opacity="0.8"/>
+  <circle cx="80" cy="46" r="5" fill="#46c98a" opacity="0.8"/>
+  <text x="110" y="50" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#e8e8e9">Employr · Competency Calibration &amp; Work-Sample Evaluation Board</text>
+  
+  <rect x="740" y="36" width="170" height="22" rx="11" fill="rgba(245,212,0,0.12)" stroke="#f5d400" stroke-width="0.8"/>
+  <circle cx="754" cy="47" r="3.5" fill="#f5d400"/>
+  <text x="766" y="51" font-family="Inter, sans-serif" font-size="10.5" font-weight="500" fill="#f5d400">Calibration Round: 03</text>
+
+  <!-- Left: Candidate List & Requisition (260px) -->
+  <rect x="24" y="68" width="260" height="388" fill="#141517" stroke="#232428" stroke-width="1"/>
+  <text x="44" y="98" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#77787c" letter-spacing="0.04em">ACTIVE REQUISITIONS</text>
+
+  <!-- Job Card -->
+  <rect x="36" y="112" width="236" height="54" rx="8" fill="#202227" stroke="#2c2e35" stroke-width="1"/>
+  <text x="48" y="134" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#e8e8e9">Senior Technical Project Manager</text>
+  <text x="48" y="152" font-family="monospace" font-size="10" fill="#38bdf8">REQ-082 · 14 Candidates Screened</text>
+
+  <text x="44" y="196" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#77787c" letter-spacing="0.04em">CALIBRATION SHORTLIST</text>
+
+  <!-- Candidate 1: Selected -->
+  <rect x="36" y="210" width="236" height="50" rx="8" fill="#26272e" stroke="#f5d400" stroke-width="1"/>
+  <circle cx="56" cy="235" r="14" fill="#38bdf8"/>
+  <text x="50" y="240" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#111827">RZ</text>
+  <text x="78" y="230" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#e8e8e9">Rizal H. P.</text>
+  <text x="78" y="248" font-family="monospace" font-size="10" fill="#46c98a">Score: 94.2% · Recommended</text>
+
+  <!-- Candidate 2 -->
+  <rect x="36" y="270" width="236" height="50" rx="8" fill="#181a1d" stroke="#23252a" stroke-width="1"/>
+  <circle cx="56" cy="295" r="14" fill="#64748b"/>
+  <text x="50" y="300" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#ffffff">AL</text>
+  <text x="78" y="290" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#a7a7aa">Alexandre L.</text>
+  <text x="78" y="308" font-family="monospace" font-size="10" fill="#77787c">Score: 78.5% · In Review</text>
+
+  <!-- Center & Right: Rubric Scoring Grid (652px) -->
+  <rect x="284" y="68" width="652" height="388" fill="#16171a"/>
+  
+  <text x="312" y="102" font-family="Inter, sans-serif" font-size="15" font-weight="600" fill="#e8e8e9">Rizal H. P. — Multi-Dimension Rubric Evaluation</text>
+  <text x="312" y="122" font-family="Inter, sans-serif" font-size="11" fill="#77787c">Evaluated across 4 core competency verticals based on real project evidence and WBS execution cases.</text>
+
+  <!-- Rubric 1: Scope & WBS Precision -->
+  <rect x="312" y="142" width="596" height="60" rx="8" fill="#1c1d22" stroke="#282a30" stroke-width="1"/>
+  <text x="328" y="166" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#e8e8e9">1. Scope, Vertical Slices &amp; Dependency Governance</text>
+  <text x="328" y="184" font-family="Inter, sans-serif" font-size="10.5" fill="#a7a7aa">Demonstrated with 10-week offline POS rollout and explicit risk mitigation register.</text>
+  <rect x="740" y="156" width="140" height="8" rx="4" fill="#24262d"/>
+  <rect x="740" y="156" width="134" height="8" rx="4" fill="#46c98a"/>
+  <text x="890" y="164" font-family="monospace" font-size="11" font-weight="600" fill="#46c98a">96%</text>
+
+  <!-- Rubric 2: Technical Architecture Alignment -->
+  <rect x="312" y="214" width="596" height="60" rx="8" fill="#1c1d22" stroke="#282a30" stroke-width="1"/>
+  <text x="328" y="238" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#e8e8e9">2. Systems Architecture &amp; Technical Fluency</text>
+  <text x="328" y="256" font-family="Inter, sans-serif" font-size="10.5" fill="#a7a7aa">Authored PRDs with state machine diagrams, zero-hallucination RAG pipelines, and DB contracts.</text>
+  <rect x="740" y="228" width="140" height="8" rx="4" fill="#24262d"/>
+  <rect x="740" y="228" width="130" height="8" rx="4" fill="#46c98a"/>
+  <text x="890" y="236" font-family="monospace" font-size="11" font-weight="600" fill="#46c98a">93%</text>
+
+  <!-- Rubric 3: Cross-Functional Alignment -->
+  <rect x="312" y="286" width="596" height="60" rx="8" fill="#1c1d22" stroke="#282a30" stroke-width="1"/>
+  <text x="328" y="310" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#e8e8e9">3. Cross-Functional Execution (Eng, Design, Ops)</text>
+  <text x="328" y="328" font-family="Inter, sans-serif" font-size="10.5" fill="#a7a7aa">Effective operational alignment reducing frontline cashier onboarding from 3 days to &lt; 4 hours.</text>
+  <rect x="740" y="300" width="140" height="8" rx="4" fill="#24262d"/>
+  <rect x="740" y="300" width="132" height="8" rx="4" fill="#46c98a"/>
+  <text x="890" y="308" font-family="monospace" font-size="11" font-weight="600" fill="#46c98a">94%</text>
+
+  <!-- Final Call to Action inside showcase -->
+  <rect x="312" y="362" width="596" height="54" rx="8" fill="#1b1c21" stroke="#2b2d35" stroke-width="1"/>
+  <text x="330" y="394" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#f5d400">★ Calibrated Candidate Outcome:</text>
+  <text x="510" y="394" font-family="Inter, sans-serif" font-size="12" fill="#e8e8e9">Hire Recommendation: Senior Technical PM Lead</text>
+</svg>

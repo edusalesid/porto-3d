@@ -31,6 +31,8 @@ export interface PortfolioProject {
   period: string;
   projectStatus: string;
   relevanceRank: number;
+  bannerImage?: string;
+  galleryImages?: { url: string; title: string; caption?: string }[];
   // 14-point Case Archive structure
   overview: string;
   context: string;
@@ -82,10 +84,10 @@ export const ROOMS: RoomMetadata[] = [
     name: 'Virtual Lobby',
     shortLabel: 'Lobby',
     code: '01',
-    purpose: 'Orientation & Executive Summary',
+    purpose: 'Orientasi & Ringkasan Eksekutif',
     summary:
-      'Central orientation hub introducing Rizal as a Technical Project Manager working at the intersection of project execution, product development, software systems, and AI-enabled workflows.',
-    ctaLabel: 'Explore Executive Summary',
+      'Pusat orientasi utama yang memperkenalkan profil Rizal sebagai Technical PM: tata kelola scope WBS, dependensi sprint, arsitektur sistem, dan workflow AI.',
+    ctaLabel: 'Jelajahi Ringkasan Eksekutif',
     cameraPosition: [0, 16.8, 23.0],
     cameraTarget: [0, 0.6, 1.8],
     roomCenter: [0, 0, 0],
@@ -98,13 +100,13 @@ export const ROOMS: RoomMetadata[] = [
   },
   {
     id: 'projects',
-    name: 'Project Room',
+    name: 'Projects Studio',
     shortLabel: 'Projects',
     code: '02',
-    purpose: 'Curated Project Directory & Delivery Proof',
+    purpose: 'Showcase Produk & Galeri Banner',
     summary:
-      'Interactive project workstation showcasing 6 verified projects across Product/SaaS, AI workflows, Software Systems, Marketing Operations, and Education.',
-    ctaLabel: 'Open Project Directory',
+      'Katalog 6 produk unggulan lengkap dengan banner visual, screenshot antarmuka, stack teknologi, metrik KPI nyata, dan ringkasan eksekusi.',
+    ctaLabel: 'Buka Showcase Produk',
     cameraPosition: [-15.5, 9.2, -0.5],
     cameraTarget: [-11.5, 1.5, -8.5],
     roomCenter: [-11.5, 0, -8.5],
@@ -120,10 +122,10 @@ export const ROOMS: RoomMetadata[] = [
     name: 'Systems Lab',
     shortLabel: 'Systems',
     code: '03',
-    purpose: 'Workflow Architecture, Risk & Technical Collaboration',
+    purpose: 'Arsitektur Sistem & Alur SOP',
     summary:
-      'Inside the operational engine: how problems are decomposed into WBS milestones, API contracts, risk registers, and human-in-the-loop AI workflows.',
-    ctaLabel: 'Inspect Systems & Workflows',
+      'Dokumentasi teknis PRD, diagram state machine sinkronisasi offline, pipa RAG bebas halusinasi dengan sitasi terverifikasi, dan alur kerja operasional.',
+    ctaLabel: 'Periksa Sistem & Alur Kerja',
     cameraPosition: [15.5, 9.2, -0.5],
     cameraTarget: [11.5, 1.5, -8.5],
     roomCenter: [11.5, 0, -8.5],
@@ -139,10 +141,10 @@ export const ROOMS: RoomMetadata[] = [
     name: 'Experience Gallery',
     shortLabel: 'Experience',
     code: '04',
-    purpose: 'Chronological Track Record & Role Scope',
+    purpose: 'Rekam Jejak Karir & Kepemimpinan',
     summary:
-      'Chronological timeline of project management engagements, product leadership roles, operational scope, and direct links to verified case studies.',
-    ctaLabel: 'View Timeline & Roles',
+      'Linimasa kronologis kepemimpinan proyek, lingkup tanggung jawab tim engineering & lintas divisi, serta portofolio delivery dari tahun ke tahun.',
+    ctaLabel: 'Lihat Linimasa & Peran',
     cameraPosition: [-16, 8.8, 13.5],
     cameraTarget: [-11.5, 1.5, 6.5],
     roomCenter: [-11.5, 0, 6.5],
@@ -158,10 +160,10 @@ export const ROOMS: RoomMetadata[] = [
     name: 'Case Archive',
     shortLabel: 'Cases',
     code: '05',
-    purpose: '14-Point Deep-Dive Case Studies',
+    purpose: 'Studi Kasus 14-Poin Mendalam',
     summary:
-      'Comprehensive architectural archive examining problem statements, constraints, key decisions, trade-offs, execution milestones, and lessons learned.',
-    ctaLabel: 'Read Deep-Dive Cases',
+      'Arsip analisis mendalam mencakup problem statement, batasan teknis (constraints), trade-offs, mitigasi risiko, fase eksekusi, hingga evaluasi lessons learned.',
+    ctaLabel: 'Baca Studi Kasus Lengkap',
     cameraPosition: [16, 8.8, 13.5],
     cameraTarget: [11.5, 1.5, 6.5],
     roomCenter: [11.5, 0, 6.5],
@@ -177,10 +179,10 @@ export const ROOMS: RoomMetadata[] = [
     name: 'Contact Lounge',
     shortLabel: 'Contact',
     code: '06',
-    purpose: 'Direct Communication, LinkedIn & CV Download',
+    purpose: 'Saluran Kolaborasi & Unduh CV',
     summary:
-      'Ready to collaborate on product delivery, technical project management, or operational systems? Connect directly via email, LinkedIn, or download the full CV.',
-    ctaLabel: 'Connect & Download CV',
+      'Ruang terhubung langsung dengan Rizal melalui email, profil LinkedIn, atau pengunduhan berkas CV terverifikasi (format print-ready & plain-text).',
+    ctaLabel: 'Hubungi & Unduh CV',
     cameraPosition: [0, 8.5, 21.5],
     cameraTarget: [0, 1.4, 11.5],
     roomCenter: [0, 0, 11.5],
@@ -204,6 +206,19 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     period: '2025 — 2026',
     projectStatus: 'Production Pilot Deployed',
     relevanceRank: 1,
+    bannerImage: '/products/mfood-pos-banner.svg',
+    galleryImages: [
+      {
+        url: '/products/mfood-pos-banner.svg',
+        title: 'POS Cashier & Table Order Grid',
+        caption: 'Offline-resilient order capture with IndexedDB sync and zero lost orders.',
+      },
+      {
+        url: '/products/mfood-pos-kds.svg',
+        title: 'Kitchen Display System (KDS)',
+        caption: 'Live order routing with low-latency local WebSocket LAN fallback.',
+      },
+    ],
     overview:
       'mFood POS is an integrated point-of-sale, table management, and kitchen ticket synchronization platform designed for high-throughput F&B outlets operating on unstable store Wi-Fi connections.',
     context:
@@ -334,6 +349,14 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     period: '2025',
     projectStatus: 'Internal Enterprise Release',
     relevanceRank: 2,
+    bannerImage: '/products/diamond-kms-banner.svg',
+    galleryImages: [
+      {
+        url: '/products/diamond-kms-banner.svg',
+        title: 'RBAC Document Hierarchy & AI RAG Citations',
+        caption: 'Strict zero-hallucination policy retrieval with verified paragraph citations.',
+      },
+    ],
     overview:
       'DIAMOND KMS is a structured knowledge management and standard operating procedure (SOP) governance system with citation-grounded semantic search for internal operational teams.',
     context:
@@ -453,6 +476,14 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     period: '2025',
     projectStatus: 'MVP Shipped',
     relevanceRank: 3,
+    bannerImage: '/products/employr-banner.svg',
+    galleryImages: [
+      {
+        url: '/products/employr-banner.svg',
+        title: 'Competency Rubric & Calibration Matrix',
+        caption: 'Evidence-based candidate scoring against WBS benchmarks.',
+      },
+    ],
     overview:
       'Employr is a talent evaluation and hiring workflow platform that aligns job requisitions, structured case assessments, and multi-reviewer scorecards into a transparent pipeline.',
     context:
@@ -545,6 +576,14 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     period: '2024 — 2025',
     projectStatus: 'Field Validated',
     relevanceRank: 4,
+    bannerImage: '/products/triagro-banner.svg',
+    galleryImages: [
+      {
+        url: '/products/triagro-banner.svg',
+        title: 'First-Mile Lot Intake & Weighbridge Reconciliation',
+        caption: 'Digital lot tracking reducing harvest shrinkage from 4.2% to 0.08%.',
+      },
+    ],
     overview:
       'Triagro digitizes first-mile harvest intake, moisture/grade logging, and transport batch tracking for agricultural commodities moving from rural collection points to central processing.',
     context:
@@ -634,6 +673,14 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     period: '2025 — 2026',
     projectStatus: 'Live Community Event & Platform',
     relevanceRank: 5,
+    bannerImage: '/products/prompt-battle-banner.svg',
+    galleryImages: [
+      {
+        url: '/products/prompt-battle-banner.svg',
+        title: 'Real-Time Prompt Duel Arena',
+        caption: 'Live deterministic schema evaluation, token usage analysis & leaderboard.',
+      },
+    ],
     overview:
       'Prompt Battle transforms passive AI webinars into an active, measurable arena where participants craft structured prompts against real business constraints and receive rubric-based evaluation.',
     context:
@@ -723,6 +770,14 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     period: '2024 — 2025',
     projectStatus: 'Operational Workflow',
     relevanceRank: 6,
+    bannerImage: '/products/revops-banner.svg',
+    galleryImages: [
+      {
+        url: '/products/revops-banner.svg',
+        title: 'Automated Lead Attribution & SLA Router',
+        caption: 'Sub-minute webhook dispatch and WhatsApp alerts with 98.4% on-time response.',
+      },
+    ],
     overview:
       'RevOps Campaign Engine standardizes how multi-channel marketing campaigns capture, enrich, score, and route inbound leads to sales representatives without manual spreadsheet exports.',
     context:

@@ -1,97 +1,153 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { RoomId } from '@/lib/portfolio-data';
 import { trackPortfolioEvent } from '@/lib/analytics';
+import { CameraMode } from '@/components/three/VirtualOfficeCanvas';
+import { Map as MapIcon, EyeOff, FileDown, Box } from 'lucide-react';
 
 interface TopNavProps {
   activeRoom?: RoomId;
+  cameraMode: CameraMode;
+  onChangeCameraMode: (mode: CameraMode) => void;
+  showFloorPlan: boolean;
+  onToggleFloorPlan: () => void;
+  onToggleHide: () => void;
   onSelectRoom?: (roomId: RoomId) => void;
-  onOpenDrawer?: (roomId: RoomId) => void;
+  onOpenRoomDetail?: (roomId: RoomId) => void;
 }
-
-const NAV_ITEMS: { id: RoomId; label: string; href: string }[] = [
-  { id: 'projects', label: 'Projects', href: '/projects' },
-  { id: 'systems', label: 'Systems', href: '/systems' },
-  { id: 'experience', label: 'Experience', href: '/experience' },
-  { id: 'cases', label: 'Cases', href: '/cases' },
-  { id: 'contact', label: 'Contact', href: '/?room=contact' },
-];
 
 export default function TopNav({
   activeRoom,
+  cameraMode,
+  onChangeCameraMode,
+  showFloorPlan,
+  onToggleFloorPlan,
+  onToggleHide,
   onSelectRoom,
-  onOpenDrawer,
+  onOpenRoomDetail,
 }: TopNavProps) {
-  const handleNavClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    item: { id: RoomId; label: string; href: string }
-  ) => {
-    if (onSelectRoom) {
-      e.preventDefault();
-      onSelectRoom(item.id);
-      if (onOpenDrawer && item.id !== 'lobby') {
-        onOpenDrawer(item.id);
-      }
-    }
-  };
-
   return (
-    <header className="w-full h-14 px-6 bg-[#0f1011] border-b border-[#23252a] flex items-center justify-between gap-8 z-30 relative">
-      {/* Zone 1: Single text element wordmark */}
-      <Link
-        href="/"
-        onClick={(e) => {
-          if (onSelectRoom) {
-            e.preventDefault();
-            onSelectRoom('lobby');
-          }
-        }}
-        className="font-display text-sm font-semibold tracking-[-0.02em] text-[#f7f8f8] hover:text-white transition-colors whitespace-nowrap shrink-0 flex items-center gap-2"
-      >
-        <span className="w-2 h-2 rounded-xs bg-[#5e6ad2]" />
-        <span>RIZAL OS</span>
-      </Link>
+    <header className="fixed top-2.5 inset-x-2.5 sm:inset-x-4 md:top-3.5 z-30 pointer-events-none flex items-center justify-between gap-2.5">
+      {/* Zone 1: Brand & Denah Ruangan */}
+      <div className="pointer-events-auto flex items-center gap-1.5 p-1 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] shadow-lg backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => {
+            if (onSelectRoom) onSelectRoom('lobby');
+          }}
+          className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-[#232426] transition-colors cursor-pointer"
+        >
+          <span className="w-2 h-2 rounded-full bg-[#f5d400] animate-pulse" />
+          <span className="font-display text-xs sm:text-sm font-semibold tracking-[-0.02em] text-[#e8e8e9]">
+            Riizalhp
+          </span>
+        </button>
 
-      {/* Zone 2: 5 concise single-line text navigation links */}
-      <nav
-        aria-label="Primary Navigation"
-        className="hidden md:flex items-center gap-6 text-xs font-medium text-[#8a8f98]"
-      >
-        {NAV_ITEMS.map((item) => {
-          const isActive = activeRoom === item.id;
-          return (
-            <Link
-              key={item.id}
-              href={item.href}
-              onClick={(e) => handleNavClick(e, item)}
-              className={`whitespace-nowrap shrink-0 py-1 transition-colors border-b ${
-                isActive
-                  ? 'text-[#f7f8f8] border-[#5e6ad2] font-medium'
-                  : 'text-[#8a8f98] border-transparent hover:text-[#f7f8f8]'
-              }`}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+        <div className="h-4 w-px bg-[rgba(255,255,255,0.085)]" />
 
-      {/* Zone 3: 1 primary action */}
-      <div className="flex items-center gap-3 shrink-0">
+        {/* Denah Ruangan (Deskriptif) */}
+        <button
+          type="button"
+          onClick={onToggleFloorPlan}
+          aria-expanded={showFloorPlan}
+          title="Denah Ruangan: Peta & deskripsi isi setiap ruangan kerja (Shortcut: M)"
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+            showFloorPlan
+              ? 'bg-[#28292b] text-[#f5d400] border border-[rgba(255,255,255,0.13)]'
+              : 'text-[#a7a7aa] hover:text-[#e8e8e9] hover:bg-[#232426]'
+          }`}
+        >
+          <MapIcon className="w-3.5 h-3.5 text-[#f5d400]" />
+          <span className="whitespace-nowrap">Denah Ruangan</span>
+        </button>
+
+        {/* Direct Showcase quick link */}
+        <button
+          type="button"
+          onClick={() => {
+            if (onSelectRoom) onSelectRoom('projects');
+          }}
+          title="Buka Showcase Produk Langsung"
+          className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#a7a7aa] hover:text-[#e8e8e9] hover:bg-[#232426] transition-colors cursor-pointer"
+        >
+          <Box className="w-3.5 h-3.5 text-[#38bdf8]" />
+          <span>Showcase</span>
+        </button>
+      </div>
+
+      {/* Zone 2: Camera Controls (Orbit / FPS / TPS) + Hide + CV */}
+      <div className="pointer-events-auto flex items-center gap-1.5 p-1 rounded-xl bg-[#18191b] border border-[rgba(255,255,255,0.085)] shadow-lg backdrop-blur-md overflow-x-auto no-scrollbar">
+        {/* Camera mode segmented pills */}
+        <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-[#141516] border border-[rgba(255,255,255,0.055)]">
+          <button
+            type="button"
+            onClick={() => onChangeCameraMode('orbit')}
+            title="Kamera Orbit 3D (Shortcut: 1)"
+            className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+              cameraMode === 'orbit'
+                ? 'bg-[#28292b] text-[#e8e8e9] shadow-xs'
+                : 'text-[#77787c] hover:text-[#e8e8e9]'
+            }`}
+          >
+            <span className="font-mono text-[10px] text-[#77787c] hidden sm:inline">1</span>
+            <span>Orbit</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onChangeCameraMode('fps')}
+            title="Kamera First-Person Walkthrough (Shortcut: 2)"
+            className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+              cameraMode === 'fps'
+                ? 'bg-[#28292b] text-[#e8e8e9] shadow-xs'
+                : 'text-[#77787c] hover:text-[#e8e8e9]'
+            }`}
+          >
+            <span className="font-mono text-[10px] text-[#77787c] hidden sm:inline">2</span>
+            <span>FPS</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onChangeCameraMode('tps')}
+            title="Kamera Third-Person Perspective (Shortcut: 3)"
+            className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+              cameraMode === 'tps'
+                ? 'bg-[#28292b] text-[#e8e8e9] shadow-xs'
+                : 'text-[#77787c] hover:text-[#e8e8e9]'
+            }`}
+          >
+            <span className="font-mono text-[10px] text-[#77787c] hidden sm:inline">3</span>
+            <span>TPS</span>
+          </button>
+        </div>
+
+        <div className="h-4 w-px bg-[rgba(255,255,255,0.085)]" />
+
+        {/* Hide UI (replaces Zen) */}
+        <button
+          type="button"
+          onClick={onToggleHide}
+          title="Sembunyikan semua UI (Shortcut: Z)"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#a7a7aa] hover:text-[#e8e8e9] hover:bg-[#232426] transition-colors cursor-pointer"
+        >
+          <EyeOff className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Hide</span>
+          <span className="font-mono text-[10px] text-[#77787c]">(Z)</span>
+        </button>
+
+        {/* CV Download */}
         <a
           href="/api/cv"
-          download="Rizal_Technical_Project_Manager_CV.txt"
-          onClick={() =>
-            trackPortfolioEvent('cv_downloaded', { source: 'top_bar' })
-          }
-          className="px-3 py-1.5 text-xs font-medium text-[#f7f8f8] bg-[#5e6ad2] hover:bg-[#6e7ae2] rounded-md transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
+          download="Rizal_Technical_PM_CV.pdf"
+          onClick={() => trackPortfolioEvent('cv_downloaded', { source: 'top_nav' })}
+          className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1d1e20] hover:bg-[#28292b] text-[#e8e8e9] border border-[rgba(255,255,255,0.13)] transition-colors shrink-0"
         >
-          Download CV
+          <FileDown className="w-3.5 h-3.5 text-[#46c98a]" />
+          <span>CV</span>
         </a>
       </div>
     </header>
   );
 }
-

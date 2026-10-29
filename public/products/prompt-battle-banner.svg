@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pb-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#14131a"/>
+      <stop offset="100%" stop-color="#191724"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="960" height="480" fill="url(#pb-bg)"/>
+  
+  <rect x="24" y="24" width="912" height="432" rx="12" fill="#181622" stroke="#2c273d" stroke-width="1.5"/>
+
+  <!-- Top bar -->
+  <path d="M 24 36 Q 24 24 36 24 L 924 24 Q 936 24 936 36 L 936 68 L 24 68 Z" fill="#201d2d"/>
+  <circle cx="48" cy="46" r="5" fill="#e76b6b" opacity="0.8"/>
+  <circle cx="64" cy="46" r="5" fill="#e5b84b" opacity="0.8"/>
+  <circle cx="80" cy="46" r="5" fill="#46c98a" opacity="0.8"/>
+  <text x="110" y="50" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#e8e8e9">Prompt Battle Arena · Real-Time LLM Prompt Engineering Competition</text>
+  
+  <rect x="730" y="36" width="180" height="22" rx="11" fill="rgba(245,212,0,0.15)" stroke="#f5d400" stroke-width="0.8"/>
+  <circle cx="744" cy="47" r="3.5" fill="#f5d400"/>
+  <text x="756" y="51" font-family="Inter, sans-serif" font-size="10.5" font-weight="500" fill="#f5d400">Match Time Left: 02:45</text>
+
+  <!-- Split Duel View: Player 1 (440px) vs Player 2 (440px) -->
+  <!-- Player 1 -->
+  <rect x="44" y="84" width="416" height="348" rx="8" fill="#1e1a2b" stroke="#37304e" stroke-width="1"/>
+  <text x="64" y="112" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#a78bfa">Player 01 · Prompt Architect</text>
+  <rect x="64" y="128" width="376" height="150" rx="6" fill="#161420" stroke="#2a243a" stroke-width="1"/>
+  <text x="76" y="150" font-family="monospace" font-size="10.5" fill="#c4b5fd">You are an enterprise JSON extractor.</text>
+  <text x="76" y="168" font-family="monospace" font-size="10.5" fill="#c4b5fd">Strict constraint: Emit NO preamble or markdown.</text>
+  <text x="76" y="186" font-family="monospace" font-size="10.5" fill="#c4b5fd">Extract fields: `tax_id`, `invoice_total`, `line_items`.</text>
+  <text x="76" y="204" font-family="monospace" font-size="10.5" fill="#c4b5fd">Trap mitigation: If currency is USD, convert to IDR @16200.</text>
+  
+  <!-- Score 1 -->
+  <rect x="64" y="292" width="376" height="60" rx="6" fill="#241f36"/>
+  <text x="80" y="316" font-family="Inter, sans-serif" font-size="11" fill="#a7a7aa">Test Suite Results: 8/8 Passed</text>
+  <text x="80" y="336" font-family="monospace" font-size="12" font-weight="700" fill="#46c98a">Score: 980 pts · Latency: 420ms · 184 tokens</text>
+
+  <!-- Player 2 -->
+  <rect x="480" y="84" width="436" height="348" rx="8" fill="#1e1a2b" stroke="#37304e" stroke-width="1"/>
+  <text x="500" y="112" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#f472b6">Player 02 · Challenger</text>
+  <rect x="500" y="128" width="396" height="150" rx="6" fill="#161420" stroke="#2a243a" stroke-width="1"/>
+  <text x="512" y="150" font-family="monospace" font-size="10.5" fill="#fbcfe8">Parse the given invoice into clean JSON.</text>
+  <text x="512" y="168" font-family="monospace" font-size="10.5" fill="#fbcfe8">Keys: tax_id, invoice_total, line_items.</text>
+  <text x="512" y="186" font-family="monospace" font-size="10.5" fill="#fbcfe8">Make sure to return valid JSON format only.</text>
+
+  <!-- Score 2 -->
+  <rect x="500" y="292" width="396" height="60" rx="6" fill="#241f36"/>
+  <text x="516" y="316" font-family="Inter, sans-serif" font-size="11" fill="#a7a7aa">Test Suite Results: 5/8 Passed (Failed currency trap)</text>
+  <text x="516" y="336" font-family="monospace" font-size="12" font-weight="700" fill="#e5b84b">Score: 610 pts · Latency: 680ms · 295 tokens</text>
+</svg>

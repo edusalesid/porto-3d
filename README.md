@@ -59,7 +59,7 @@ Proyek ini sudah dikonfigurasi penuh untuk **Vercel** (`vercel.json`, `next.conf
 # Install dependencies
 npm install
 
-# Jalankan server development (http://localhost:3000)
+# Jalankan server development (http://localhost:9000)
 npm run dev
 
 # Build untuk production

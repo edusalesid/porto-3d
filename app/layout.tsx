@@ -1,23 +1,18 @@
 import type { Metadata, Viewport } from 'next';
-import { Outfit, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-display',
-  weight: ['500', '600', '700'],
-});
-
-const jakarta = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
-  weight: ['400', '500', '600', '700'],
+  display: 'swap',
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   weight: ['400', '500', '600'],
+  display: 'swap',
 });
 
 const siteUrl =
@@ -61,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${jakarta.variable} ${jetbrainsMono.variable} dark`}
+      className={`${inter.variable} ${jetbrainsMono.variable} dark`}
     >
       <body
         suppressHydrationWarning
@@ -72,4 +67,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-

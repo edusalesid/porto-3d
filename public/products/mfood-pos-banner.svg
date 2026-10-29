@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mfood-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#121314"/>
+      <stop offset="100%" stop-color="#18191b"/>
+    </linearGradient>
+    <linearGradient id="card-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f2023"/>
+      <stop offset="100%" stop-color="#18191b"/>
+    </linearGradient>
+    <linearGradient id="accent-amber" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="accent-green" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#46c98a"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="480" fill="url(#mfood-bg)"/>
+  
+  <!-- Subtle Grid -->
+  <g opacity="0.06" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="60" x2="960" y2="60"/>
+    <line x1="0" y1="120" x2="960" y2="120"/>
+    <line x1="0" y1="180" x2="960" y2="180"/>
+    <line x1="0" y1="240" x2="960" y2="240"/>
+    <line x1="0" y1="300" x2="960" y2="300"/>
+    <line x1="0" y1="360" x2="960" y2="360"/>
+    <line x1="0" y1="420" x2="960" y2="420"/>
+    <line x1="160" y1="0" x2="160" y2="480"/>
+    <line x1="320" y1="0" x2="320" y2="480"/>
+    <line x1="480" y1="0" x2="480" y2="480"/>
+    <line x1="640" y1="0" x2="640" y2="480"/>
+    <line x1="800" y1="0" x2="800" y2="480"/>
+  </g>
+
+  <!-- Outer Window Frame -->
+  <rect x="24" y="24" width="912" height="432" rx="12" fill="#171819" stroke="#28292c" stroke-width="1.5"/>
+
+  <!-- Window Header -->
+  <path d="M 24 36 Q 24 24 36 24 L 924 24 Q 936 24 936 36 L 936 68 L 24 68 Z" fill="#1b1c1e"/>
+  <circle cx="48" cy="46" r="5" fill="#e76b6b" opacity="0.8"/>
+  <circle cx="64" cy="46" r="5" fill="#e5b84b" opacity="0.8"/>
+  <circle cx="80" cy="46" r="5" fill="#46c98a" opacity="0.8"/>
+  <text x="110" y="50" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#e8e8e9" letter-spacing="-0.02em">mFood POS · High-Throughput Cashier &amp; Kitchen Sync</text>
+  
+  <!-- Status Badge in Header -->
+  <rect x="740" y="36" width="170" height="22" rx="11" fill="rgba(70,201,138,0.12)" stroke="#46c98a" stroke-width="0.8"/>
+  <circle cx="754" cy="47" r="3.5" fill="#46c98a"/>
+  <text x="765" y="51" font-family="Inter, sans-serif" font-size="10.5" font-weight="500" fill="#46c98a">IndexedDB Sync: 100%</text>
+
+  <!-- App Layout Split: Left Menu Categories (160px), Center Item Grid (450px), Right Cart (280px) -->
+  
+  <!-- Left Category Rail -->
+  <rect x="24" y="68" width="160" height="388" fill="#151617" stroke="#232426" stroke-width="1"/>
+  <text x="40" y="98" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#77787c" letter-spacing="0.04em">OUTLET ZONES</text>
+  
+  <rect x="34" y="112" width="140" height="32" rx="6" fill="#28292c"/>
+  <text x="46" y="132" font-family="Inter, sans-serif" font-size="12" font-weight="500" fill="#f5d400">● Main Dining (T1-T12)</text>
+
+  <rect x="34" y="152" width="140" height="32" rx="6" fill="transparent"/>
+  <text x="46" y="172" font-family="Inter, sans-serif" font-size="12" font-weight="500" fill="#a7a7aa">○ Outdoor Terrace</text>
+
+  <rect x="34" y="192" width="140" height="32" rx="6" fill="transparent"/>
+  <text x="46" y="212" font-family="Inter, sans-serif" font-size="12" font-weight="500" fill="#a7a7aa">○ Bar &amp; Beverages</text>
+
+  <rect x="34" y="232" width="140" height="32" rx="6" fill="transparent"/>
+  <text x="46" y="252" font-family="Inter, sans-serif" font-size="12" font-weight="500" fill="#a7a7aa">○ Takeaway Queue</text>
+
+  <!-- Offline Cache indicator at bottom of sidebar -->
+  <rect x="36" y="380" width="136" height="56" rx="8" fill="#1c1d1f" stroke="#2a2b2e" stroke-width="1"/>
+  <text x="48" y="402" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#e8e8e9">Local Fallback Node</text>
+  <text x="48" y="420" font-family="monospace" font-size="9" fill="#77787c">LAN WebSocket · OK</text>
+
+  <!-- Center Menu Item Grid -->
+  <!-- Search and Filter bar -->
+  <rect x="200" y="82" width="440" height="34" rx="7" fill="#1c1d20" stroke="#28292b" stroke-width="1"/>
+  <text x="216" y="103" font-family="Inter, sans-serif" font-size="12" fill="#77787c">🔍 Cari menu atau SKU barcode...</text>
+
+  <!-- Item Cards (2x2 grid) -->
+  <!-- Item 1 -->
+  <rect x="200" y="130" width="210" height="135" rx="10" fill="url(#card-grad)" stroke="#28292c" stroke-width="1"/>
+  <rect x="212" y="142" width="48" height="48" rx="8" fill="#2d2216"/>
+  <text x="228" y="172" font-family="Inter, sans-serif" font-size="20">☕</text>
+  <text x="270" y="158" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#e8e8e9">Double Espresso</text>
+  <text x="270" y="176" font-family="Inter, sans-serif" font-size="11" fill="#a7a7aa">Arabica Blend Single Origin</text>
+  <rect x="212" y="202" width="186" height="1" fill="#26272a"/>
+  <text x="212" y="228" font-family="monospace" font-size="13" font-weight="600" fill="#46c98a">Rp 32.000</text>
+  <rect x="340" y="214" width="58" height="24" rx="5" fill="#f59e0b"/>
+  <text x="353" y="230" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#121314">+ ADD</text>
+
+  <!-- Item 2 -->
+  <rect x="430" y="130" width="210" height="135" rx="10" fill="url(#card-grad)" stroke="#28292c" stroke-width="1"/>
+  <rect x="442" y="142" width="48" height="48" rx="8" fill="#19251f"/>
+  <text x="458" y="172" font-family="Inter, sans-serif" font-size="20">🥩</text>
+  <text x="500" y="158" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#e8e8e9">Truffle Wagyu Don</text>
+  <text x="500" y="176" font-family="Inter, sans-serif" font-size="11" fill="#a7a7aa">A5 Cut, Onsen Egg</text>
+  <rect x="442" y="202" width="186" height="1" fill="#26272a"/>
+  <text x="442" y="228" font-family="monospace" font-size="13" font-weight="600" fill="#46c98a">Rp 128.000</text>
+  <rect x="570" y="214" width="58" height="24" rx="5" fill="#28292c"/>
+  <text x="583" y="230" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#a7a7aa">+ ADD</text>
+
+  <!-- Item 3 -->
+  <rect x="200" y="280" width="210" height="135" rx="10" fill="url(#card-grad)" stroke="#28292c" stroke-width="1"/>
+  <rect x="212" y="292" width="48" height="48" rx="8" fill="#1b212d"/>
+  <text x="228" y="322" font-family="Inter, sans-serif" font-size="20">🍝</text>
+  <text x="270" y="308" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#e8e8e9">Smoked Carbonara</text>
+  <text x="270" y="326" font-family="Inter, sans-serif" font-size="11" fill="#a7a7aa">Fresh Handmade Fettuccine</text>
+  <rect x="212" y="352" width="186" height="1" fill="#26272a"/>
+  <text x="212" y="378" font-family="monospace" font-size="13" font-weight="600" fill="#46c98a">Rp 85.000</text>
+  <rect x="340" y="364" width="58" height="24" rx="5" fill="#28292c"/>
+  <text x="353" y="380" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#a7a7aa">+ ADD</text>
+
+  <!-- Item 4 -->
+  <rect x="430" y="280" width="210" height="135" rx="10" fill="url(#card-grad)" stroke="#28292c" stroke-width="1"/>
+  <rect x="442" y="292" width="48" height="48" rx="8" fill="#261b2d"/>
+  <text x="458" y="322" font-family="Inter, sans-serif" font-size="20">🍵</text>
+  <text x="500" y="308" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#e8e8e9">Matcha Oat Latte</text>
+  <text x="500" y="326" font-family="Inter, sans-serif" font-size="11" fill="#a7a7aa">Ceremonial Uji Grade</text>
+  <rect x="442" y="352" width="186" height="1" fill="#26272a"/>
+  <text x="442" y="378" font-family="monospace" font-size="13" font-weight="600" fill="#46c98a">Rp 42.000</text>
+  <rect x="570" y="364" width="58" height="24" rx="5" fill="#28292c"/>
+  <text x="583" y="380" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#a7a7aa">+ ADD</text>
+
+  <!-- Right Order Summary & KDS Dispatch Card -->
+  <rect x="660" y="68" width="276" height="388" fill="#141517" stroke="#26272a" stroke-width="1"/>
+  <text x="680" y="98" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#e8e8e9">Table 04 · Active Order</text>
+  <text x="680" y="116" font-family="monospace" font-size="10.5" fill="#77787c">TICKET #MF-9821 · Guest: 2</text>
+
+  <!-- Line Item 1 -->
+  <rect x="680" y="132" width="236" height="48" rx="6" fill="#1a1b1e" stroke="#252629" stroke-width="1"/>
+  <text x="692" y="152" font-family="Inter, sans-serif" font-size="12" font-weight="500" fill="#e8e8e9">1x Double Espresso</text>
+  <text x="692" y="168" font-family="Inter, sans-serif" font-size="10" fill="#77787c">Note: Less sweet</text>
+  <text x="860" y="158" font-family="monospace" font-size="12" fill="#e8e8e9">32.000</text>
+
+  <!-- Line Item 2 -->
+  <rect x="680" y="188" width="236" height="48" rx="6" fill="#1a1b1e" stroke="#252629" stroke-width="1"/>
+  <text x="692" y="208" font-family="Inter, sans-serif" font-size="12" font-weight="500" fill="#e8e8e9">1x Truffle Wagyu Don</text>
+  <text x="692" y="224" font-family="Inter, sans-serif" font-size="10" fill="#77787c">Note: Medium-rare egg</text>
+  <text x="852" y="214" font-family="monospace" font-size="12" fill="#e8e8e9">128.000</text>
+
+  <!-- Subtotal calculation -->
+  <rect x="680" y="250" width="236" height="1" fill="#252629"/>
+  <text x="680" y="274" font-family="Inter, sans-serif" font-size="11" fill="#77787c">Subtotal</text>
+  <text x="864" y="274" font-family="monospace" font-size="11" fill="#a7a7aa">160.000</text>
+  <text x="680" y="294" font-family="Inter, sans-serif" font-size="11" fill="#77787c">Service (5%) + Tax (10%)</text>
+  <text x="872" y="294" font-family="monospace" font-size="11" fill="#a7a7aa">24.000</text>
+  <text x="680" y="322" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#e8e8e9">Total Bill</text>
+  <text x="846" y="322" font-family="monospace" font-size="14" font-weight="700" fill="#f5d400">Rp 184.000</text>
+
+  <!-- Primary Action: Send to Kitchen Button -->
+  <rect x="680" y="342" width="236" height="42" rx="8" fill="#f59e0b"/>
+  <text x="730" y="368" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#121314">⚡ DISPATCH TO KITCHEN</text>
+
+  <!-- Sync latency guarantee -->
+  <text x="704" y="414" font-family="monospace" font-size="9.5" fill="#46c98a">● P2P Mesh: 0 Lost Orders Guarantee</text>
+</svg>

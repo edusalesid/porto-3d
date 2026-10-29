@@ -7,7 +7,8 @@ export type AnalyticsEventName =
   | 'case_study_viewed'
   | 'cv_downloaded'
   | 'contact_clicked'
-  | 'external_link_opened';
+  | 'external_link_opened'
+  | 'camera_mode_changed';
 
 export interface AnalyticsEventRecord {
   event: AnalyticsEventName;

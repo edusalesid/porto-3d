@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="kds-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#141517"/>
+      <stop offset="100%" stop-color="#18191c"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#kds-bg)"/>
+  <rect x="16" y="16" width="608" height="368" rx="10" fill="#17181a" stroke="#25262a" stroke-width="1.5"/>
+  
+  <!-- Header -->
+  <rect x="16" y="16" width="608" height="44" rx="10" fill="#1f2024"/>
+  <circle cx="36" cy="38" r="4" fill="#46c98a"/>
+  <text x="48" y="42" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#e8e8e9">KDS Station 02 · Hot Kitchen &amp; Grill Display</text>
+  <text x="470" y="42" font-family="monospace" font-size="11" fill="#f5d400">⚡ Live LAN Socket: 12ms</text>
+
+  <!-- 3 KDS Order Columns -->
+  <!-- Ticket 1: Urgent (8m elapsed) -->
+  <rect x="32" y="76" width="180" height="288" rx="8" fill="#1b1c1f" stroke="#e5b84b" stroke-width="1.5"/>
+  <rect x="32" y="76" width="180" height="32" rx="8" fill="#292419"/>
+  <text x="44" y="96" font-family="monospace" font-size="11" font-weight="700" fill="#f5d400">#9820 · T-02</text>
+  <text x="148" y="96" font-family="monospace" font-size="11" fill="#e5b84b">08:14</text>
+  <text x="44" y="130" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#e8e8e9">2x Truffle Wagyu Don</text>
+  <text x="44" y="146" font-family="Inter, sans-serif" font-size="10" fill="#a7a7aa">↳ Well-done / Extra Sauce</text>
+  <text x="44" y="176" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#e8e8e9">1x Garlic Wings (6pcs)</text>
+  <rect x="44" y="318" width="156" height="32" rx="6" fill="#f59e0b"/>
+  <text x="82" y="338" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#121314">MARK COOKED</text>
+
+  <!-- Ticket 2: New (2m elapsed) -->
+  <rect x="230" y="76" width="180" height="288" rx="8" fill="#1b1c1f" stroke="#2a2b2e" stroke-width="1"/>
+  <rect x="230" y="76" width="180" height="32" rx="8" fill="#202226"/>
+  <text x="242" y="96" font-family="monospace" font-size="11" font-weight="700" fill="#46c98a">#9821 · T-04</text>
+  <text x="346" y="96" font-family="monospace" font-size="11" fill="#77787c">02:18</text>
+  <text x="242" y="130" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#e8e8e9">1x Smoked Carbonara</text>
+  <text x="242" y="146" font-family="Inter, sans-serif" font-size="10" fill="#a7a7aa">↳ No black pepper</text>
+  <text x="242" y="176" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#e8e8e9">1x Truffle Wagyu Don</text>
+  <rect x="242" y="318" width="156" height="32" rx="6" fill="#25262a"/>
+  <text x="290" y="338" font-family="Inter, sans-serif" font-size="11" font-weight="500" fill="#a7a7aa">START PREP</text>
+
+  <!-- Ticket 3: Ready for Pickup -->
+  <rect x="428" y="76" width="180" height="288" rx="8" fill="#1b1c1f" stroke="#46c98a" stroke-width="1.5"/>
+  <rect x="428" y="76" width="180" height="32" rx="8" fill="#16281e"/>
+  <text x="440" y="96" font-family="monospace" font-size="11" font-weight="700" fill="#46c98a">#9818 · Takeaway</text>
+  <text x="544" y="96" font-family="monospace" font-size="11" fill="#46c98a">READY</text>
+  <text x="440" y="130" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#e8e8e9">3x Chicken Katsu Sando</text>
+  <text x="440" y="160" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#e8e8e9">2x Iced Americano</text>
+  <rect x="440" y="318" width="156" height="32" rx="6" fill="#46c98a"/>
+  <text x="480" y="338" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#121314">BAGGED &amp; SERVED</text>
+</svg>

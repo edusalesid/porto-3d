@@ -614,6 +614,109 @@ function createRizalAvatar(): AvatarRig {
   return { group, leftLeg, rightLeg, leftArm, rightArm, headGroup };
 }
 
+interface OrbitPlayerBeacon {
+  group: THREE.Group;
+  update: (elapsed: number, delta: number) => void;
+}
+
+function createOrbitPlayerBeacon(disposables: { dispose: () => void }[]): OrbitPlayerBeacon {
+  const group = new THREE.Group();
+
+  // 1. Static base ring on floor
+  const baseRingGeo = new THREE.RingGeometry(0.42, 0.52, 32);
+  baseRingGeo.rotateX(-Math.PI / 2);
+  const baseRingMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    transparent: true,
+    opacity: 0.9,
+    side: THREE.DoubleSide,
+  });
+  const baseRing = new THREE.Mesh(baseRingGeo, baseRingMat);
+  baseRing.position.y = 0.026;
+  group.add(baseRing);
+
+  // 2. Animated pulse ring on floor
+  const pulseRingGeo = new THREE.RingGeometry(0.48, 0.58, 32);
+  pulseRingGeo.rotateX(-Math.PI / 2);
+  const pulseRingMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    transparent: true,
+    opacity: 0.75,
+    side: THREE.DoubleSide,
+  });
+  const pulseRing = new THREE.Mesh(pulseRingGeo, pulseRingMat);
+  pulseRing.position.y = 0.028;
+  group.add(pulseRing);
+
+  // 3. Vertical holographic beacon light cylinder
+  const beamGeo = new THREE.CylinderGeometry(0.025, 0.05, 2.4, 12);
+  const beamMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    transparent: true,
+    opacity: 0.35,
+  });
+  const beam = new THREE.Mesh(beamGeo, beamMat);
+  beam.position.y = 1.25;
+  group.add(beam);
+
+  // 4. Floating holographic diamond / waypoint marker
+  const diamondGeo = new THREE.OctahedronGeometry(0.22, 0);
+  const diamondMat = new THREE.MeshStandardMaterial({
+    color: 0x38bdf8,
+    emissive: new THREE.Color(0x0284c7),
+    emissiveIntensity: 0.9,
+    roughness: 0.25,
+    metalness: 0.8,
+  });
+  const diamond = new THREE.Mesh(diamondGeo, diamondMat);
+  diamond.position.y = 2.45;
+  group.add(diamond);
+
+  // 5. Floating halo ring around diamond
+  const haloGeo = new THREE.RingGeometry(0.3, 0.35, 24);
+  haloGeo.rotateX(-Math.PI / 2);
+  const haloMat = new THREE.MeshBasicMaterial({
+    color: 0xf5d400,
+    transparent: true,
+    opacity: 0.85,
+    side: THREE.DoubleSide,
+  });
+  const halo = new THREE.Mesh(haloGeo, haloMat);
+  halo.position.y = 2.45;
+  group.add(halo);
+
+  disposables.push(
+    baseRingGeo,
+    baseRingMat,
+    pulseRingGeo,
+    pulseRingMat,
+    beamGeo,
+    beamMat,
+    diamondGeo,
+    diamondMat,
+    haloGeo,
+    haloMat
+  );
+
+  return {
+    group,
+    update: (elapsed: number, delta: number) => {
+      const phase = (elapsed * 1.6) % 1;
+      pulseRing.scale.set(1 + phase * 2.2, 1, 1 + phase * 2.2);
+      pulseRingMat.opacity = (1 - phase) * 0.75;
+
+      const bob = Math.sin(elapsed * 2.8) * 0.12;
+      diamond.position.y = 2.45 + bob;
+      diamond.rotation.y += delta * 1.8;
+      diamond.rotation.x = Math.sin(elapsed * 1.4) * 0.1;
+
+      halo.position.y = 2.45 + bob;
+      halo.rotation.y -= delta * 1.2;
+      halo.rotation.z = Math.sin(elapsed * 2.0) * 0.15;
+    },
+  };
+}
+
 export default function VirtualOfficeCanvas({
   activeRoom,
   reducedMotion,
@@ -643,8 +746,8 @@ export default function VirtualOfficeCanvas({
   const requestRenderRef = useRef<(() => void) | null>(null);
   const syncVisualStyleRef = useRef<((style: VisualStyle3D) => void) | null>(null);
 
-  const [visualStyle, setVisualStyle] = useState<VisualStyle3D>('studio');
-  const visualStyleRef = useRef<VisualStyle3D>('studio');
+  const [visualStyle, setVisualStyle] = useState<VisualStyle3D>('cozy');
+  const visualStyleRef = useRef<VisualStyle3D>('cozy');
 
   const handleCycleVisualStyle = () => {
     setVisualStyle((prev) => {
@@ -663,6 +766,7 @@ export default function VirtualOfficeCanvas({
 
   const hoveredRoomIdRef = useRef<RoomId | null>(null);
   const isCameraTransitioningRef = useRef<boolean>(false);
+  const orbitFocusPlayerRef = useRef<boolean>(false);
 
   // Player / Avatar state for FPS and TPS modes (spawned at unobstructed Lobby walkway z = 4.1)
   const initialSpawn = getRoomSpawnPoint(activeRoom);
@@ -672,6 +776,10 @@ export default function VirtualOfficeCanvas({
   const playerPitchRef = useRef<number>(-0.18);
   const tpsDistanceRef = useRef<number>(4.8);
   const walkTargetRef = useRef<THREE.Vector3 | null>(null);
+  const pendingDrawerRoomRef = useRef<RoomId | null>(null);
+  const isAutoRunningToRoomRef = useRef<boolean>(false);
+  const arrivalPauseTimerRef = useRef<number>(0);
+  const autoRunTimeoutTimerRef = useRef<number>(0);
 
   const keysPressedRef = useRef<{
     forward: boolean;
@@ -731,8 +839,8 @@ export default function VirtualOfficeCanvas({
         isCameraTransitioningRef.current = true;
       } else {
         isCameraTransitioningRef.current = false;
-        const spawn = getRoomSpawnPoint(activeRoomRef.current);
-        playerPosRef.current.set(...spawn);
+        // Keep player position when switching camera modes
+
         cameraOrbitYawRef.current = Math.PI;
         avatarFacingYawRef.current = Math.PI;
         playerPitchRef.current = cameraMode === 'fps' ? -0.04 : -0.22;
@@ -793,20 +901,44 @@ export default function VirtualOfficeCanvas({
     }
   }, [isDrawerOpen]);
 
+  const navigateToRoomWithAutoRun = (roomId: RoomId) => {
+    const spawn = getRoomSpawnPoint(roomId);
+    const targetVec = new THREE.Vector3(spawn[0], 0, spawn[2]);
+    const distToTarget = Math.hypot(
+      playerPosRef.current.x - targetVec.x,
+      playerPosRef.current.z - targetVec.z
+    );
+
+    activeRoomRef.current = roomId;
+    onSelectRoom(roomId);
+    isCameraTransitioningRef.current = true;
+
+    if (distToTarget < 1.5) {
+      pendingDrawerRoomRef.current = null;
+      isAutoRunningToRoomRef.current = false;
+      walkTargetRef.current = null;
+      onOpenRoomDetail(roomId);
+      if (requestRenderRef.current) requestRenderRef.current();
+      return;
+    }
+
+    pendingDrawerRoomRef.current = roomId;
+    isAutoRunningToRoomRef.current = true;
+    arrivalPauseTimerRef.current = 0;
+    autoRunTimeoutTimerRef.current = 0;
+    walkTargetRef.current = targetVec;
+
+    if (requestRenderRef.current) {
+      requestRenderRef.current();
+    }
+  };
+
   useEffect(() => {
     const prevRoom = activeRoomRef.current;
     activeRoomRef.current = activeRoom;
 
     if (prevRoom !== activeRoom && !isDrawerOpenRef.current) {
-      if (cameraModeRef.current === 'orbit') {
-        isCameraTransitioningRef.current = true;
-      } else {
-        const spawn = getRoomSpawnPoint(activeRoom);
-        playerPosRef.current.set(...spawn);
-        cameraOrbitYawRef.current = Math.PI;
-        avatarFacingYawRef.current = Math.PI;
-        walkTargetRef.current = null;
-      }
+      navigateToRoomWithAutoRun(activeRoom);
     }
 
     if (requestRenderRef.current) {
@@ -838,6 +970,15 @@ export default function VirtualOfficeCanvas({
       playerPitchRef.current = cameraModeRef.current === 'fps' ? -0.04 : -0.22;
       walkTargetRef.current = null;
     }
+    if (requestRenderRef.current) {
+      requestRenderRef.current();
+    }
+  };
+
+  const handleFocusPlayer = () => {
+    if (cameraModeRef.current !== 'orbit') return;
+    orbitFocusPlayerRef.current = true;
+    isCameraTransitioningRef.current = true;
     if (requestRenderRef.current) {
       requestRenderRef.current();
     }
@@ -1410,8 +1551,12 @@ export default function VirtualOfficeCanvas({
     const avatarRig = createRizalAvatar();
     avatarRig.group.position.copy(playerPosRef.current);
     avatarRig.group.rotation.y = avatarFacingYawRef.current;
-    avatarRig.group.visible = cameraModeRef.current === 'tps';
+    avatarRig.group.visible = cameraModeRef.current === 'tps' || cameraModeRef.current === 'orbit';
     scene.add(avatarRig.group);
+
+    const orbitBeacon = createOrbitPlayerBeacon(disposables);
+    avatarRig.group.add(orbitBeacon.group);
+    orbitBeacon.group.visible = cameraModeRef.current === 'orbit';
 
     const targetMarkerGeo = new THREE.RingGeometry(0.22, 0.32, 24);
     targetMarkerGeo.rotateX(-Math.PI / 2);
@@ -2147,24 +2292,6 @@ export default function VirtualOfficeCanvas({
         if (requestRenderRef.current) requestRenderRef.current();
         return;
       }
-
-      raycaster.setFromCamera(pointer, camera);
-      const hits = raycaster.intersectObjects(interactiveMeshes, true);
-      let newHoverRoom: RoomId | null = null;
-      if (hits.length > 0) {
-        let obj: THREE.Object3D | null = hits[0].object;
-        while (obj && !obj.userData?.roomId) {
-          obj = obj.parent;
-        }
-        newHoverRoom = (obj?.userData?.roomId as RoomId) || null;
-      }
-
-      if (hoveredRoomIdRef.current !== newHoverRoom) {
-        hoveredRoomIdRef.current = newHoverRoom;
-        updateHotspotPositions();
-      }
-
-      renderer.domElement.style.cursor = hits.length > 0 ? 'pointer' : 'grab';
     };
 
     const handlePointerUp = (e: PointerEvent) => {
@@ -2172,30 +2299,24 @@ export default function VirtualOfficeCanvas({
       if (activeTouchPoints.size < 2) lastPinchDist = null;
       if (activeLookPointerId === e.pointerId) {
         activeLookPointerId = null;
-        isDraggingLook = false;
-      } else if (e.pointerType !== 'touch') {
-        isDraggingLook = false;
       }
+      isDraggingLook = false;
 
       if (isDrawerOpenRef.current) return;
-      const dx = Math.abs(e.clientX - pointerDownPos.x);
-      const dy = Math.abs(e.clientY - pointerDownPos.y);
-      const tapThreshold = e.pointerType === 'touch' ? 12 : 6;
-      if (dx > tapThreshold || dy > tapThreshold) return;
 
       const rect = renderer.domElement.getBoundingClientRect();
-      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-      raycaster.setFromCamera(
-        cameraModeRef.current === 'fps' &&
-          document.pointerLockElement === renderer.domElement
-          ? centerReticle
-          : pointer,
-        camera
+      const pointer = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
       );
 
+      // In Orbit mode, ignore drag releases (pan/rotate)
+      const dragDist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+      if (cameraModeRef.current === 'orbit' && dragDist > 6) return;
+
+      raycaster.setFromCamera(pointer, camera);
       const hits = raycaster.intersectObjects(interactiveMeshes, true);
+      const floorHits = raycaster.intersectObjects(floorWalkMeshes, true);
       let hitRoomId: RoomId | undefined;
       let hitIsFloor = false;
       let hitPoint: THREE.Vector3 | null = null;
@@ -2211,57 +2332,29 @@ export default function VirtualOfficeCanvas({
         hitRoomId = obj?.userData?.roomId as RoomId | undefined;
       }
 
-      if (cameraModeRef.current !== 'orbit') {
-        const floorHits = raycaster.intersectObjects(floorWalkMeshes, true);
-        if (hitRoomId && !hitIsFloor) {
-          if (hitPoint) {
-            const [clampedX, clampedZ] = pushOutFromColliders(
-              hitPoint.x,
-              hitPoint.z,
-              PLAYER_RADIUS + 0.35
-            );
-            walkTargetRef.current = new THREE.Vector3(clampedX, 0, clampedZ);
-          }
-          if (onClickRoom) {
-            onClickRoom(hitRoomId);
-          } else {
-            onSelectRoom(hitRoomId);
-          }
-          if (requestRenderRef.current) requestRenderRef.current();
-          return;
-        }
-
-        if (floorHits.length > 0) {
-          const pt = floorHits[0].point;
-          const [clampedX, clampedZ] = pushOutFromColliders(pt.x, pt.z, PLAYER_RADIUS);
-          walkTargetRef.current = new THREE.Vector3(clampedX, 0, clampedZ);
-          if (hitRoomId) {
-            if (onClickRoom) {
-              onClickRoom(hitRoomId);
-            } else {
-              onSelectRoom(hitRoomId);
-            }
-          } else {
-            onDismissPlace?.();
-          }
-          if (requestRenderRef.current) requestRenderRef.current();
-          return;
-        }
-      }
-
+      // If user clicked any room object, furniture, or room floor rug:
       if (hitRoomId) {
-        walkTargetRef.current = null;
         fpsEdgeTurnRef.current = 0;
-        isCameraTransitioningRef.current = true;
-        if (onClickRoom) {
-          onClickRoom(hitRoomId);
-        } else {
-          onSelectRoom(hitRoomId);
-        }
+        navigateToRoomWithAutoRun(hitRoomId);
         if (requestRenderRef.current) requestRenderRef.current();
-      } else {
-        onDismissPlace?.();
+        return;
       }
+
+      // If user clicked on general floor (hallway / outside rooms):
+      if (floorHits.length > 0) {
+        const pt = floorHits[0].point;
+        const [clampedX, clampedZ] = pushOutFromColliders(pt.x, pt.z, PLAYER_RADIUS);
+        walkTargetRef.current = new THREE.Vector3(clampedX, 0, clampedZ);
+        pendingDrawerRoomRef.current = null;
+        isAutoRunningToRoomRef.current = false;
+        arrivalPauseTimerRef.current = 0;
+        fpsEdgeTurnRef.current = 0;
+        onDismissPlace?.();
+        if (requestRenderRef.current) requestRenderRef.current();
+        return;
+      }
+
+      onDismissPlace?.();
     };
 
     const handleWheel = (e: WheelEvent) => {
@@ -2476,13 +2569,110 @@ export default function VirtualOfficeCanvas({
       const mode = cameraModeRef.current;
       const isLockedByDrawer = isDrawerOpenRef.current;
       controls.enabled = mode === 'orbit' && !isLockedByDrawer;
-      avatarRig.group.visible = mode === 'tps';
+      avatarRig.group.visible = mode === 'tps' || mode === 'orbit';
+      orbitBeacon.group.visible = mode === 'orbit';
       ceilingGroup.visible = mode === 'fps' || mode === 'tps';
 
       let needsMoreFrames = false;
 
       if (mode === 'orbit') {
-        walkTargetMarker.visible = false;
+        let isMoving = false;
+        const prevX = playerPosRef.current.x;
+        const prevZ = playerPosRef.current.z;
+        const walkSpeed = isAutoRunningToRoomRef.current ? 8.8 : 4.6;
+
+        if (walkTargetRef.current) {
+          const dx = walkTargetRef.current.x - prevX;
+          const dz = walkTargetRef.current.z - prevZ;
+          const dist = Math.hypot(dx, dz);
+          if (dist > 0.18) {
+            const step = Math.min(dist, walkSpeed * delta);
+            const desiredX = prevX + (dx / dist) * step;
+            const desiredZ = prevZ + (dz / dist) * step;
+            const [resolvedX, resolvedZ] = resolveCollisionsWithSliding(
+              prevX,
+              prevZ,
+              desiredX,
+              desiredZ
+            );
+            playerPosRef.current.x = resolvedX;
+            playerPosRef.current.z = resolvedZ;
+
+            const actualMoved = Math.hypot(resolvedX - prevX, resolvedZ - prevZ);
+            if (actualMoved < 0.004) {
+              stuckTimer += delta;
+              if (stuckTimer > (isAutoRunningToRoomRef.current ? 1.5 : 0.25)) {
+                walkTargetRef.current = null;
+                walkTargetMarker.visible = false;
+                stuckTimer = 0;
+              }
+            } else {
+              stuckTimer = 0;
+            }
+
+            const targetAvatarYaw = Math.atan2(dx, dz);
+            const angleDiff = Math.atan2(
+              Math.sin(targetAvatarYaw - avatarFacingYawRef.current),
+              Math.cos(targetAvatarYaw - avatarFacingYawRef.current)
+            );
+            avatarFacingYawRef.current +=
+              isSoftwareGl || reducedMotionRef.current
+                ? angleDiff
+                : angleDiff * Math.min(1, delta * 14);
+
+            isMoving = actualMoved > 0.001;
+            needsMoreFrames = true;
+
+            if (walkTargetRef.current) {
+              walkTargetMarker.visible = true;
+              walkTargetMarker.position.set(
+                walkTargetRef.current.x,
+                0.03,
+                walkTargetRef.current.z
+              );
+            }
+          } else {
+            walkTargetRef.current = null;
+            walkTargetMarker.visible = false;
+          }
+        } else {
+          walkTargetMarker.visible = false;
+        }
+
+        // Arrival handling with micro-pause (0.25s) before opening drawer
+        if (isAutoRunningToRoomRef.current && pendingDrawerRoomRef.current) {
+          autoRunTimeoutTimerRef.current += delta;
+          if (!walkTargetRef.current || autoRunTimeoutTimerRef.current > 2.2) {
+            arrivalPauseTimerRef.current += delta;
+            needsMoreFrames = true;
+            if (arrivalPauseTimerRef.current >= 0.25 || autoRunTimeoutTimerRef.current > 2.2) {
+              const roomToOpen = pendingDrawerRoomRef.current;
+              pendingDrawerRoomRef.current = null;
+              isAutoRunningToRoomRef.current = false;
+              arrivalPauseTimerRef.current = 0;
+              autoRunTimeoutTimerRef.current = 0;
+              onOpenRoomDetail(roomToOpen);
+            }
+          }
+        }
+
+        avatarRig.group.position.copy(playerPosRef.current);
+        avatarRig.group.rotation.y = avatarFacingYawRef.current;
+        orbitBeacon.update(elapsed, delta);
+
+        if (isMoving) {
+          walkCycle += delta * (isAutoRunningToRoomRef.current ? 19.0 : 10.5);
+          const swing = Math.sin(walkCycle) * 0.55;
+          avatarRig.leftLeg.rotation.x = swing;
+          avatarRig.rightLeg.rotation.x = -swing;
+          avatarRig.leftArm.rotation.x = -swing * 0.75;
+          avatarRig.rightArm.rotation.x = swing * 0.75;
+        } else {
+          avatarRig.leftLeg.rotation.x *= 0.8;
+          avatarRig.rightLeg.rotation.x *= 0.8;
+          avatarRig.leftArm.rotation.x *= 0.8;
+          avatarRig.rightArm.rotation.x *= 0.8;
+        }
 
         const keys = keysPressedRef.current;
         const mJoy = moveJoystickRef.current;
@@ -2543,12 +2733,18 @@ export default function VirtualOfficeCanvas({
 
         if (!isLockedByDrawer && isCameraTransitioningRef.current) {
           const currentRoom = ROOMS.find((r) => r.id === activeRoomRef.current) || ROOMS[0];
+          if (orbitFocusPlayerRef.current) {
+            _targetLook.set(playerPosRef.current.x, 0.8, playerPosRef.current.z);
+            _targetPos.set(playerPosRef.current.x + 7.5, 12.0, playerPosRef.current.z + 8.5);
+          } else {
           _targetPos.set(...currentRoom.cameraPosition);
           _targetLook.set(...currentRoom.cameraTarget);
+          }
 
           if (reducedMotionRef.current || isSoftwareGl) {
             camera.position.copy(_targetPos);
             controls.target.copy(_targetLook);
+            orbitFocusPlayerRef.current = false;
             isCameraTransitioningRef.current = false;
           } else {
             const distPos = camera.position.distanceToSquared(_targetPos);
@@ -2560,6 +2756,7 @@ export default function VirtualOfficeCanvas({
               controls.target.lerp(_targetLook, lerpAlpha);
             } else {
               isCameraTransitioningRef.current = false;
+              orbitFocusPlayerRef.current = false;
             }
           }
         }
@@ -2646,7 +2843,7 @@ export default function VirtualOfficeCanvas({
           !keys.right
             ? Math.max(0.28, moveJoyMag)
             : 1.0;
-        const walkSpeed = 6.2 * speedMultiplier;
+        const walkSpeed = isAutoRunningToRoomRef.current ? 8.8 : (6.2 * speedMultiplier);
         const prevX = playerPosRef.current.x;
         const prevZ = playerPosRef.current.z;
 
@@ -2745,11 +2942,28 @@ export default function VirtualOfficeCanvas({
           walkTargetMarker.visible = false;
         }
 
+        // Arrival handling in FPS/TPS with micro-pause
+        if (isAutoRunningToRoomRef.current && pendingDrawerRoomRef.current) {
+          autoRunTimeoutTimerRef.current += delta;
+          if (!walkTargetRef.current || autoRunTimeoutTimerRef.current > 2.2) {
+            arrivalPauseTimerRef.current += delta;
+            needsMoreFrames = true;
+            if (arrivalPauseTimerRef.current >= 0.25 || autoRunTimeoutTimerRef.current > 2.2) {
+              const roomToOpen = pendingDrawerRoomRef.current;
+              pendingDrawerRoomRef.current = null;
+              isAutoRunningToRoomRef.current = false;
+              arrivalPauseTimerRef.current = 0;
+              autoRunTimeoutTimerRef.current = 0;
+              onOpenRoomDetail(roomToOpen);
+            }
+          }
+        }
+
         avatarRig.group.position.copy(playerPosRef.current);
         avatarRig.group.rotation.y = avatarFacingYawRef.current;
 
         if (isMoving) {
-          walkCycle += delta * 10.5;
+          walkCycle += delta * (isAutoRunningToRoomRef.current ? 19.0 : 10.5);
           const swing = Math.sin(walkCycle) * 0.55;
           avatarRig.leftLeg.rotation.x = swing;
           avatarRig.rightLeg.rotation.x = -swing;
@@ -2911,113 +3125,13 @@ export default function VirtualOfficeCanvas({
         <button
           type="button"
           onClick={onToggleZenMode}
-          aria-label="Exit Zen Mode"
+          aria-label="Tampilkan UI (Z)"
           className="fixed top-3 right-3 sm:top-4 sm:right-4 z-30 px-3 py-1.5 rounded-md bg-[#0f1011] hover:bg-[#18191a] border border-[#23252a] text-xs font-mono text-[#f7f8f8] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
         >
-          Keluar Zen Mode (Z)
+          Tampilkan UI (Z)
         </button>
       )}
 
-      {/* TOP-CENTER CAMERA MODE & 3D STYLE HUD — Linear DESIGN.md surface (#0f1011) & 1px border (#23252a) */}
-      {!zenMode && (
-        <div
-          role="region"
-          aria-label="3D Camera Mode Switcher"
-          className="fixed top-13 left-2.5 right-2.5 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 md:top-3.5 z-20 flex items-center justify-between sm:justify-center gap-1 p-1 rounded-lg bg-[#0f1011] border border-[#23252a]"
-        >
-          <div className="flex items-center gap-0.5">
-            <button
-              type="button"
-              onClick={() => onChangeCameraMode('orbit')}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2] ${
-                cameraMode === 'orbit'
-                  ? 'bg-[#5e6ad2] text-[#f7f8f8]'
-                  : 'text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a]'
-              }`}
-            >
-              <kbd
-                className={`hidden sm:inline-block px-1 py-0.5 rounded-xs text-[10px] font-mono ${
-                  cameraMode === 'orbit'
-                    ? 'bg-black/25 text-[#f7f8f8]'
-                    : 'bg-[#141516] text-[#8a8f98] border border-[#23252a]'
-                }`}
-              >
-                1
-              </kbd>
-              <span>Orbit</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onChangeCameraMode('fps')}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2] ${
-                cameraMode === 'fps'
-                  ? 'bg-[#5e6ad2] text-[#f7f8f8]'
-                  : 'text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a]'
-              }`}
-            >
-              <kbd
-                className={`hidden sm:inline-block px-1 py-0.5 rounded-xs text-[10px] font-mono ${
-                  cameraMode === 'fps'
-                    ? 'bg-black/25 text-[#f7f8f8]'
-                    : 'bg-[#141516] text-[#8a8f98] border border-[#23252a]'
-                }`}
-              >
-                2
-              </kbd>
-              <span>FPS</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onChangeCameraMode('tps')}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2] ${
-                cameraMode === 'tps'
-                  ? 'bg-[#5e6ad2] text-[#f7f8f8]'
-                  : 'text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a]'
-              }`}
-            >
-              <kbd
-                className={`hidden sm:inline-block px-1 py-0.5 rounded-xs text-[10px] font-mono ${
-                  cameraMode === 'tps'
-                    ? 'bg-black/25 text-[#f7f8f8]'
-                    : 'bg-[#141516] text-[#8a8f98] border border-[#23252a]'
-                }`}
-              >
-                3
-              </kbd>
-              <span>TPS</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-0.5">
-            <span className="hidden sm:inline-block h-3.5 w-px bg-[#23252a] mx-1" aria-hidden="true" />
-            <button
-              type="button"
-              onClick={handleCycleVisualStyle}
-              title="Ganti gaya visual ruangan 3D: Studio / Clay Maquette / Warm Loft (Shortcut: G)"
-              className="px-2 py-1 rounded-md text-[11px] font-mono text-[#f7f8f8] bg-[#141516] hover:bg-[#18191a] border border-[#23252a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
-            >
-              {styleLabel}
-              <span className="hidden sm:inline text-[#8a8f98]"> (G)</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleResetView}
-              title="Reset posisi kamera (Shortcut: R)"
-              className="px-2 py-1 rounded-md text-[11px] font-mono text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
-            >
-              Reset<span className="hidden sm:inline"> (R)</span>
-            </button>
-            <button
-              type="button"
-              onClick={onToggleZenMode}
-              title="Sembunyikan semua UI (Shortcut: Z)"
-              className="px-2 py-1 rounded-md text-[11px] font-mono text-[#8a8f98] hover:text-[#f7f8f8] hover:bg-[#18191a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
-            >
-              Zen<span className="hidden sm:inline"> (Z)</span>
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* FPS Crosshair Reticle in Center of Screen */}
       {!zenMode && !isDrawerOpen && cameraMode === 'fps' && (
@@ -3043,7 +3157,7 @@ export default function VirtualOfficeCanvas({
           </div>
           <button
             type="button"
-            onClick={() => onOpenRoomDetail(activeRoom)}
+            onClick={() => navigateToRoomWithAutoRun(activeRoom)}
             className="px-3 py-1.5 rounded-md bg-[#5e6ad2] hover:bg-[#6e7ae2] text-[#f7f8f8] text-xs font-medium transition-colors shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2]"
           >
             Buka Detail Ruangan
@@ -3307,8 +3421,7 @@ export default function VirtualOfficeCanvas({
               type="button"
               data-room-hotspot={room.id}
               onClick={() => {
-                onSelectRoom(room.id);
-                onOpenRoomDetail(room.id);
+                navigateToRoomWithAutoRun(room.id);
               }}
               aria-label={`Enter ${room.name} (${room.shortLabel})`}
               className={`pointer-events-auto absolute top-0 left-0 flex items-center gap-2 px-2.5 py-1.5 rounded-md border transition-opacity duration-150 cursor-pointer opacity-0 ${
@@ -3334,7 +3447,7 @@ export default function VirtualOfficeCanvas({
       {!zenMode && showFloorPlan && (
         <aside
           aria-label="Digital Office Floor Plan"
-          className="fixed top-26 left-2.5 right-2.5 sm:left-auto sm:right-4 sm:w-64 md:top-15 z-30 bg-[#0f1011] border border-[#23252a] rounded-lg p-3.5"
+          className="fixed top-26 left-2.5 right-2.5 sm:left-auto sm:right-4 sm:w-[330px] md:top-15 z-30 bg-[#0f1011] border border-[#23252a] rounded-lg p-3.5 shadow-2xl"
         >
           <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-[#23252a]">
             <div>
@@ -3359,25 +3472,36 @@ export default function VirtualOfficeCanvas({
               {(['projects', 'systems'] as RoomId[]).map((rid) => {
                 const r = ROOMS.find((rm) => rm.id === rid)!;
                 const active = activeRoom === rid;
+                const subtitle =
+                  rid === 'projects'
+                    ? 'Katalog produk & karya'
+                    : 'Blueprint & alur kerja';
                 return (
                   <button
                     key={rid}
                     type="button"
                     onClick={() => {
-                      if (onClickRoom) {
-                        onClickRoom(rid);
-                      } else {
-                        onSelectRoom(rid);
-                      }
+                      onToggleFloorPlan();
+                      navigateToRoomWithAutoRun(rid);
                     }}
-                    className={`text-left p-2 rounded-md border transition-colors cursor-pointer ${
+                    className={`text-left p-2.5 rounded-md border transition-colors cursor-pointer flex flex-col justify-between ${
                       active
                         ? 'bg-[#5e6ad2]/15 border-[#5e6ad2] text-[#f7f8f8]'
                         : 'bg-[#141516] border-[#23252a] text-[#8a8f98] hover:text-[#f7f8f8] hover:border-[#34373f]'
                     }`}
                   >
-                    <div className="text-[11px] font-medium text-[#f7f8f8] truncate">{r.name}</div>
-                    <div className="text-[10px] text-[#62666d] truncate">Sayap Utara</div>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className="w-1.5 h-1.5 rounded-full shrink-0"
+                        style={{ backgroundColor: r.accentHex }}
+                      />
+                      <span className="text-xs font-medium text-[#f7f8f8] leading-snug">
+                        {r.name}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-[#a7a7aa] leading-tight mt-1">
+                      {subtitle}
+                    </div>
                   </button>
                 );
               })}
@@ -3386,45 +3510,63 @@ export default function VirtualOfficeCanvas({
             <button
               type="button"
               onClick={() => {
-                if (onClickRoom) {
-                  onClickRoom('lobby');
-                } else {
-                  onSelectRoom('lobby');
-                }
+                onToggleFloorPlan();
+                navigateToRoomWithAutoRun('lobby');
               }}
-              className={`w-full text-left p-2 rounded-md border transition-colors cursor-pointer ${
+              className={`w-full text-left p-2.5 rounded-md border transition-colors cursor-pointer ${
                 activeRoom === 'lobby'
                   ? 'bg-[#5e6ad2]/15 border-[#5e6ad2] text-[#f7f8f8]'
                   : 'bg-[#141516] border-[#23252a] text-[#8a8f98] hover:text-[#f7f8f8] hover:border-[#34373f]'
               }`}
             >
-              <div className="text-xs font-medium text-[#f7f8f8]">Virtual Office Lobby</div>
-              <div className="text-[10px] text-[#62666d]">Area Resepsionis Utama</div>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: '#38bdf8' }}
+                />
+                <span className="text-xs font-medium text-[#f7f8f8] leading-snug">
+                  Virtual Office Lobby
+                </span>
+              </div>
+              <div className="text-[10px] text-[#a7a7aa] leading-tight mt-1">
+                Profil ringkas & cara kerja
+              </div>
             </button>
 
             <div className="grid grid-cols-2 gap-1.5">
               {(['experience', 'cases'] as RoomId[]).map((rid) => {
                 const r = ROOMS.find((rm) => rm.id === rid)!;
                 const active = activeRoom === rid;
+                const subtitle =
+                  rid === 'experience'
+                    ? 'Perjalanan karir & tim'
+                    : 'Bedah solusi studi kasus';
                 return (
                   <button
                     key={rid}
                     type="button"
                     onClick={() => {
-                      if (onClickRoom) {
-                        onClickRoom(rid);
-                      } else {
-                        onSelectRoom(rid);
-                      }
+                      onToggleFloorPlan();
+                      navigateToRoomWithAutoRun(rid);
                     }}
-                    className={`text-left p-2 rounded-md border transition-colors cursor-pointer ${
+                    className={`text-left p-2.5 rounded-md border transition-colors cursor-pointer flex flex-col justify-between ${
                       active
                         ? 'bg-[#5e6ad2]/15 border-[#5e6ad2] text-[#f7f8f8]'
                         : 'bg-[#141516] border-[#23252a] text-[#8a8f98] hover:text-[#f7f8f8] hover:border-[#34373f]'
                     }`}
                   >
-                    <div className="text-[11px] font-medium text-[#f7f8f8] truncate">{r.name}</div>
-                    <div className="text-[10px] text-[#62666d] truncate">Sayap Tengah</div>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className="w-1.5 h-1.5 rounded-full shrink-0"
+                        style={{ backgroundColor: r.accentHex }}
+                      />
+                      <span className="text-xs font-medium text-[#f7f8f8] leading-snug">
+                        {r.name}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-[#a7a7aa] leading-tight mt-1">
+                      {subtitle}
+                    </div>
                   </button>
                 );
               })}
@@ -3433,20 +3575,27 @@ export default function VirtualOfficeCanvas({
             <button
               type="button"
               onClick={() => {
-                if (onClickRoom) {
-                  onClickRoom('contact');
-                } else {
-                  onSelectRoom('contact');
-                }
+                onToggleFloorPlan();
+                navigateToRoomWithAutoRun('contact');
               }}
-              className={`w-full text-left p-2 rounded-md border transition-colors cursor-pointer ${
+              className={`w-full text-left p-2.5 rounded-md border transition-colors cursor-pointer ${
                 activeRoom === 'contact'
                   ? 'bg-[#5e6ad2]/15 border-[#5e6ad2] text-[#f7f8f8]'
                   : 'bg-[#141516] border-[#23252a] text-[#8a8f98] hover:text-[#f7f8f8] hover:border-[#34373f]'
               }`}
             >
-              <div className="text-xs font-medium text-[#f7f8f8]">Coffee Bar & Contact Lounge</div>
-              <div className="text-[10px] text-[#62666d]">Area Tamu Selatan</div>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: '#38bdf8' }}
+                />
+                <span className="text-xs font-medium text-[#f7f8f8] leading-snug">
+                  Coffee Bar & Contact Lounge
+                </span>
+              </div>
+              <div className="text-[10px] text-[#a7a7aa] leading-tight mt-1">
+                Ngobrol santai & unduh berkas CV
+              </div>
             </button>
           </div>
         </aside>
