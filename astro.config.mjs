@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://rizal.dev',
+  site: 'https://www.riizalhp.web.id',
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
